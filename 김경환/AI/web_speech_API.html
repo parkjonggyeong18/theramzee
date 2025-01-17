@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>실시간 음성-텍스트 변환 데모</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        #transcript {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>실시간 음성-텍스트 변환 데모</h1>
+    <button id="startButton">시작</button>
+    <button id="stopButton" disabled>정지</button>
+    <div id="transcript"></div>
+
+    <script>
+        const startButton = document.getElementById('startButton');
+        const stopButton = document.getElementById('stopButton');
+        const transcriptDiv = document.getElementById('transcript');
+
+        let recognition;
+
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'ko-KR';  // 한국어 설정
+
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+
+                transcriptDiv.innerHTML = finalTranscript + '<i style="color:#999">' + interimTranscript + '</i>';
+            };
+
+            recognition.onerror = (event) => {
+                console.error('음성 인식 오류:', event.error);
+            };
+
+            startButton.onclick = () => {
+                recognition.start();
+                startButton.disabled = true;
+                stopButton.disabled = false;
+            };
+
+            stopButton.onclick = () => {
+                recognition.stop();
+                startButton.disabled = false;
+                stopButton.disabled = true;
+            };
+        } else {
+            console.log('Web Speech API is not supported in this browser.');
+            startButton.disabled = true;
+            stopButton.disabled = true;
+            transcriptDiv.textContent = '이 브라우저는 Web Speech API를 지원하지 않습니다.';
+        }
+    </script>
+</body>
+</html>
