@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자세 기반 긴장도 분석</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+        #stress-meter {
+            width: 300px;
+            height: 30px;
+            background-color: #f0f0f0;
+            margin-top: 600px;
+        }
+        #stress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #ff6b6b;
+            transition: width 0.3s ease-in-out;
+        }
+        #stress-text {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <video id="input-video" style="display: none;"></video>
+    <canvas id="output-canvas"></canvas>
+    <div id="stress-meter"><div id="stress-bar"></div></div>
+    <div id="stress-text">긴장도: 0%</div>
+
+    <script>
+        const videoElement = document.getElementById('input-video');
+        const canvasElement = document.getElementById('output-canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const stressBar = document.getElementById('stress-bar');
+        const stressText = document.getElementById('stress-text');
+
+        function onResults(results) {
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+            
+            if (results.poseLandmarks) {
+                drawConnectors(canvasCtx, results.poseLandmarks, POSE_CONNECTIONS, {color: '#00FF00', lineWidth: 4});
+                drawLandmarks(canvasCtx, results.poseLandmarks, {color: '#FF0000', lineWidth: 2});
+                
+                const stressLevel = calculateStressLevel(results.poseLandmarks);
+                updateStressMeter(stressLevel);
+            }
+            
+            canvasCtx.restore();
+        }
+
+        function calculateStressLevel(landmarks) {
+            // 어깨 높이 차이 계산
+            const leftShoulderY = landmarks[11].y;
+            const rightShoulderY = landmarks[12].y;
+            const shoulderDiff = Math.abs(leftShoulderY - rightShoulderY);
+
+            // 목의 기울기 계산
+            const noseY = landmarks[0].y;
+            const midShoulderY = (leftShoulderY + rightShoulderY) / 2;
+            const neckTilt = Math.abs(noseY - midShoulderY);
+
+            // 손의 움직임 계산 (간단한 예시)
+            const leftHandY = landmarks[19].y;
+            const rightHandY = landmarks[20].y;
+            const handMovement = Math.abs(leftHandY - rightHandY);
+
+            // 긴장도 계산 (0-1 사이의 값)
+            let stressLevel = (shoulderDiff * 2 + neckTilt + handMovement) / 4;
+            
+            // 0-100 범위로 변환
+            return Math.min(Math.round(stressLevel * 100), 100);
+        }
+
+        function updateStressMeter(level) {
+            stressBar.style.width = `${level}%`;
+            stressText.textContent = `긴장도: ${level}%`;
+            
+            if (level < 30) {
+                stressBar.style.backgroundColor = '#4caf50'; // 녹색
+            } else if (level < 70) {
+                stressBar.style.backgroundColor = '#ffc107'; // 노란색
+            } else {
+                stressBar.style.backgroundColor = '#ff5722'; // 빨간색
+            }
+        }
+
+        const pose = new Pose({locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`;
+        }});
+        pose.setOptions({
+            modelComplexity: 1,
+            smoothLandmarks: true,
+            enableSegmentation: false,
+            smoothSegmentation: true,
+            minDetectionConfidence: 0.5,
+            minTrackingConfidence: 0.5
+        });
+        pose.onResults(onResults);
+
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await pose.send({image: videoElement});
+            },
+            width: 640,
+            height: 480
+        });
+        camera.start();
+    </script>
+</body>
+</html>
