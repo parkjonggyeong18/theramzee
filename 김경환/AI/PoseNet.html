@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PoseNet 자세 교정</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/posenet"></script>
+</head>
+<body>
+    <video id="video" width="640" height="480" autoplay></video>
+    <canvas id="canvas"></canvas>
+    <div id="message"></div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const messageDiv = document.getElementById('message');
+
+        async function setupCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            video.srcObject = stream;
+            return new Promise(resolve => {
+                video.onloadedmetadata = () => {
+                    resolve(video);
+                };
+            });
+        }
+
+        async function detectPose() {
+            const net = await posenet.load();
+            
+            while (true) {
+                const pose = await net.estimateSinglePose(video);
+                
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                drawKeypoints(pose.keypoints);
+                checkPosture(pose.keypoints);
+                
+                await tf.nextFrame();
+            }
+        }
+
+        function drawKeypoints(keypoints) {
+            keypoints.forEach(keypoint => {
+                if (keypoint.score > 0.5) {
+                    ctx.beginPath();
+                    ctx.arc(keypoint.position.x, keypoint.position.y, 5, 0, 2 * Math.PI);
+                    ctx.fillStyle = 'red';
+                    ctx.fill();
+                }
+            });
+        }
+
+        function checkPosture(keypoints) {
+            const leftShoulder = keypoints[5].position;
+            const rightShoulder = keypoints[6].position;
+            const leftEar = keypoints[3].position;
+            const rightEar = keypoints[4].position;
+
+            const shoulderSlope = Math.abs(leftShoulder.y - rightShoulder.y);
+            const earSlope = Math.abs(leftEar.x - rightEar.x);
+
+            if (shoulderSlope > 20) {
+                messageDiv.textContent = "어깨를 수평으로 유지하세요!";
+            } else {
+                messageDiv.textContent = "좋은 자세입니다!";
+            }
+        }
+
+        async function init() {
+            await setupCamera();
+            canvas.width = video.width;
+            canvas.height = video.height;
+            detectPose();
+        }
+
+        init();
+    </script>
+</body>
+</html>
