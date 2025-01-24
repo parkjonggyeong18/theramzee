@@ -1,9 +1,22 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/gradation_db
+    url: jdbc:mysql://localhost:3306/asd
     username: root
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
+  data:
+    redis:
+      port: 6379
+      host: localhost
+
+  server:
+    port: 8080
+
+  springdoc:
+    api-docs:
+      path: /api-docs
+    swagger-ui:
+      path: /swagger-ui.html
