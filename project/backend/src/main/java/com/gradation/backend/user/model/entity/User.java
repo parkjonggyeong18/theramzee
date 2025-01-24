@@ -1,6 +1,6 @@
 package com.gradation.backend.user.model.entity;
 
-import com.gradation.backend.friends.model.entitiy.Friends;
+//import com.gradation.backend.friends.model.entitiy.Friends;
 import com.gradation.backend.room.model.entity.Room;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -43,6 +43,6 @@ public class User {
     @JoinColumn(name = "room_id", foreignKey = @ForeignKey(name = "FK_User_Room"))
     private Room room;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Friends> friends;
+//    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Friends> friends;
 }
