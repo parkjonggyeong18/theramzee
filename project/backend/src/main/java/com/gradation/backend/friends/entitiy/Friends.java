@@ -12,8 +12,9 @@ import lombok.Setter;
 public class Friends {
 
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long friendsId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "FK_Friends_User"), nullable = false)
@@ -21,7 +22,7 @@ public class Friends {
 
     @ManyToOne
     @JoinColumn(name = "friends_id", foreignKey = @ForeignKey(name = "FK_Friends_Friend"), nullable = false)
-    private User friend; // 친구 사용자와의 다대일 관계
+    private User friend;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "ENUM('REQUESTED', 'ACCEPTED', 'REJECTED')")
