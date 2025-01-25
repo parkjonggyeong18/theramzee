@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/asd
     username: root
-    password:
+    password: ssafy
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -11,12 +11,30 @@ spring:
     redis:
       port: 6379
       host: localhost
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: gd122572@gmail.com
+    password: fzbujhthgsrmwhwh
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
-  server:
-    port: 8080
+jwt:
+  secret: your_jwt_secret_key
+  access-token:
+    expiration: 3600000 # 1 hour in milliseconds
+  refresh-token:
+    expiration: 604800000 # 1 week in milliseconds
 
-  springdoc:
-    api-docs:
-      path: /api-docs
-    swagger-ui:
-      path: /swagger-ui.html
+server:
+  port: 8080
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
