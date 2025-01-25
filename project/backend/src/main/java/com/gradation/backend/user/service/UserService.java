@@ -1,6 +1,7 @@
 package com.gradation.backend.user.service;
 
 
+import com.gradation.backend.user.model.entity.User;
 import com.gradation.backend.user.model.request.UserRequest;
 import com.gradation.backend.user.model.response.StatusResponse;
 import com.gradation.backend.user.model.response.TokenResponse;
@@ -29,4 +30,10 @@ public interface UserService {
     void deleteUser(String username);
 
     StatusResponse logout(String username);
+
+    User getCurrentUser();
+
+    Long getUserId(String username);
+
+    User getUserByUserName(String username);
 }

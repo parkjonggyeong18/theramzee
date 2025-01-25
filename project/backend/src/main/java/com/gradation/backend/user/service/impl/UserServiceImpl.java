@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -164,6 +165,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
         return toResponseDTO(user);
     }
+    @Override
+    public Long getUserId(String username) {
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
+        return user.getUserId();
+    }
 
     /**
      * 사용자 정보 업데이트 메서드.
@@ -236,5 +242,19 @@ public class UserServiceImpl implements UserService {
     private boolean isValidPassword(String password) {
         String passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$";
         return password.matches(passwordPattern);
+    }
+
+    @Override
+    public User getCurrentUser() {
+        // 1. SecurityContextHolder에서 현재 인증된 사용자 정보 가져오기
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        // 2. 데이터베이스에서 사용자 정보 조회
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("현재 사용자를 찾을 수 없습니다."));
+    }
+    @Override
+    public User getUserByUserName(String username){
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
+        return user;
     }
 }

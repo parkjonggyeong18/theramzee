@@ -1,4 +1,4 @@
-package com.gradation.backend.friends.entitiy;
+package com.gradation.backend.friends.model.entitiy;
 
 import com.gradation.backend.user.model.entity.User;
 import jakarta.persistence.*;

@@ -1,12 +1,7 @@
 package com.gradation.backend.user.model.response;
 
-import com.gradation.backend.friends.entitiy.Friends;
-import com.gradation.backend.room.model.entity.Room;
-import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Getter
 @Setter

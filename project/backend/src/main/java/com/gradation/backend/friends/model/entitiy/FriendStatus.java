@@ -1,4 +1,4 @@
-package com.gradation.backend.friends.entitiy;
+package com.gradation.backend.friends.model.entitiy;
 
 public enum FriendStatus {
     REQUESTED,
