@@ -1,6 +1,7 @@
 package com.gradation.backend.user.model.entity;
 
-import com.gradation.backend.friends.model.entitiy.Friends;
+
+import com.gradation.backend.friends.entitiy.Friends;
 import com.gradation.backend.room.model.entity.Room;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -15,8 +16,9 @@ import java.util.List;
 public class User {
 
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     @Column(nullable = false, length = 20)
     private String username;
