@@ -76,5 +76,4 @@ public class ChatController {
                 receiver, "/queue/messages", chatMessage
         );
     }
-
 }
