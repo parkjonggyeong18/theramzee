@@ -2,6 +2,7 @@ package com.gradation.backend.friends.service;
 
 import com.gradation.backend.friends.model.entitiy.FriendStatus;
 import com.gradation.backend.friends.model.entitiy.Friends;
+import com.gradation.backend.friends.model.request.FriendRequestRequest;
 import com.gradation.backend.friends.model.response.FriendResponse;
 import com.gradation.backend.friends.repository.FriendsRepository;
 import com.gradation.backend.user.model.entity.User;
@@ -11,6 +12,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -104,5 +106,23 @@ public class FriendsService {
 
         friendsRepository.deleteAll(friendRelations);
         return true;
+    }
+
+    @Transactional(readOnly = true)
+    public List<FriendRequestRequest> getFriendRequests(User currentUser) {
+        // 로그인한 유저가 받은 친구 요청을 조회
+        List<Friends> receivedRequests = friendsRepository.findByFriendAndStatus(currentUser, FriendStatus.REQUESTED);
+
+        // 요청을 보낸 사람의 정보로 DTO 생성
+        List<FriendRequestRequest> requests = new ArrayList<>();
+        for (Friends received : receivedRequests) {
+            User sender = received.getUser();  // 친구 요청을 보낸 유저
+            requests.add(new FriendRequestRequest(
+                    sender.getNickname(),                   // 보낸 사람의 닉네임
+                    received.getStatus().toString()         // 요청 상태 (REQUESTED)
+            ));
+        }
+
+        return requests;
     }
 }

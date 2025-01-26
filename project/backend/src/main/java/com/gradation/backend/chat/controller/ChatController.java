@@ -2,6 +2,10 @@ package com.gradation.backend.chat.controller;
 
 import com.gradation.backend.chat.model.entity.ChatMessage;
 import com.gradation.backend.chat.service.impl.ChatMessageService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
@@ -11,6 +15,7 @@ import java.security.Principal;
 import java.util.List;
 
 @Controller
+@Tag(name = "1:1 채팅 관리", description = "채팅 관리 API")
 public class ChatController {
 
     private final ChatMessageService chatMessageService;
@@ -22,6 +27,14 @@ public class ChatController {
     }
 
     // 기존 메시지 조회
+    @Operation(
+            summary = "채팅 내역 조회",
+            description = "사용자가 요청한 채팅 내역을 조회하여 반환합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "채팅 내역 조회 성공"),
+                    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            }
+    )
     @MessageMapping("/chat.history")
     @Transactional
     public void loadChatHistory(String receiver, Principal principal) {
@@ -39,6 +52,14 @@ public class ChatController {
         System.out.println("Chat history 전송 완료.");
     }
 
+    @Operation(
+            summary = "메시지 전송",
+            description = "새로운 채팅 메시지를 보내고, 상대방에게 실시간으로 전송합니다.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "메시지 전송 성공"),
+                    @ApiResponse(responseCode = "400", description = "잘못된 요청")
+            }
+    )
     @MessageMapping("/chat.send")
     @Transactional
     public void sendMessage(ChatMessage chatMessage, Principal principal) {
