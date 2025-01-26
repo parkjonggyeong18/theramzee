@@ -30,5 +30,6 @@ public class FollowService {
         userRepository.save(currentUser);
 
         return friendRoom;
+
     }
 }
