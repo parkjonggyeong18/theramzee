@@ -247,7 +247,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getCurrentUser() {
         // 1. SecurityContextHolder에서 현재 인증된 사용자 정보 가져오기
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println(username);
         // 2. 데이터베이스에서 사용자 정보 조회
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("현재 사용자를 찾을 수 없습니다."));

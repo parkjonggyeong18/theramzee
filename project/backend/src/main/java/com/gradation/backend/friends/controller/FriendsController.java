@@ -37,6 +37,14 @@ public class FriendsController {
         System.out.println(friendResponse);
         return ResponseEntity.ok(BaseResponse.success("친구 찾기 성공적으로 처리되었습니다.", friendResponse));
     }
+//    @GetMapping
+//    public ResponseEntity<BaseResponse<List<FriendResponse>>> getFriendsList() {
+//        User currentUser = userService.getCurrentUser();
+//        List<FriendResponse> friendResponse = friendService.getFriends(currentUser.getUserId());
+//        System.out.println(friendResponse);
+//        return ResponseEntity.ok(BaseResponse.success("친구 찾기 성공적으로 처리되었습니다.", friendResponse));
+//    }
+
     @GetMapping("/request")
     public ResponseEntity<List<FriendRequestRequest>> getFriendRequests() {
         User currentUser = userService.getCurrentUser();  // 로그인한 유저 정보 가져오기
@@ -56,6 +64,15 @@ public class FriendsController {
         return ResponseEntity.ok(BaseResponse.success("친구 요청을 성공했습니다.", response));
     }
 
+//    @PostMapping("/request/{friendNickname}")
+//    public ResponseEntity<BaseResponse<FriendRequestResponse>> sendFriendRequest(@PathVariable String friendNickname) {
+//        User currentUser = userService.getCurrentUser();
+//        friendService.sendFriendRequest(currentUser, friendNickname);
+//        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(currentUser.getNickname())
+//                .receiverNickname(friendNickname).build();
+//        return ResponseEntity.ok(BaseResponse.success("친구 요청을 성공했습니다.", response));
+//    }
+
     @PostMapping("/accept")
     @Transactional
     public ResponseEntity<BaseResponse<FriendRequestResponse>> acceptFriendRequest(@RequestHeader("Authorization") String token, @RequestBody FriendAcceptRequest acceptRequest) {
@@ -67,6 +84,16 @@ public class FriendsController {
         return ResponseEntity.ok(BaseResponse.success("친구 요청을 수락했습니다.", response));
     }
 
+//    @PostMapping("/accept/{senderNickname}")
+//    @Transactional
+//    public ResponseEntity<BaseResponse<FriendRequestResponse>> acceptFriendRequest(@PathVariable String senderdNickname) {
+//        User currentUser = userService.getCurrentUser();
+//        friendService.acceptFriendRequest(currentUser, senderdNickname);
+//        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(senderdNickname)
+//                .receiverNickname(currentUser.getNickname()).build();
+//        return ResponseEntity.ok(BaseResponse.success("친구 요청을 수락했습니다.", response));
+//    }
+
     @DeleteMapping
     @Transactional
     public ResponseEntity<BaseResponse<FriendRequestResponse>> removeFriend(@RequestHeader("Authorization") String token, @RequestBody FriendRequest friendRequest) {
@@ -77,4 +104,13 @@ public class FriendsController {
                 .receiverNickname(friendRequest.getFriendNickname()).build();
         return ResponseEntity.ok(BaseResponse.success("삭제에 성공했습니다.", response));
     }
+//    @DeleteMapping("/{friendNickname}")
+//    public ResponseEntity<BaseResponse<FriendRequestResponse>> removeFriend(@PathVariable String friendNickname) {
+//        User currentUser = userService.getCurrentUser();
+//        friendService.removeFriend(currentUser, friendNickname);
+//        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(currentUser.getNickname())
+//                .receiverNickname(friendNickname).build();
+//        return ResponseEntity.ok(BaseResponse.success("삭제에 성공했습니다.", response));
+//    }
+
 }

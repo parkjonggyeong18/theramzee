@@ -16,4 +16,6 @@ public interface FriendsRepository extends JpaRepository<Friends, Long> {
     Optional<Friends> findByUserAndFriend(User user, User friend);
     Optional<Friends> findByUserAndFriendAndStatus(User user, User friend, FriendStatus status);
     List<Friends> findByFriendAndStatus(User friend, FriendStatus status);
+    @Query("SELECT f.friend FROM Friends f WHERE f.user = :user AND f.status = :status")
+    List<User> findFriendsByUser(User user, FriendStatus status);
 }

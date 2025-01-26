@@ -25,7 +25,9 @@ public class FollowService {
         if (friendRoom == null) {
             throw new RuntimeException("친구가 속한 방이 없습니다.");
         }
-
+        if (friendRoom.getGameStatus()) {
+            throw new RuntimeException("게임이 진행 중인 방에는 입장할 수 없습니다.");
+        }
         // 친구의 방으로 입장 (비밀번호 무시)
         currentUser.setRoom(friendRoom);
         // 현재 유저의 방 정보 업데이트
