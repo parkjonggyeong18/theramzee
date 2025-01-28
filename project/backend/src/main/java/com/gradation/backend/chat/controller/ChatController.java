@@ -2,6 +2,8 @@ package com.gradation.backend.chat.controller;
 
 import com.gradation.backend.chat.model.entity.ChatMessage;
 import com.gradation.backend.chat.service.impl.ChatMessageService;
+import com.gradation.backend.user.model.entity.User;
+import com.gradation.backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,10 +22,12 @@ public class ChatController {
 
     private final ChatMessageService chatMessageService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final UserService userService;
 
-    public ChatController(ChatMessageService chatMessageService, SimpMessagingTemplate messagingTemplate) {
+    public ChatController(ChatMessageService chatMessageService, SimpMessagingTemplate messagingTemplate, UserService userService) {
         this.chatMessageService = chatMessageService;
         this.messagingTemplate = messagingTemplate;
+        this.userService = userService;
     }
 
     // 기존 메시지 조회
@@ -40,7 +44,6 @@ public class ChatController {
     public void loadChatHistory(String receiver, Principal principal) {
         String sender = principal.getName(); // 발신자 정보
         System.out.println("Chat history 요청 - Sender: " + sender + ", Receiver: " + receiver);
-
         // Redis에서 이전 대화 내역 조회
         List<String> chatHistory = chatMessageService.getMessages(sender, receiver);
 
@@ -51,6 +54,23 @@ public class ChatController {
 
         System.out.println("Chat history 전송 완료.");
     }
+
+//    @MessageMapping("/chat.history")
+//    @Transactional
+//    public void loadChatHistory(String receiver, Principal principal) {
+//        String sender = principal.getName(); // 발신자 정보
+//        System.out.println("Chat history 요청 - Sender: " + sender + ", Receiver: " + receiver);
+//        User user = userService.getUserByUserNickname(receiver);
+//        // Redis에서 이전 대화 내역 조회
+//        List<String> chatHistory = chatMessageService.getMessages(sender, user.getUsername());
+//
+//        // 조회된 내역을 발신자에게 전송
+//        messagingTemplate.convertAndSendToUser(
+//                sender, "/queue/chat-history", chatHistory
+//        );
+//
+//        System.out.println("Chat history 전송 완료.");
+//    }
 
     @Operation(
             summary = "메시지 전송",
@@ -65,15 +85,31 @@ public class ChatController {
     public void sendMessage(ChatMessage chatMessage, Principal principal) {
         // 현재 WebSocket 세션의 사용자 이름
         String sender = principal.getName();
+
         String receiver = chatMessage.getReceiver();
 
         System.out.println("Sender: " + sender);
         System.out.println("Receiver: " + receiver);
-
         chatMessageService.saveMessage(sender, receiver, chatMessage.getContent());
         // 메시지를 개인 큐로 전송
         messagingTemplate.convertAndSendToUser(
                 receiver, "/queue/messages", chatMessage
         );
     }
+//    @MessageMapping("/chat.send")
+//    @Transactional
+//    public void sendMessage(ChatMessage chatMessage, Principal principal) {
+//        // 현재 WebSocket 세션의 사용자 이름
+//        String sender = principal.getName();
+//        User user = userService.getUserByUserNickname(chatMessage.getReceiver());
+//        String receiver = user.getUsername();
+//
+//        System.out.println("Sender: " + sender);
+//        System.out.println("Receiver: " + receiver);
+//        chatMessageService.saveMessage(sender, receiver, chatMessage.getContent());
+//        // 메시지를 개인 큐로 전송
+//        messagingTemplate.convertAndSendToUser(
+//                receiver, "/queue/messages", chatMessage
+//        );
+//    }
 }

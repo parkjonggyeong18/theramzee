@@ -36,4 +36,6 @@ public interface UserService {
     Long getUserId(String username);
 
     User getUserByUserName(String username);
+
+    public User getUserByUserNickname(String nickname);
 }
