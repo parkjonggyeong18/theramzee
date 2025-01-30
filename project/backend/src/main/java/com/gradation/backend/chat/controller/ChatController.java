@@ -116,7 +116,9 @@ public class ChatController {
 @Transactional
 public void sendMessage(ChatMessage chatMessage, Principal principal) {
     String sender = principal.getName();
-    String receiver = chatMessage.getReceiver();
+        User user = userService.getUserByUserNickname(chatMessage.getReceiver());
+       String receiver = user.getUsername();
+//    String receiver = chatMessage.getReceiver();
 
     chatMessageService.saveMessage(sender, receiver, chatMessage.getContent());
 
