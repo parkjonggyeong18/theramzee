@@ -80,22 +80,22 @@ public class ChatController {
                     @ApiResponse(responseCode = "400", description = "잘못된 요청")
             }
     )
-    @MessageMapping("/chat.send")
-    @Transactional
-    public void sendMessage(ChatMessage chatMessage, Principal principal) {
-        // 현재 WebSocket 세션의 사용자 이름
-        String sender = principal.getName();
-
-        String receiver = chatMessage.getReceiver();
-
-        System.out.println("Sender: " + sender);
-        System.out.println("Receiver: " + receiver);
-        chatMessageService.saveMessage(sender, receiver, chatMessage.getContent());
-        // 메시지를 개인 큐로 전송
-        messagingTemplate.convertAndSendToUser(
-                receiver, "/queue/messages", chatMessage
-        );
-    }
+//    @MessageMapping("/chat.send")
+//    @Transactional
+//    public void sendMessage(ChatMessage chatMessage, Principal principal) {
+//        // 현재 WebSocket 세션의 사용자 이름
+//        String sender = principal.getName();
+//
+//        String receiver = chatMessage.getReceiver();
+//
+//        System.out.println("Sender: " + sender);
+//        System.out.println("Receiver: " + receiver);
+//        chatMessageService.saveMessage(sender, receiver, chatMessage.getContent());
+//        // 메시지를 개인 큐로 전송
+//        messagingTemplate.convertAndSendToUser(
+//                receiver, "/queue/messages", chatMessage
+//        );
+//    }
 //    @MessageMapping("/chat.send")
 //    @Transactional
 //    public void sendMessage(ChatMessage chatMessage, Principal principal) {
@@ -112,4 +112,27 @@ public class ChatController {
 //                receiver, "/queue/messages", chatMessage
 //        );
 //    }
+@MessageMapping("/chat.send")
+@Transactional
+public void sendMessage(ChatMessage chatMessage, Principal principal) {
+    String sender = principal.getName();
+    String receiver = chatMessage.getReceiver();
+
+    chatMessageService.saveMessage(sender, receiver, chatMessage.getContent());
+
+    Long unreadCount = chatMessageService.getUnreadCount(receiver, sender);
+    if (unreadCount > 0) {
+        messagingTemplate.convertAndSendToUser(
+                receiver,
+                "/queue/notifications",
+                "새로운 메시지가 있습니다 (" + unreadCount + "개)"
+        );
+    }
+
+    messagingTemplate.convertAndSendToUser(
+            receiver,
+            "/queue/messages",
+            chatMessage
+    );
+}
 }
