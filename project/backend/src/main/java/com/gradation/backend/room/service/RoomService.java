@@ -41,7 +41,7 @@ public class RoomService {
         roomRepository.save(room);
 
         // Fetch Join을 사용하여 fakeUsers를 강제로 로드
-        return roomRepository.findByIdWithFakeUsers(room.getRoomId())
+        return roomRepository.findByIdWithUsers(room.getRoomId())
                 .orElseThrow(() -> new RuntimeException("Room not found after creation"));
 
     }
@@ -61,7 +61,7 @@ public class RoomService {
                 .orElseThrow(() -> new RuntimeException("참여자를 찾을 수 없습니다."));
 
         // 방 조회 (fetch join)
-        Room room = roomRepository.findByIdWithFakeUsers(roomId)
+        Room room = roomRepository.findByIdWithUsers(roomId)
                 .orElseThrow(() -> new RuntimeException("참여하려는 방을 찾을 수 없습니다."));
 
         //비번방일 경우 비밀번호 검증
@@ -88,7 +88,7 @@ public class RoomService {
                 .orElseThrow(() -> new RuntimeException("참여자를 찾을 수 없습니다."));
 
         // 방 조회 (fetch join)
-        Room room = roomRepository.findByIdWithFakeUsers(roomId)
+        Room room = roomRepository.findByIdWithUsers(roomId)
                 .orElseThrow(() -> new RuntimeException("참여하려는 방을 찾을 수 없습니다."));
 
         // 참여자 검증
@@ -100,7 +100,7 @@ public class RoomService {
             }
             roomRepository.delete(room);
         }
-        room.removeFakeUser(user);
+        room.removeUser(user);
     }
 
     /**
@@ -110,7 +110,7 @@ public class RoomService {
      */
     @Transactional(readOnly = true)
     public List<Room> getRooms(){
-        return roomRepository.findAllWithFakeUsers();
+        return roomRepository.findAllWithUsers();
     }
 
     /**
@@ -121,7 +121,7 @@ public class RoomService {
      */
     @Transactional(readOnly = true)
     public Room getRoom(Long roomId){
-        return roomRepository.findByIdWithFakeUsers(roomId)
+        return roomRepository.findByIdWithUsers(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found. id=" + roomId));
 
     }
