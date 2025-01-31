@@ -12,8 +12,9 @@ import lombok.Setter;
 public class Room {
 
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long roomId;
 
     @Column(length = 100)
     private String title;
