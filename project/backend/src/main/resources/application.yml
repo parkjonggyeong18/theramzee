@@ -20,3 +20,7 @@ spring:
       path: /api-docs
     swagger-ui:
       path: /swagger-ui.html
+
+  openvidu:
+    url: ${OPENVIDU_URL:http://localhost:4443/}
+    secret: ${OPENVIDU_SECRET:MY_SECRET}
