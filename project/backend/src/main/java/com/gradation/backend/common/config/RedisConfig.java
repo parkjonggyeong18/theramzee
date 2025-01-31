@@ -17,7 +17,6 @@ public class RedisConfig {
      * RedisTemplate Bean 정의.
      *
      * @return {@link RedisTemplate} 객체로, Redis와의 데이터 작업을 수행할 수 있습니다.
-     * @author 박종경
      */
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory connectionFactory) {

@@ -27,8 +27,8 @@ public class SwaggerConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("MBTIgram Springdoc")
-                .description("Springdoc을 사용한 MBTIgram Swagger UI")
+                .title("The RamZee Springdoc")
+                .description("Springdoc을 사용한 The RamZee Swagger UI")
                 .version("1.0.0");
     }
 }

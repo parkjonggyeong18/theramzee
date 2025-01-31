@@ -1,6 +1,11 @@
 package com.gradation.backend.user.model.entity;
 
+<<<<<<< HEAD
 import com.gradation.backend.friends.entitiy.Friends;
+=======
+
+import com.gradation.backend.friends.model.entitiy.Friends;
+>>>>>>> f0aa11f023a07ca2ebea8b96d380f83f7884d7e1
 import com.gradation.backend.room.model.entity.Room;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,11 +17,12 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "User")
-public class User {
+public class User{
 
     @Id
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     @Column(nullable = false, length = 20)
     private String username;
