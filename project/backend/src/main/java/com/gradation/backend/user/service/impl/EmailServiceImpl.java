@@ -83,7 +83,7 @@ public class EmailServiceImpl implements EmailService {
         // RedisTemplate 사용
         ValueOperations<String, String> valOperations = redisTemplate.opsForValue();
         String redisKey = "email:auth:" + toMail;
-        valOperations.set(redisKey, Integer.toString(authNumber), 180, TimeUnit.SECONDS);
+        valOperations.set(redisKey, Integer.toString(authNumber), 300, TimeUnit.SECONDS);
     }
 
     /**

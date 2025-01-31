@@ -75,7 +75,6 @@ public class FriendsServiceImpl implements FriendsService {
         messagingTemplate.convertAndSend(
                 "/topic/friend-requests/" + receiver.getUsername(),
                 sender.getNickname());
-
     }
 
     /**

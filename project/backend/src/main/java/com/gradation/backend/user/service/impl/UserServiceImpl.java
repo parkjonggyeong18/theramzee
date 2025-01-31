@@ -21,6 +21,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -165,6 +166,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
         return toResponseDTO(user);
     }
+
+    /**
+     * 사용자 정보 조회 메서드.
+     *
+     * @param username 조회하려는 사용자의 이름
+     * @return 조회된 사용자 정보를 담은 UserResponse 객체
+     * @throws UserNotFoundException 사용자를 찾을 수 없을 경우
+     */
     @Override
     public Long getUserId(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -244,6 +253,15 @@ public class UserServiceImpl implements UserService {
         return password.matches(passwordPattern);
     }
 
+    /**
+     * 현재 인증된 사용자 정보를 반환합니다.
+     *
+     * 이 메서드는 Spring Security의 SecurityContextHolder에서
+     * 현재 인증된 사용자의 정보를 가져와 데이터베이스에서 조회한 후 반환합니다.
+     *
+     * @return 현재 인증된 사용자의 {@link User} 객체
+     * @throws RuntimeException 현재 인증된 사용자를 데이터베이스에서 찾을 수 없는 경우 발생
+     */
     @Override
     public User getCurrentUser() {
         // 1. SecurityContextHolder에서 현재 인증된 사용자 정보 가져오기
@@ -253,13 +271,29 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("현재 사용자를 찾을 수 없습니다."));
     }
+
+    /**
+     * 주어진 사용자 이름(username)을 기반으로 사용자를 조회합니다.
+     *
+     * @param username 조회할 사용자의 username
+     * @return 주어진 username에 해당하는 {@link User} 객체
+     * @throws UserNotFoundException 데이터베이스에서 해당 username을 가진 사용자를 찾을 수 없는 경우 발생
+     */
     @Override
-    public User getUserByUserName(String username){
+    public User getUserByUserName(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
         return user;
     }
+
+    /**
+     * 주어진 사용자 닉네임(nickname)을 기반으로 사용자를 조회합니다.
+     *
+     * @param nickname 조회할 사용자의 닉네임
+     * @return 주어진 닉네임에 해당하는 {@link User} 객체
+     * @throws UserNotFoundException 데이터베이스에서 해당 닉네임을 가진 사용자를 찾을 수 없는 경우 발생
+     */
     @Override
-    public User getUserByUserNickname(String nickname){
+    public User getUserByUserNickname(String nickname) {
         User user = userRepository.findByNickname(nickname).orElseThrow(() -> new UserNotFoundException("User not found"));
         return user;
     }

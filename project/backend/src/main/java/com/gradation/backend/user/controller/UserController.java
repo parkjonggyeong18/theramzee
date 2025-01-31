@@ -37,7 +37,7 @@ public class UserController {
      */
     @GetMapping("/me")
     @Operation(summary = "현재 사용자 정보 조회", description = "현재 인증된 사용자의 정보를 가져옵니다.")
-    public ResponseEntity<BaseResponse<UserResponse>> getCurrentUser(Authentication authentication) {
+    public ResponseEntity<BaseResponse<UserResponse>> getUser(Authentication authentication) {
         // 인증된 사용자의 이름으로 사용자 정보 조회
         UserResponse userResponse = userService.getUserByUsername(authentication.getName());
         return ResponseEntity.ok(BaseResponse.success("사용자 정보를 성공적으로 조회했습니다.", userResponse));

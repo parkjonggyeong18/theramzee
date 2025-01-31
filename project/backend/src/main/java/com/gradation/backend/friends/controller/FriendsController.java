@@ -24,7 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/friends")
 @RequiredArgsConstructor
-@Tag(name = "친구 관리", description = "친구 관리 API")
+@Tag(name = "친구 정보", description = "친구 관리 API")
 public class FriendsController {
     private final UserService userService;
     private final FriendsService friendService;
@@ -43,7 +43,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "200", description = "친구 목록 조회 성공"),
             @ApiResponse(responseCode = "401", description = "인증 실패")
     })
-    @GetMapping
+    @GetMapping("/list")
     @Transactional
     public ResponseEntity<BaseResponse<List<FriendResponse>>> getFriends(@RequestHeader("Authorization") String token) {
         System.out.println(token + ":");
@@ -167,7 +167,7 @@ public class FriendsController {
             @ApiResponse(responseCode = "404", description = "친구를 찾을 수 없음"),
             @ApiResponse(responseCode = "401", description = "인증 실패")
     })
-    @DeleteMapping
+    @DeleteMapping("/delete")
     @Transactional
     public ResponseEntity<BaseResponse<FriendRequestResponse>> removeFriend(@RequestHeader("Authorization") String token, @RequestBody FriendRequest friendRequest) {
         String username = jwtTokenUtil.extractUsername(token.substring(7));

@@ -65,7 +65,6 @@ public class AuthController {
     @Operation(summary = "사용자 로그인", description = "사용자를 인증하고 Access 및 Refresh 토큰을 반환합니다.")
     public ResponseEntity<BaseResponse<TokenResponse>> login(@RequestBody @Valid UserRequest request) {
         try {
-            // 서비스 계층에 로그인 로직 위임
             TokenResponse tokenResponse = userService.login(request);
             return ResponseEntity.ok(BaseResponse.success("로그인 성공", tokenResponse));
         } catch (BadCredentialsException e) {

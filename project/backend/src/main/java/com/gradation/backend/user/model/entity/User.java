@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "User")
-public class User {
+public class User{
 
     @Id
     @Column(name = "id")

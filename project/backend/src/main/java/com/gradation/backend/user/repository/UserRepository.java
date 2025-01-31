@@ -12,31 +12,10 @@ import java.util.Optional;
  */
 public interface UserRepository extends JpaRepository<User, Long>{
 
-    /**
-     * 사용자명을 기반으로 사용자를 조회합니다.
-     *
-     * @param username 조회하려는 사용자의 사용자명
-     * @return 사용자 정보가 포함된 Optional 객체 (존재하지 않을 경우 빈 Optional 반환)
-     * @author 박종경
-     */
     Optional<User> findByUsername(String username);
 
-    /**
-     * 특정 사용자명이 존재하는지 확인합니다.
-     *
-     * @param username 확인하려는 사용자명
-     * @return 사용자명이 존재하면 true, 그렇지 않으면 false
-     * @author 박종경
-     */
     boolean existsByUsername(String username);
 
-    /**
-     * 특정 사용자명이 존재하는지 확인합니다.
-     *
-     * @param email 확인하려는 이메일명
-     * @return 이메일명이 존재하면 true, 그렇지 않으면 false
-     * @author 박종경
-     */
     boolean existsByEmail(String email);
 
     boolean existsByNickname(String nickname);

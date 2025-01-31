@@ -37,5 +37,5 @@ public interface UserService {
 
     User getUserByUserName(String username);
 
-    public User getUserByUserNickname(String nickname);
+    User getUserByUserNickname(String nickname);
 }
