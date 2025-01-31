@@ -1,7 +1,7 @@
 package com.gradation.backend.room.model.response;
 
-import com.backend.springwebrtc.room.domain.entity.FakeUser;
-import com.backend.springwebrtc.room.domain.entity.Room;
+import com.gradation.backend.room.model.entity.FakeUser;
+import com.gradation.backend.room.model.entity.Room;
 import lombok.Data;
 
 import java.util.List;

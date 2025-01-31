@@ -39,7 +39,6 @@ public class RoomService {
         // 2) 방 엔티티 생성 & DB 저장
         Room room = Room.createRoom(title, password, fakeHost);
         roomRepository.save(room);
-        roomRepository.flush();
 
         // Fetch Join을 사용하여 fakeUsers를 강제로 로드
         return roomRepository.findByIdWithFakeUsers(room.getRoomId())
