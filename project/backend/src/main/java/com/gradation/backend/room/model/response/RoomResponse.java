@@ -1,6 +1,5 @@
 package com.gradation.backend.room.model.response;
 
-import com.gradation.backend.room.model.entity.FakeUser;
 import com.gradation.backend.room.model.entity.Room;
 
 import lombok.Data;

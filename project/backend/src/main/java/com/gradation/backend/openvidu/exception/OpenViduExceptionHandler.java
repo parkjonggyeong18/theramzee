@@ -18,7 +18,8 @@ public class OpenViduExceptionHandler {
                 .body(BaseResponse.error("OpenVidu Client Exception: " + e.getMessage()));
     }
 
-    // 오픈비두 HTTP 에러
+    // 오픈비두 HTT
+
     @ExceptionHandler(OpenViduHttpException.class)
     public ResponseEntity<BaseResponse<String>> handleOpenViduHttpException(OpenViduHttpException e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

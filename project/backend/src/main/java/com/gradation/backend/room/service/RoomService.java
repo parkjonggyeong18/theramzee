@@ -1,6 +1,5 @@
 package com.gradation.backend.room.service;
 
-import com.gradation.backend.room.model.entity.FakeUser;
 import com.gradation.backend.room.model.entity.Room;
 import com.gradation.backend.room.repository.FakeUserRepository;
 import com.gradation.backend.room.repository.RoomRepository;
