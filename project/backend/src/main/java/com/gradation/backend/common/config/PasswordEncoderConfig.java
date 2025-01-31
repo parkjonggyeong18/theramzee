@@ -17,7 +17,6 @@ public class PasswordEncoderConfig {
      * PasswordEncoder Bean 정의.
      *
      * @return {@link BCryptPasswordEncoder} 객체를 반환하여 비밀번호 암호화 및 검증에 사용됩니다.
-     * @author 박종경
      */
     @Bean
     public PasswordEncoder passwordEncoder() {

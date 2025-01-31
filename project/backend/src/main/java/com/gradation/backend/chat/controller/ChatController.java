@@ -114,6 +114,7 @@ public class ChatController {
 //    }
 @MessageMapping("/chat.send")
 @Transactional
+    @Tag(name = "친구 관리", description = "친구 관리 API")
 public void sendMessage(ChatMessage chatMessage, Principal principal) {
     String sender = principal.getName();
         User user = userService.getUserByUserNickname(chatMessage.getReceiver());

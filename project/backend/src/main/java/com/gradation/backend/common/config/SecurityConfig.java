@@ -38,7 +38,6 @@ public class SecurityConfig {
      * SecurityConfig 생성자.
      *
      * @param userDetailsService 사용자 인증 정보를 제공하는 UserDetailsService 구현체
-     * @author 박종경
      */
     public SecurityConfig(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
@@ -53,7 +52,6 @@ public class SecurityConfig {
      * @param authenticationConfiguration Spring Security의 AuthenticationConfiguration 객체
      * @return AuthenticationManager 객체
      * @throws Exception 예외가 발생할 경우
-     * @author 박종경
      */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -66,7 +64,6 @@ public class SecurityConfig {
      *
      * @param passwordEncoder 비밀번호 암호화를 위한 PasswordEncoder 구현체
      * @return DaoAuthenticationProvider 객체
-     * @author 박종경
      */
     @Bean
     public DaoAuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
@@ -84,7 +81,6 @@ public class SecurityConfig {
      * @param jwtAuthenticationFilter JWT 기반 인증을 처리하는 필터
      * @return SecurityFilterChain 객체
      * @throws Exception 예외가 발생할 경우
-     * @author 박종경
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter, CorsConfigurationSource corsConfigurationSource) throws Exception {

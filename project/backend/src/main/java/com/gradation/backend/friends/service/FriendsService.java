@@ -17,131 +17,137 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * 친구 관리 서비스 클래스.
+ *
+ * 사용자 간의 친구 요청, 친구 수락, 친구 삭제 등을 처리하며
+ * 친구 목록과 요청 목록을 조회하는 기능을 제공합니다.
+ */
 @Service
 @AllArgsConstructor
 public class FriendsService {
+
     private final UserRepository userRepository;
     private final FriendsRepository friendsRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
+    /**
+     * 사용자의 친구 목록을 조회합니다.
+     *
+     * @param userId 친구 목록을 조회할 사용자의 ID
+     * @return {@link FriendResponse} 리스트로 구성된 친구 정보 (닉네임과 온라인/오프라인 상태)
+     */
     @Transactional(readOnly = true)
     public List<FriendResponse> getFriends(Long userId) {
-        return friendsRepository.findByUserIdAndStatus(userId, FriendStatus.ACCEPTED).stream().map(friend -> new FriendResponse(friend.getFriend().getNickname(), friend.getFriend().getUserStatus() ? "온라인" : "오프라인")).collect(Collectors.toList());
+        return friendsRepository.findByUserIdAndStatus(userId, FriendStatus.ACCEPTED).stream()
+                .map(friend -> new FriendResponse(
+                        friend.getFriend().getNickname(),
+                        friend.getFriend().getUserStatus() ? "온라인" : "오프라인"
+                )).collect(Collectors.toList());
     }
 
-//    @Transactional(readOnly = true)
-//    public List<FriendDTO> getFriendsList(User currentUser) {
-//        return currentUser.getFriends().stream()
-//                .filter(f -> f.getStatus() == FriendStatus.ACCEPTED)
-//                .map(f -> {
-//                    User friend = f.getFriend().equals(currentUser) ? f.getUser() : f.getFriend();
-//                    return FriendDTO.builder()
-//                            .nickname(friend.getNickname())
-//                            .isOnline(friend.getUserStatus())
-//                            .build();
-//                })
-//                .collect(Collectors.toList());
-//    }
-
+    /**
+     * 친구 요청을 보냅니다.
+     *
+     * @param sender         친구 요청을 보내는 사용자
+     * @param friendNickname 친구 요청을 받을 사용자의 닉네임
+     * @return 요청이 성공적으로 전송되었으면 true, 이미 요청이나 관계가 있으면 false
+     */
     @Transactional
     public boolean sendFriendRequest(User sender, String friendNickname) {
-        System.out.println(friendNickname);
-        User receiver = userRepository.findByNickname(friendNickname).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        User receiver = userRepository.findByNickname(friendNickname)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        // 이미 요청이나 친구 관계가 있는지 확인
+        // 이미 친구 관계 또는 요청이 존재하는지 확인
         Optional<Friends> existingRelation = friendsRepository.findByUserAndFriend(sender, receiver);
         if (existingRelation.isPresent()) {
-            System.out.println("gd");
             return false;
         }
 
+        // 친구 요청 생성 및 저장
         Friends friendRequest = new Friends();
         friendRequest.setUser(sender);
         friendRequest.setFriend(receiver);
         friendRequest.setStatus(FriendStatus.REQUESTED);
         friendsRepository.save(friendRequest);
 
-        System.out.println("메시지 전송 경로: /topic/friend-requests/" + receiver.getUsername());
-        System.out.println("전송된 메시지: " + sender.getNickname());
-        // 친구 요청 실시간 알림
-        messagingTemplate.convertAndSend("/topic/friend-requests/" + receiver.getUsername(), sender.getNickname());
+        // 친구 요청 실시간 알림 전송
+        messagingTemplate.convertAndSend(
+                "/topic/friend-requests/" + receiver.getUsername(),
+                sender.getNickname());
 
         return true;
     }
 
-    //    @Transactional
-//    public boolean acceptFriendRequest(User receiver, String senderNickname) {
-//        User sender = userRepository.findByNickname(senderNickname)
-//                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-//
-//        Friends friendRequest = friendsRepository.findByUserAndFriendAndStatus(sender, receiver, FriendStatus.REQUESTED)
-//                .orElseThrow(() -> new RuntimeException("친구 요청을 찾을 수 없습니다."));
-//
-//        friendRequest.setStatus(FriendStatus.ACCEPTED);
-//        friendsRepository.save(friendRequest);
-//
-//        Friends reverseFriendRequest = new Friends();
-//        reverseFriendRequest.setUser(receiver);
-//        reverseFriendRequest.setFriend(sender);
-//        reverseFriendRequest.setStatus(FriendStatus.ACCEPTED);
-//        friendsRepository.save(reverseFriendRequest);
-//
-//        // 양쪽 사용자에게 친구 목록 업데이트 알림
-//        messagingTemplate.convertAndSend(
-//                "/topic/friends/" + sender.getUsername(),
-//                "update-friend-list"
-//        );
-//        messagingTemplate.convertAndSend(
-//                "/topic/friends/" + receiver.getUsername(),
-//                "update-friend-list"
-//        );
-//
-//        return true;
-//    }
+    /**
+     * 친구 요청을 수락합니다.
+     *
+     * @param receiver       친구 요청을 수락하는 사용자
+     * @param senderNickname 친구 요청을 보낸 사용자의 닉네임
+     * @return 요청이 성공적으로 수락되면 true
+     */
     @Transactional
     public boolean acceptFriendRequest(User receiver, String senderNickname) {
-        User sender = userRepository.findByNickname(senderNickname).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        User sender = userRepository.findByNickname(senderNickname)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        Friends friendRequest = friendsRepository.findByUserAndFriendAndStatus(sender, receiver, FriendStatus.REQUESTED).orElseThrow(() -> new RuntimeException("친구 요청을 찾을 수 없습니다."));
+        Friends friendRequest = friendsRepository.findByUserAndFriendAndStatus(sender, receiver, FriendStatus.REQUESTED)
+                .orElseThrow(() -> new RuntimeException("친구 요청을 찾을 수 없습니다."));
 
+        // 친구 요청 상태를 "ACCEPTED"로 업데이트
         friendRequest.setStatus(FriendStatus.ACCEPTED);
         friendsRepository.save(friendRequest);
 
         // 친구 목록을 갱신하여 가져옴
-        List<User> updatedSenderFriends = friendsRepository.findFriendsByUser(sender, FriendStatus.ACCEPTED); // 예시: 친구 목록 조회
-        List<User> updatedReceiverFriends = friendsRepository.findFriendsByUser(receiver, FriendStatus.ACCEPTED); // 예시: 친구 목록 조회
+        List<User> updatedSenderFriends = friendsRepository.findFriendsByUser(sender, FriendStatus.ACCEPTED);
+        List<User> updatedReceiverFriends = friendsRepository.findFriendsByUser(receiver, FriendStatus.ACCEPTED);
 
-        // 친구 목록 갱신 결과를 양쪽 사용자에게 전송
-        messagingTemplate.convertAndSend("/topic/friends/" + sender.getNickname(), updatedSenderFriends // 갱신된 친구 목록 전송
-        );
-        messagingTemplate.convertAndSend("/topic/friends/" + receiver.getNickname(), updatedReceiverFriends // 갱신된 친구 목록 전송
-        );
+        // 친구 목록 갱신 알림을 두 사용자에게 전송
+        messagingTemplate.convertAndSend("/topic/friends/" + sender.getNickname(), updatedSenderFriends);
+        messagingTemplate.convertAndSend("/topic/friends/" + receiver.getNickname(), updatedReceiverFriends);
 
         return true;
     }
 
-
+    /**
+     * 현재 사용자와 특정 사용자의 친구 관계를 삭제합니다.
+     *
+     * @param currentUser    친구 관계를 삭제하는 사용자
+     * @param friendNickname 삭제하려는 친구의 닉네임
+     * @return 삭제가 성공적으로 완료되면 true
+     */
     @Transactional
     public boolean removeFriend(User currentUser, String friendNickname) {
-        User friendToRemove = userRepository.findByNickname(friendNickname).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        User friendToRemove = userRepository.findByNickname(friendNickname)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
-        List<Friends> friendRelations = friendsRepository.findAll().stream().filter(f -> (f.getUser().equals(currentUser) && f.getFriend().equals(friendToRemove)) || (f.getUser().equals(friendToRemove) && f.getFriend().equals(currentUser))).collect(Collectors.toList());
+        // 두 사용자 간의 모든 친구 관계를 조회 및 삭제
+        List<Friends> friendRelations = friendsRepository.findAll().stream()
+                .filter(f -> (f.getUser().equals(currentUser) && f.getFriend().equals(friendToRemove)) ||
+                        (f.getUser().equals(friendToRemove) && f.getFriend().equals(currentUser)))
+                .collect(Collectors.toList());
 
         friendsRepository.deleteAll(friendRelations);
         return true;
     }
 
+    /**
+     * 현재 사용자가 받은 친구 요청 목록을 조회합니다.
+     *
+     * @param currentUser 친구 요청 목록을 조회할 사용자
+     * @return {@link FriendRequestRequest} 리스트로 구성된 요청 정보 (보낸 사람 닉네임과 요청 상태)
+     */
     @Transactional(readOnly = true)
     public List<FriendRequestRequest> getFriendRequests(User currentUser) {
-        // 로그인한 유저가 받은 친구 요청을 조회
         List<Friends> receivedRequests = friendsRepository.findByFriendAndStatus(currentUser, FriendStatus.REQUESTED);
 
-        // 요청을 보낸 사람의 정보로 DTO 생성
+        // 친구 요청 정보를 DTO로 변환
         List<FriendRequestRequest> requests = new ArrayList<>();
         for (Friends received : receivedRequests) {
-            User sender = received.getUser();  // 친구 요청을 보낸 유저
-            requests.add(new FriendRequestRequest(sender.getNickname(),                   // 보낸 사람의 닉네임
-                    received.getStatus().toString()         // 요청 상태 (REQUESTED)
+            User sender = received.getUser();
+            requests.add(new FriendRequestRequest(
+                    sender.getNickname(),
+                    received.getStatus().toString()
             ));
         }
 
