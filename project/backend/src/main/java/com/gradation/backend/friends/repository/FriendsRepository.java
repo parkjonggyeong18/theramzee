@@ -2,6 +2,7 @@ package com.gradation.backend.friends.repository;
 
 import com.gradation.backend.friends.model.entitiy.FriendStatus;
 import com.gradation.backend.friends.model.entitiy.Friends;
+import com.gradation.backend.friends.model.response.FriendResponse;
 import com.gradation.backend.user.model.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,5 +18,5 @@ public interface FriendsRepository extends JpaRepository<Friends, Long> {
     Optional<Friends> findByUserAndFriendAndStatus(User user, User friend, FriendStatus status);
     List<Friends> findByFriendAndStatus(User friend, FriendStatus status);
     @Query("SELECT f.friend FROM Friends f WHERE f.user = :user AND f.status = :status")
-    List<User> findFriendsByUser(User user, FriendStatus status);
+    List<FriendResponse> findFriendsByUser(User user, FriendStatus status);
 }

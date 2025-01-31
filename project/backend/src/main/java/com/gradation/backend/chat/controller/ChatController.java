@@ -1,11 +1,10 @@
 package com.gradation.backend.chat.controller;
 
 import com.gradation.backend.chat.model.entity.ChatMessage;
-import com.gradation.backend.chat.service.impl.ChatMessageService;
+import com.gradation.backend.chat.service.ChatMessageService;
 import com.gradation.backend.user.model.entity.User;
 import com.gradation.backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.messaging.simp.SimpMessagingTemplate;

@@ -1,4 +1,4 @@
-package com.gradation.backend.chat.service.impl;//package com.gradation.backend.chat.service.impl;
+package com.gradation.backend.chat.service;//package com.gradation.backend.chat.service.impl;
 //
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.data.redis.core.RedisTemplate;
@@ -54,7 +54,7 @@ import java.util.List;
  * Redis를 활용하여 채팅 메시지 저장, 조회, 읽지 않은 메시지 관리 등의 기능을 제공합니다.
  */
 @Service
-public class ChatMessageService {
+public class ChatMessageServiceImpl implements ChatMessageService{
 
     private static final String CHAT_PREFIX = "chat:"; // Redis 키 접두사
 
@@ -70,7 +70,7 @@ public class ChatMessageService {
      * @param receiver 메시지 수신자
      * @return Redis 채팅 키
      */
-    private String generateChatKey(String sender, String receiver) {
+    public String generateChatKey(String sender, String receiver) {
         if (sender.compareTo(receiver) < 0) {
             return CHAT_PREFIX + sender + ":" + receiver;
         } else {
@@ -85,7 +85,7 @@ public class ChatMessageService {
      * @param receiver 메시지 수신자
      * @return 읽지 않은 메시지 카운트를 위한 Redis 키
      */
-    private String generateUnreadKey(String sender, String receiver) {
+    public String generateUnreadKey(String sender, String receiver) {
         return "unread:" + generateChatKey(sender, receiver);
     }
 

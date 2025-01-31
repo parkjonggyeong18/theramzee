@@ -4,7 +4,7 @@ import com.gradation.backend.common.model.response.BaseResponse;
 import com.gradation.backend.common.utill.JwtTokenUtil;
 import com.gradation.backend.friends.model.request.FriendAcceptRequest;
 import com.gradation.backend.friends.model.request.FriendRequest;
-import com.gradation.backend.friends.model.request.FriendRequestRequest;
+import com.gradation.backend.friends.model.response.FriendRequestListResponse;
 import com.gradation.backend.friends.model.response.FriendRequestResponse;
 import com.gradation.backend.friends.model.response.FriendResponse;
 import com.gradation.backend.friends.service.FriendsService;
@@ -74,9 +74,9 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "인증 실패")
     })
     @GetMapping("/request")
-    public ResponseEntity<List<FriendRequestRequest>> getFriendRequests() {
+    public ResponseEntity<List<FriendRequestListResponse>> getFriendRequests() {
         User currentUser = userService.getCurrentUser();  // 로그인한 유저 정보 가져오기
-        List<FriendRequestRequest> friendRequests = friendService.getFriendRequests(currentUser);  // 친구 요청 조회
+        List<FriendRequestListResponse> friendRequests = friendService.getFriendRequests(currentUser);  // 친구 요청 조회
         return ResponseEntity.ok(friendRequests);  // 친구 요청 목록 반환
     }
 
