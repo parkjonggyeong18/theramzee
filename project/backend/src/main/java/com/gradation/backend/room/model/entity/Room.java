@@ -69,7 +69,7 @@ public class Room {
      *
      * @param user
      */
-    public void removeFakeUser(User user) {
+    public void removeUser(User user) {
         users.remove(user);
         user.setRoom(null);
     }

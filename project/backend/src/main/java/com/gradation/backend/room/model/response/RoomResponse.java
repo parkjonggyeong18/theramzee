@@ -2,6 +2,7 @@ package com.gradation.backend.room.model.response;
 
 import com.gradation.backend.room.model.entity.Room;
 
+import com.gradation.backend.user.model.entity.User;
 import lombok.Data;
 import java.util.List;
 
@@ -19,9 +20,9 @@ public class RoomResponse {
         this.roomId = room.getRoomId();
         this.title = room.getTitle();
         this.gameStatus = room.getGameStatus();
-        this.hostNickName = room.getFakeHost().getNickname();
+        this.hostNickName = room.getHost().getNickname();
 
-        List<FakeUser> fakeUsers = room.getFakeUsers();  // Fetch Join으로 이미 로딩됨
+        List<User> fakeUsers = room.getUsers();  // Fetch Join으로 이미 로딩됨
         this.currentParticipantCount = fakeUsers.size(); // 조회된 참여자 list size
 
 //        // fakeUsers에서 닉네임만 추출
