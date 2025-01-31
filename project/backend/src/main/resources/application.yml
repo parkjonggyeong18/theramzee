@@ -1,8 +1,12 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/asd
+    url: jdbc:mysql://localhost:3306/gradation_db
     username: root
+<<<<<<< HEAD
+    password: 123
+=======
     password: ssafy
+>>>>>>> f0aa11f023a07ca2ebea8b96d380f83f7884d7e1
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
