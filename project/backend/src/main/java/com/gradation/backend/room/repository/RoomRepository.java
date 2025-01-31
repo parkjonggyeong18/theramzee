@@ -1,6 +1,5 @@
 package com.gradation.backend.room.repository;
 
-import com.gradation.backend.room.model.entity.FakeUser;
 import com.gradation.backend.room.model.entity.Room;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +27,3 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             "LEFT JOIN FETCH r.fakeUsers ")
     List<Room> findAllWithFakeUsers();
 }
-
