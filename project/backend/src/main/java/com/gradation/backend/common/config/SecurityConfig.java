@@ -3,6 +3,7 @@ package com.gradation.backend.common.config;
 
 import com.gradation.backend.common.filter.JwtAuthenticationFilter;
 import com.gradation.backend.common.utill.JwtTokenUtil;
+import com.gradation.backend.user.service.impl.CustomUserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,14 +33,14 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsServiceImpl userDetailsService;
 
     /**
      * SecurityConfig 생성자.
      *
      * @param userDetailsService 사용자 인증 정보를 제공하는 UserDetailsService 구현체
      */
-    public SecurityConfig(UserDetailsService userDetailsService) {
+    public SecurityConfig(CustomUserDetailsServiceImpl userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
     @Bean

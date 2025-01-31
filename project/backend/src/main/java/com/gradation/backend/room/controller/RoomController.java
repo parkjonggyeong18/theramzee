@@ -8,6 +8,8 @@ import com.gradation.backend.room.model.request.LeaveRoomRequest;
 import com.gradation.backend.room.model.response.RoomResponse;
 
 import com.gradation.backend.room.service.RoomService;
+import com.gradation.backend.user.model.entity.User;
+import com.gradation.backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 public class RoomController {
 
     private final RoomService roomService;
+    private final UserService userService;
 
     /**
      * 방 생성
@@ -32,10 +35,12 @@ public class RoomController {
     @PostMapping("rooms/")
     @Operation(summary = "방 생성", description = "새로운 방을 생성합니다.")
     public ResponseEntity<BaseResponse<RoomResponse>> createRoom(@RequestBody CreateRoomRequest request) {
+        User currentUser = userService.getCurrentUser();
+        System.out.println(currentUser.getNickname() + "11");
         Room createdRoom = roomService.createRoom(
                 request.getTitle(),
                 request.getPassword(),
-                request.getNickname()
+                currentUser.getNickname()
         );
         RoomResponse response = new RoomResponse(createdRoom);
         return ResponseEntity.ok(BaseResponse.success("success", response));
