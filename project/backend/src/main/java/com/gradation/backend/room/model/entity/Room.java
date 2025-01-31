@@ -1,5 +1,6 @@
 package com.gradation.backend.room.model.entity;
 
+import com.gradation.backend.user.model.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,25 +28,21 @@ public class Room {
     @Column(name = "game_status", nullable = false)
     private Boolean gameStatus;
 
-//    @OneToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "host_id", foreignKey = @ForeignKey(name = "FK_user_name"), nullable = false)
-//    private User host;
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "host_id", foreignKey = @ForeignKey(name = "FK_user_name"), nullable = false)
-    private FakeUser fakeHost;
+    private User host;
 
     @OneToMany(mappedBy = "room", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)
-    private List<FakeUser> fakeUsers = new ArrayList<>();
+    private List<User> users = new ArrayList<>();
 
     /**
      * 참여자 추가
      *
-     * @param fakeUser
+     * @param user
      */
-    public void addFakeUser(FakeUser fakeUser) {
-        this.fakeUsers.add(fakeUser);
-        fakeUser.setRoom(this);   // 양방향 동기화
+    public void addUser(User user) {
+        this.users.add(user);
+        user.setRoom(this);   // 양방향 동기화
     }
 
     /**
@@ -53,16 +50,16 @@ public class Room {
      *
      * @param title
      * @param password
-     * @param fakeHost
+     * @param host
      * @return Room
      */
-    public static Room createRoom(String title, Integer password, FakeUser fakeHost) {
+    public static Room createRoom(String title, Integer password, User host) {
         Room room = new Room();
         room.setTitle(title);
         room.setPassword(password);
         room.setGameStatus(false);
-        room.setFakeHost(fakeHost);
-        room.addFakeUser(fakeHost);
+        room.setHost(host);
+        room.addUser(host);
 
         return room;
     }
@@ -72,8 +69,8 @@ public class Room {
      *
      * @param user
      */
-    public void removeFakeUser(FakeUser user) {
-        fakeUsers.remove(user);
+    public void removeUser(User user) {
+        users.remove(user);
         user.setRoom(null);
     }
 }

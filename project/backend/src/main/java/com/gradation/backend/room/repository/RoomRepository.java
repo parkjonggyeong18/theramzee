@@ -13,17 +13,17 @@ import java.util.Optional;
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
     /**
-     * 방 단건 조회 시 fakeUsers와 함께 로딩
+     * 방 단건 조회 시 Users와 함께 로딩
      */
     @Query("SELECT r FROM Room r " +
-            "LEFT JOIN FETCH r.fakeUsers " +
+            "LEFT JOIN FETCH r.users " +
             "WHERE r.roomId = :roomId")
-    Optional<Room> findByIdWithFakeUsers(@Param("roomId") Long roomId);
+    Optional<Room> findByIdWithUsers(@Param("roomId") Long roomId);
 
     /**
-     * 방 목록 조회 시 fakeUsers와 함께 로딩
+     * 방 목록 조회 시 Users와 함께 로딩
      */
     @Query("SELECT DISTINCT r FROM Room r " +
-            "LEFT JOIN FETCH r.fakeUsers ")
-    List<Room> findAllWithFakeUsers();
+            "LEFT JOIN FETCH r.users ")
+    List<Room> findAllWithUsers();
 }
