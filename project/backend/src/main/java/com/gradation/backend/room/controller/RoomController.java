@@ -8,6 +8,7 @@ import com.gradation.backend.room.model.request.LeaveRoomRequest;
 import com.gradation.backend.room.model.response.RoomResponse;
 
 import com.gradation.backend.room.service.RoomService;
+import com.gradation.backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
 public class RoomController {
 
     private final RoomService roomService;
+    private final UserService userService;
 
     /**
      * 방 생성
@@ -32,10 +34,13 @@ public class RoomController {
     @PostMapping("rooms/")
     @Operation(summary = "방 생성", description = "새로운 방을 생성합니다.")
     public ResponseEntity<BaseResponse<RoomResponse>> createRoom(@RequestBody CreateRoomRequest request) {
+
+        String nickname = userService.getCurrentUser().getNickname(); // 호스트 닉네임 (현재 사용자)
+
         Room createdRoom = roomService.createRoom(
                 request.getTitle(),
                 request.getPassword(),
-                request.getNickname()
+                nickname
         );
         RoomResponse response = new RoomResponse(createdRoom);
         return ResponseEntity.ok(BaseResponse.success("success", response));
@@ -50,8 +55,9 @@ public class RoomController {
             @PathVariable Long roomId,
             @RequestBody JoinRoomRequest request
     ) {
+        String nickname = userService.getCurrentUser().getNickname();
         try {
-            Room updatedRoom = roomService.joinRoom(roomId, request.getNickname(), request.getPassword());
+            Room updatedRoom = roomService.joinRoom(roomId, nickname, request.getPassword());
             RoomResponse response = new RoomResponse(updatedRoom);
             return ResponseEntity.ok(BaseResponse.success("success", response));
         } catch (IllegalArgumentException e) {
@@ -67,10 +73,11 @@ public class RoomController {
     @PostMapping("rooms/{roomId}/leave/")
     @Operation(summary = "방 나가기", description = "방을 나갑니다.")
     public ResponseEntity<BaseResponse<RoomResponse>> leaveRoom(
-            @PathVariable Long roomId,
-            @RequestBody LeaveRoomRequest request
+            @PathVariable Long roomId
+//            @RequestBody LeaveRoomRequest request
     ) {
-        roomService.leaveRoom(roomId, request.getNickname());
+        String nickname = userService.getCurrentUser().getNickname();
+        roomService.leaveRoom(roomId, nickname);
         return ResponseEntity.ok(BaseResponse.success("success",null));
     }
 
