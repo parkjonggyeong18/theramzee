@@ -43,23 +43,23 @@ public class FriendsController {
             @ApiResponse(responseCode = "200", description = "친구 목록 조회 성공"),
             @ApiResponse(responseCode = "401", description = "인증 실패")
     })
-    @GetMapping("/list")
-    @Transactional
-    public ResponseEntity<BaseResponse<List<FriendResponse>>> getFriends(@RequestHeader("Authorization") String token) {
-        System.out.println(token + ":");
-        String username = jwtTokenUtil.extractUsername(token.substring(7));
-        Long userId = userService.getUserId(username);
-        List<FriendResponse> friendResponse = friendService.getFriends(userId);
-        System.out.println(friendResponse);
-        return ResponseEntity.ok(BaseResponse.success("친구 찾기 성공적으로 처리되었습니다.", friendResponse));
-    }
-//    @GetMapping
-//    public ResponseEntity<BaseResponse<List<FriendResponse>>> getFriendsList() {
-//        User currentUser = userService.getCurrentUser();
-//        List<FriendResponse> friendResponse = friendService.getFriends(currentUser.getUserId());
+//    @GetMapping("/list")
+//    @Transactional
+//    public ResponseEntity<BaseResponse<List<FriendResponse>>> getFriends(@RequestHeader("Authorization") String token) {
+//        System.out.println(token + ":");
+//        String username = jwtTokenUtil.extractUsername(token.substring(7));
+//        Long userId = userService.getUserId(username);
+//        List<FriendResponse> friendResponse = friendService.getFriends(userId);
 //        System.out.println(friendResponse);
 //        return ResponseEntity.ok(BaseResponse.success("친구 찾기 성공적으로 처리되었습니다.", friendResponse));
 //    }
+    @GetMapping("list")
+    public ResponseEntity<BaseResponse<List<FriendResponse>>> getFriendsList() {
+        User currentUser = userService.getCurrentUser();
+        List<FriendResponse> friendResponse = friendService.getFriends(currentUser.getUserId());
+        System.out.println(friendResponse);
+        return ResponseEntity.ok(BaseResponse.success("친구 찾기 성공적으로 처리되었습니다.", friendResponse));
+    }
 
     /**
      * 친구 요청 목록 조회 API.
@@ -74,10 +74,10 @@ public class FriendsController {
             @ApiResponse(responseCode = "401", description = "인증 실패")
     })
     @GetMapping("/request")
-    public ResponseEntity<List<FriendRequestListResponse>> getFriendRequests() {
+    public ResponseEntity<BaseResponse<List<FriendRequestListResponse>>> getFriendRequests() {
         User currentUser = userService.getCurrentUser();  // 로그인한 유저 정보 가져오기
         List<FriendRequestListResponse> friendRequests = friendService.getFriendRequests(currentUser);  // 친구 요청 조회
-        return ResponseEntity.ok(friendRequests);  // 친구 요청 목록 반환
+        return ResponseEntity.ok(BaseResponse.success("친구 요청 목록 찾기에 성공했습니다.", friendRequests));  // 친구 요청 목록 반환
     }
 
     /**
@@ -95,26 +95,26 @@ public class FriendsController {
             @ApiResponse(responseCode = "404", description = "사용자 또는 친구를 찾을 수 없음"),
             @ApiResponse(responseCode = "401", description = "인증 실패")
     })
-    @PostMapping("/request")
-    @Transactional
-    public ResponseEntity<BaseResponse<FriendRequestResponse>> sendFriendRequest(@RequestHeader("Authorization") String token, @RequestBody FriendRequest friendRequest) {
-        System.out.println(token);
-        String username = jwtTokenUtil.extractUsername(token.substring(7));
-        User user = userService.getUserByUserName(username);
-        friendService.sendFriendRequest(user, friendRequest.getFriendNickname());
-        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(user.getNickname())
-                .receiverNickname(friendRequest.getFriendNickname()).build();
-        return ResponseEntity.ok(BaseResponse.success("친구 요청을 성공했습니다.", response));
-    }
-
-//    @PostMapping("/request/{friendNickname}")
-//    public ResponseEntity<BaseResponse<FriendRequestResponse>> sendFriendRequest(@PathVariable String friendNickname) {
-//        User currentUser = userService.getCurrentUser();
-//        friendService.sendFriendRequest(currentUser, friendNickname);
-//        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(currentUser.getNickname())
-//                .receiverNickname(friendNickname).build();
+//    @PostMapping("/request")
+//    @Transactional
+//    public ResponseEntity<BaseResponse<FriendRequestResponse>> sendFriendRequest(@RequestHeader("Authorization") String token, @RequestBody FriendRequest friendRequest) {
+//        System.out.println(token);
+//        String username = jwtTokenUtil.extractUsername(token.substring(7));
+//        User user = userService.getUserByUserName(username);
+//        friendService.sendFriendRequest(user, friendRequest.getFriendNickname());
+//        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(user.getNickname())
+//                .receiverNickname(friendRequest.getFriendNickname()).build();
 //        return ResponseEntity.ok(BaseResponse.success("친구 요청을 성공했습니다.", response));
 //    }
+
+    @PostMapping("/request/{friendNickname}")
+    public ResponseEntity<BaseResponse<FriendRequestResponse>> sendFriendRequest(@PathVariable String friendNickname) {
+        User currentUser = userService.getCurrentUser();
+        friendService.sendFriendRequest(currentUser, friendNickname);
+        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(currentUser.getNickname())
+                .receiverNickname(friendNickname).build();
+        return ResponseEntity.ok(BaseResponse.success("친구 요청을 성공했습니다.", response));
+    }
 
     /**
      * 친구 요청 수락 API.
@@ -131,26 +131,26 @@ public class FriendsController {
             @ApiResponse(responseCode = "404", description = "요청을 보낸 친구를 찾을 수 없음"),
             @ApiResponse(responseCode = "401", description = "인증 실패")
     })
-    @PostMapping("/accept")
-    @Transactional
-    public ResponseEntity<BaseResponse<FriendRequestResponse>> acceptFriendRequest(@RequestHeader("Authorization") String token, @RequestBody FriendAcceptRequest acceptRequest) {
-        String username = jwtTokenUtil.extractUsername(token.substring(7));
-        User user = userService.getUserByUserName(username);
-        friendService.acceptFriendRequest(user, acceptRequest.getSenderNickname());
-        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(acceptRequest.getSenderNickname())
-                .receiverNickname(user.getNickname()).build();
-        return ResponseEntity.ok(BaseResponse.success("친구 요청을 수락했습니다.", response));
-    }
-
-//    @PostMapping("/accept/{senderNickname}")
+//    @PostMapping("/accept")
 //    @Transactional
-//    public ResponseEntity<BaseResponse<FriendRequestResponse>> acceptFriendRequest(@PathVariable String senderdNickname) {
-//        User currentUser = userService.getCurrentUser();
-//        friendService.acceptFriendRequest(currentUser, senderdNickname);
-//        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(senderdNickname)
-//                .receiverNickname(currentUser.getNickname()).build();
+//    public ResponseEntity<BaseResponse<FriendRequestResponse>> acceptFriendRequest(@RequestHeader("Authorization") String token, @RequestBody FriendAcceptRequest acceptRequest) {
+//        String username = jwtTokenUtil.extractUsername(token.substring(7));
+//        User user = userService.getUserByUserName(username);
+//        friendService.acceptFriendRequest(user, acceptRequest.getSenderNickname());
+//        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(acceptRequest.getSenderNickname())
+//                .receiverNickname(user.getNickname()).build();
 //        return ResponseEntity.ok(BaseResponse.success("친구 요청을 수락했습니다.", response));
 //    }
+
+    @PostMapping("/accept/{senderNickname}")
+    @Transactional
+    public ResponseEntity<BaseResponse<FriendRequestResponse>> acceptFriendRequest(@PathVariable String senderNickname) {
+        User currentUser = userService.getCurrentUser();
+        friendService.acceptFriendRequest(currentUser, senderNickname);
+        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(senderNickname)
+                .receiverNickname(currentUser.getNickname()).build();
+        return ResponseEntity.ok(BaseResponse.success("친구 요청을 수락했습니다.", response));
+    }
 
     /**
      * 친구 삭제 API.
@@ -167,23 +167,23 @@ public class FriendsController {
             @ApiResponse(responseCode = "404", description = "친구를 찾을 수 없음"),
             @ApiResponse(responseCode = "401", description = "인증 실패")
     })
-    @DeleteMapping("/delete")
-    @Transactional
-    public ResponseEntity<BaseResponse<FriendRequestResponse>> removeFriend(@RequestHeader("Authorization") String token, @RequestBody FriendRequest friendRequest) {
-        String username = jwtTokenUtil.extractUsername(token.substring(7));
-        User user = userService.getUserByUserName(username);
-        friendService.removeFriend(user, friendRequest.getFriendNickname());
-        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(user.getNickname())
-                .receiverNickname(friendRequest.getFriendNickname()).build();
-        return ResponseEntity.ok(BaseResponse.success("삭제에 성공했습니다.", response));
-    }
-//    @DeleteMapping("/{friendNickname}")
-//    public ResponseEntity<BaseResponse<FriendRequestResponse>> removeFriend(@PathVariable String friendNickname) {
-//        User currentUser = userService.getCurrentUser();
-//        friendService.removeFriend(currentUser, friendNickname);
-//        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(currentUser.getNickname())
-//                .receiverNickname(friendNickname).build();
+//    @DeleteMapping("/delete")
+//    @Transactional
+//    public ResponseEntity<BaseResponse<FriendRequestResponse>> removeFriend(@RequestHeader("Authorization") String token, @RequestBody FriendRequest friendRequest) {
+//        String username = jwtTokenUtil.extractUsername(token.substring(7));
+//        User user = userService.getUserByUserName(username);
+//        friendService.removeFriend(user, friendRequest.getFriendNickname());
+//        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(user.getNickname())
+//                .receiverNickname(friendRequest.getFriendNickname()).build();
 //        return ResponseEntity.ok(BaseResponse.success("삭제에 성공했습니다.", response));
 //    }
+    @DeleteMapping("/{friendNickname}")
+    public ResponseEntity<BaseResponse<FriendRequestResponse>> removeFriend(@PathVariable String friendNickname) {
+        User currentUser = userService.getCurrentUser();
+        friendService.removeFriend(currentUser, friendNickname);
+        FriendRequestResponse response = FriendRequestResponse.builder().senderNickname(currentUser.getNickname())
+                .receiverNickname(friendNickname).build();
+        return ResponseEntity.ok(BaseResponse.success("삭제에 성공했습니다.", response));
+    }
 
 }

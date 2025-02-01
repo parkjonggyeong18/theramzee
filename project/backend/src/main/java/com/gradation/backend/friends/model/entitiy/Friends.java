@@ -2,11 +2,9 @@ package com.gradation.backend.friends.model.entitiy;
 
 import com.gradation.backend.user.model.entity.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "Friends")
 public class Friends {
@@ -27,4 +25,14 @@ public class Friends {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "ENUM('REQUESTED', 'ACCEPTED', 'REJECTED')")
     private FriendStatus status;
+
+    public Friends(User receiver, User sender, FriendStatus friendStatus) {
+        this.user = receiver;
+        this.friend = sender;
+        this.status = friendStatus;
+    }
+
+    public Friends() {
+
+    }
 }
