@@ -40,10 +40,11 @@ public class OpenViduService {
 
         ConnectionProperties connectionProperties = new ConnectionProperties.Builder()
                 .role(OpenViduRole.PUBLISHER) // 동영상 전송과 스트림
-                .data("{\"sessionId\":\"" + sessionId + "\", \"username\":\"" + nickname + "\"}")
+                .data(nickname)
                 .build();
 
-        String token = session.createConnection(connectionProperties).getToken();
+        Connection connection = session.createConnection(connectionProperties);
+        String token = connection.getToken();
         System.out.println("generated token:" + token);
 
         return token;
