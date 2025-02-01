@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("api/v1/")
+@RequestMapping("api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Room API", description = "Room API")
 public class RoomController {
@@ -32,7 +32,7 @@ public class RoomController {
     /**
      * 방 생성
      */
-    @PostMapping("rooms/")
+    @PostMapping("/rooms")
     @Operation(summary = "방 생성", description = "새로운 방을 생성합니다.")
     public ResponseEntity<BaseResponse<RoomResponse>> createRoom(@RequestBody CreateRoomRequest request) {
         User currentUser = userService.getCurrentUser();
@@ -49,7 +49,7 @@ public class RoomController {
     /**
      * 방 참여
      */
-    @PostMapping("rooms/{roomId}/join/")
+    @PostMapping("/rooms/{roomId}/join")
     @Operation(summary = "방 참여", description = "방에 참여합니다.")
     public ResponseEntity<BaseResponse<RoomResponse>> joinRoom(
             @PathVariable Long roomId,
@@ -69,7 +69,7 @@ public class RoomController {
     /**
      * 방 나가기
      */
-    @PostMapping("rooms/{roomId}/leave/")
+    @PostMapping("/rooms/{roomId}/leave")
     @Operation(summary = "방 나가기", description = "방을 나갑니다.")
     public ResponseEntity<BaseResponse<RoomResponse>> leaveRoom(
             @PathVariable Long roomId,
@@ -82,7 +82,7 @@ public class RoomController {
     /**
      * 방 목록 조회
      */
-    @GetMapping("rooms/")
+    @GetMapping("/rooms")
     @Operation(summary = "방 목록 조회", description = "방 목록을 조회합니다.")
     public ResponseEntity<BaseResponse<List<RoomResponse>>> getRooms() {
         List<Room> rooms = roomService.getRooms();
@@ -95,7 +95,7 @@ public class RoomController {
     /**
      * 방 단건 조회
      */
-    @GetMapping("rooms/{roomId}/")
+    @GetMapping("/rooms/{roomId}")
     @Operation(summary = "방 단건 조회", description = "roomId로 방을 조회합니다.")
     public ResponseEntity<BaseResponse<RoomResponse>> searchRoom(@PathVariable Long roomId) {
         Room room = roomService.getRoom(roomId);
