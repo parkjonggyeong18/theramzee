@@ -40,7 +40,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws") // WebSocket 접속 엔드포인트
                 .addInterceptors(new CustomHandshakeInterceptor(jwtTokenUtil)) // JWT 검증 인터셉터 추가
                 .setHandshakeHandler(new CustomHandshakeHandler(jwtTokenUtil)) // JwtTokenUtil 주입된 Custom Principal 핸들러 지정
-                .setAllowedOrigins("http://localhost:3000") // CORS 허용 Origin 설정
+                .setAllowedOrigins("*") // CORS 허용 Origin 설정
                 .withSockJS(); // SockJS 지원 설정 (fallback 용)
     }
 }
