@@ -34,9 +34,6 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	//openvidu
-	implementation "io.openvidu:openvidu-java-client:2.31.0"
-
 	//sweager
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 	//querydsl
