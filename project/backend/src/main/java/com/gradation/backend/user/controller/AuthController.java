@@ -3,6 +3,7 @@ package com.gradation.backend.user.controller;
 import com.gradation.backend.common.model.response.BaseResponse;
 import com.gradation.backend.common.utill.JwtTokenUtil;
 import com.gradation.backend.common.utill.RedisUtil;
+import com.gradation.backend.user.model.entity.CustomUserDetails;
 import com.gradation.backend.user.model.request.UserRequest;
 import com.gradation.backend.user.model.response.TokenResponse;
 import com.gradation.backend.user.model.response.UserResponse;
@@ -92,7 +93,7 @@ public class AuthController {
         String username = jwtTokenUtil.extractUsername(refreshToken);
 
         if (username != null && redisUtil.hasKey(username + ":refresh")) {
-            UserDetails userDetails = customUserDetailsServiceImpl.loadUserByUsername(username);
+            CustomUserDetails userDetails = customUserDetailsServiceImpl.loadUserByUsername(username);
             if (jwtTokenUtil.validateToken(refreshToken, userDetails)) {
                 String newAccessToken = jwtTokenUtil.generateAccessToken(userDetails);
 

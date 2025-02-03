@@ -3,6 +3,7 @@ package com.gradation.backend.user.service.impl;
 import com.gradation.backend.common.utill.JwtTokenUtil;
 import com.gradation.backend.common.utill.RedisUtil;
 import com.gradation.backend.user.exception.UserNotFoundException;
+import com.gradation.backend.user.model.entity.CustomUserDetails;
 import com.gradation.backend.user.model.entity.User;
 import com.gradation.backend.user.model.request.UserRequest;
 import com.gradation.backend.user.model.response.TokenResponse;
@@ -122,7 +123,7 @@ public class UserServiceImpl implements UserService {
         // 사용자 인증 처리
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
         System.out.println(userDetails.getUsername());
 
         // Access 및 Refresh Token 생성

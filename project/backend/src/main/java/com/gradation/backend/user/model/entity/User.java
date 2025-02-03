@@ -1,8 +1,4 @@
 package com.gradation.backend.user.model.entity;
-<<<<<<< HEAD
-
-=======
->>>>>>> 7bedab95993718149e3ad38c094d34e57a2dcb1c
 import com.gradation.backend.friends.model.entitiy.Friends;
 import com.gradation.backend.room.model.entity.Room;
 import jakarta.persistence.*;

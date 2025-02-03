@@ -5,13 +5,13 @@ import com.gradation.backend.openvidu.service.OpenViduService;
 import com.gradation.backend.room.model.entity.Room;
 import com.gradation.backend.room.model.request.CreateRoomRequest;
 import com.gradation.backend.room.model.request.JoinRoomRequest;
-import com.gradation.backend.room.model.request.LeaveRoomRequest;
+
 import com.gradation.backend.room.model.response.CreateRoomResponse;
 import com.gradation.backend.room.model.response.JoinRoomResponse;
 import com.gradation.backend.room.model.response.RoomResponse;
 
 import com.gradation.backend.room.service.RoomService;
-import com.gradation.backend.user.service.UserService;
+
 import com.gradation.backend.user.model.entity.User;
 import com.gradation.backend.user.service.UserService;
 import io.openvidu.java.client.OpenViduHttpException;
@@ -74,12 +74,7 @@ public class RoomController {
     public ResponseEntity<BaseResponse<JoinRoomResponse>> joinRoom(
             @PathVariable Long roomId,
             @RequestBody JoinRoomRequest request
-    ) {
-        String nickname = userService.getCurrentUser().getNickname();
-        try {
-            Room updatedRoom = roomService.joinRoom(roomId, nickname, request.getPassword());
-            RoomResponse response = new RoomResponse(updatedRoom);
-            ) throws OpenViduJavaClientException, OpenViduHttpException {
+    ) throws OpenViduJavaClientException, OpenViduHttpException {
         try {
             User currentUser = userService.getCurrentUser();
             String nickname = currentUser.getNickname();
