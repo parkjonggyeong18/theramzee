@@ -13,7 +13,7 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .info(new Info().title("User Authentication API").version("1.0.0"))
+                .info(new Info().title("User Authentication API").version("2.0.0"))
                 .components(new Components()
                         .addSecuritySchemes("bearerAuth",
                                 new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")));
@@ -24,7 +24,6 @@ public class SwaggerConfig {
                 .components(new Components())
                 .info(apiInfo());
     }
-
     private Info apiInfo() {
         return new Info()
                 .title("The RamZee Springdoc")

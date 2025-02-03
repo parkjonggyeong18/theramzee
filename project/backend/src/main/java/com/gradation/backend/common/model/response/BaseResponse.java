@@ -20,10 +20,6 @@ public class BaseResponse<T> {
         this.data = data;
     }
 
-    public static <T> BaseResponse<T> success() {
-        return new BaseResponse<>(true, "Success", null);
-    }
-
     public static <T> BaseResponse<T> success(T data) {
         return new BaseResponse<>(true, "Success", data);
     }

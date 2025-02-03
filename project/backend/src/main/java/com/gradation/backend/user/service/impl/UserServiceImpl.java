@@ -123,6 +123,7 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        System.out.println(userDetails.getUsername());
 
         // Access 및 Refresh Token 생성
         String accessToken = jwtTokenUtil.generateAccessToken(userDetails);

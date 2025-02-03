@@ -1,5 +1,6 @@
 package com.gradation.backend.user.service.impl;
 
+import com.gradation.backend.user.model.entity.CustomUserDetails;
 import com.gradation.backend.user.model.entity.User;
 import com.gradation.backend.user.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -32,13 +33,24 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
      * @return UserDetails 객체 (Spring Security에서 사용하는 사용자 인증 정보)
      * @throws UsernameNotFoundException 제공된 사용자 이름으로 사용자를 찾을 수 없는 경우 발생
      */
+//    @Override
+//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+//        User user = userRepository.findByUsername(username)
+//                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+//        return new org.springframework.security.core.userdetails.User(
+//                user.getUsername(),
+//                user.getPassword(),
+//                Collections.emptyList()
+//        );
+//    }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
-        return new org.springframework.security.core.userdetails.User(
+        return new CustomUserDetails(
                 user.getUsername(),
                 user.getPassword(),
+                user.getNickname(),
                 Collections.emptyList()
         );
     }

@@ -3,6 +3,7 @@ package com.gradation.backend.common.config;
 
 import com.gradation.backend.common.filter.JwtAuthenticationFilter;
 import com.gradation.backend.common.utill.JwtTokenUtil;
+import com.gradation.backend.user.service.impl.CustomUserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -32,14 +33,14 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final UserDetailsService userDetailsService;
+    private final CustomUserDetailsServiceImpl userDetailsService;
 
     /**
      * SecurityConfig 생성자.
      *
      * @param userDetailsService 사용자 인증 정보를 제공하는 UserDetailsService 구현체
      */
-    public SecurityConfig(UserDetailsService userDetailsService) {
+    public SecurityConfig(CustomUserDetailsServiceImpl userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
     @Bean
@@ -92,7 +93,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // URL 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/**", "/swagger-ui/**", "/v3/api-docs/**","/api-docs/**","/ws/**", "/user/**","/swagger-ui.html").permitAll() // 인증 없이 접근 가능 경로
+                        .requestMatchers("/api/v1/**", "/swagger-ui/**", "/v3/api-docs/**","/api-docs/**","/ws/**", "/user/**","/swagger-ui.html","/game-socket").permitAll() // 인증 없이 접근 가능 경로
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
                 // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
@@ -105,7 +106,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:8080")); // 허용할 Origin
+        config.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:8080", "http://localhost:5173")); // 허용할 Origin
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE")); // 허용할 HTTP 메서드
         config.setAllowedHeaders(List.of("*")); // 모든 요청 헤더 허용
         config.setAllowCredentials(true); // 인증 정보 포함 허용 (쿠키, Authorization 헤더 등)
