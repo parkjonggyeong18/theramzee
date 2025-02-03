@@ -50,4 +50,3 @@ public class OpenViduService {
         return token;
     }
 }
->>>>>>> 7bedab95993718149e3ad38c094d34e57a2dcb1c
