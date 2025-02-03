@@ -11,11 +11,15 @@ import com.gradation.backend.room.model.response.JoinRoomResponse;
 import com.gradation.backend.room.model.response.RoomResponse;
 
 import com.gradation.backend.room.service.RoomService;
+<<<<<<< HEAD
+import com.gradation.backend.user.service.UserService;
+=======
 import com.gradation.backend.user.model.entity.User;
 import com.gradation.backend.user.service.UserService;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 import io.openvidu.java.client.Session;
+>>>>>>> 7bedab95993718149e3ad38c094d34e57a2dcb1c
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -34,16 +38,25 @@ public class RoomController {
 
     private final RoomService roomService;
     private final UserService userService;
+<<<<<<< HEAD
+=======
     private final OpenViduService openViduService;
+>>>>>>> 7bedab95993718149e3ad38c094d34e57a2dcb1c
 
     /**
      * 방 생성
      */
     @PostMapping("/rooms")
     @Operation(summary = "방 생성", description = "새로운 방을 생성합니다.")
+<<<<<<< HEAD
+    public ResponseEntity<BaseResponse<RoomResponse>> createRoom(@RequestBody CreateRoomRequest request) {
+
+        String nickname = userService.getCurrentUser().getNickname(); // 호스트 닉네임 (현재 사용자)
+=======
     public ResponseEntity<BaseResponse<CreateRoomResponse>> createRoom(@RequestBody CreateRoomRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
         User currentUser = userService.getCurrentUser();
         String nickname = currentUser.getNickname();
+>>>>>>> 7bedab95993718149e3ad38c094d34e57a2dcb1c
 
         Room createdRoom = roomService.createRoom(
                 request.getTitle(),
@@ -73,6 +86,13 @@ public class RoomController {
     public ResponseEntity<BaseResponse<JoinRoomResponse>> joinRoom(
             @PathVariable Long roomId,
             @RequestBody JoinRoomRequest request
+<<<<<<< HEAD
+    ) {
+        String nickname = userService.getCurrentUser().getNickname();
+        try {
+            Room updatedRoom = roomService.joinRoom(roomId, nickname, request.getPassword());
+            RoomResponse response = new RoomResponse(updatedRoom);
+=======
     ) throws OpenViduJavaClientException, OpenViduHttpException {
         try {
             User currentUser = userService.getCurrentUser();
@@ -88,6 +108,7 @@ public class RoomController {
 
             JoinRoomResponse response = new JoinRoomResponse(updatedRoom, token);
 
+>>>>>>> 7bedab95993718149e3ad38c094d34e57a2dcb1c
             return ResponseEntity.ok(BaseResponse.success("success", response));
         } catch (IllegalArgumentException e) {
             // 비밀번호 오류 처리
@@ -102,10 +123,11 @@ public class RoomController {
     @PostMapping("/rooms/{roomId}/leave")
     @Operation(summary = "방 나가기", description = "방을 나갑니다.")
     public ResponseEntity<BaseResponse<RoomResponse>> leaveRoom(
-            @PathVariable Long roomId,
-            @RequestBody LeaveRoomRequest request
+            @PathVariable Long roomId
+//            @RequestBody LeaveRoomRequest request
     ) {
-        roomService.leaveRoom(roomId, request.getNickname());
+        String nickname = userService.getCurrentUser().getNickname();
+        roomService.leaveRoom(roomId, nickname);
         return ResponseEntity.ok(BaseResponse.success("success",null));
     }
 
