@@ -1,5 +1,6 @@
 package com.gradation.backend.chat.service;
 
+import com.gradation.backend.chat.model.response.UnreadMessageResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,4 +14,5 @@ public interface ChatMessageService {
     List<String> getMessages(String sender, String receiver);
     Long getUnreadCount(String sender, String receiver);
     void markMessagesAsRead(String sender, String receiver);
+    List<UnreadMessageResponse> getUnreadCountsForReceiver(String receiver);
 }
