@@ -1,13 +1,17 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/asd
+    url: jdbc:mysql://localhost:3306/gradation
     username: root
-    password : ssafy
+<<<<<<< HEAD
+    password : root
+=======
+    password : 8794
+>>>>>>> 7bedab95993718149e3ad38c094d34e57a2dcb1c
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto:
-        dialect: org.hibernate.dialect.MySQLDialect
+      ddl-auto: create
+      dialect: org.hibernate.dialect.MySQLDialect
   data:
     redis:
       port: 6379
