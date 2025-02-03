@@ -9,7 +9,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 
 @Configuration
 @EnableWebSocket
-
+@RequiredArgsConstructor
 public class GameWebSocketConfig implements WebSocketConfigurer {
     private final GameWebSocketHandler gameWebSocketHandler;
 

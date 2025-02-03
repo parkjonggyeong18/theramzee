@@ -1,5 +1,6 @@
 package com.gradation.backend.chat.controller;
 
+import com.gradation.backend.chat.model.request.ChatUserRequest;
 import com.gradation.backend.chat.model.response.CountResponse;
 import com.gradation.backend.chat.model.response.MessageResponse;
 import com.gradation.backend.chat.service.ChatMessageService;
@@ -64,8 +65,8 @@ public class ChatNotificationController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @PutMapping("/mark-as-read")
-    public ResponseEntity<Void> markAsRead(@RequestParam String sender, @RequestParam String receiver) {
-        chatMessageService.markMessagesAsRead(sender, receiver);
+    public ResponseEntity<Void> markAsRead(@RequestBody ChatUserRequest chatUserRequest) {
+        chatMessageService.markMessagesAsRead(chatUserRequest.getSender(), chatUserRequest.getReceiver());
         return ResponseEntity.noContent().build();
     }
 
@@ -84,9 +85,9 @@ public class ChatNotificationController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping("/history")
-    public ResponseEntity<BaseResponse<List<MessageResponse>>> getChatHistory(@RequestParam String sender, @RequestParam String receiver) {
+    public ResponseEntity<BaseResponse<List<MessageResponse>>> getChatHistory(@RequestBody ChatUserRequest historyRequest) {
         // Redis에서 채팅 기록 조회
-        List<String> chatHistory = chatMessageService.getMessages(sender, receiver);
+        List<String> chatHistory = chatMessageService.getMessages(historyRequest.getSender(), historyRequest.getReceiver());
 
         // 채팅 기록 문자열을 MessageResponse 객체로 변환
         List<MessageResponse> messageResponses = chatHistory.stream()

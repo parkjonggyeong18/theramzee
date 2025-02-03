@@ -91,18 +91,30 @@ public class FriendsServiceImpl implements FriendsService {
         Friends friendRequest = friendsRepository.findByUserAndFriendAndStatus(sender, receiver, FriendStatus.REQUESTED)
                 .orElseThrow(() -> new RuntimeException("친구 요청을 찾을 수 없습니다."));
 
-        // 친구 요청 상태를 "ACCEPTED"로 업데이트
+        // sender → receiver 상태 업데이트
         friendRequest.setStatus(FriendStatus.ACCEPTED);
         friendsRepository.save(friendRequest);
 
-        // 친구 목록을 갱신하여 가져옴
-        List<FriendResponse> updatedSenderFriends = friendsRepository.findFriendsByUser(sender, FriendStatus.ACCEPTED);
-        List<FriendResponse> updatedReceiverFriends = friendsRepository.findFriendsByUser(receiver, FriendStatus.ACCEPTED);
+        // receiver → sender 상태 생성 또는 업데이트
+        Friends reverseRequest = friendsRepository.findByUserAndFriend(receiver, sender)
+                .orElseGet(() -> new Friends(receiver, sender, FriendStatus.ACCEPTED));
+        reverseRequest.setStatus(FriendStatus.ACCEPTED);
+        friendsRepository.save(reverseRequest);
 
-        // 친구 목록 갱신 알림을 두 사용자에게 전송
+        // 친구 목록 갱신
+        List<User> senderFriends = friendsRepository.findFriendsByUser(sender, FriendStatus.ACCEPTED);
+        List<FriendResponse> updatedSenderFriends = senderFriends.stream()
+                .map(friend -> new FriendResponse(friend.getNickname(), "온라인"))
+                .collect(Collectors.toList());
+
+        List<User> receiverFriends = friendsRepository.findFriendsByUser(receiver, FriendStatus.ACCEPTED);
+        List<FriendResponse> updatedReceiverFriends = receiverFriends.stream()
+                .map(friend -> new FriendResponse(friend.getNickname(), "온라인"))
+                .collect(Collectors.toList());
+
+        // 친구 목록 갱신 알림 전송
         messagingTemplate.convertAndSend("/topic/friends/" + sender.getNickname(), updatedSenderFriends);
         messagingTemplate.convertAndSend("/topic/friends/" + receiver.getNickname(), updatedReceiverFriends);
-
     }
 
     /**
