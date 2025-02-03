@@ -3,8 +3,11 @@ package com.gradation.backend.chat.controller;
 import com.gradation.backend.chat.model.request.ChatUserRequest;
 import com.gradation.backend.chat.model.response.CountResponse;
 import com.gradation.backend.chat.model.response.MessageResponse;
+import com.gradation.backend.chat.model.response.UnreadMessageResponse;
 import com.gradation.backend.chat.service.ChatMessageService;
 import com.gradation.backend.common.model.response.BaseResponse;
+import com.gradation.backend.user.model.entity.User;
+import com.gradation.backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -28,6 +31,7 @@ import java.util.List;
 public class ChatNotificationController {
 
     private final ChatMessageService chatMessageService;
+    private final UserService userService;
 
     /**
      * 읽지 않은 메시지 개수를 조회합니다.
@@ -44,10 +48,14 @@ public class ChatNotificationController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping("/unread-count")
-    public ResponseEntity<BaseResponse<CountResponse>> getUnreadCount(@RequestParam String sender, @RequestParam String receiver) {
-        Long unreadCount = chatMessageService.getUnreadCount(sender, receiver);
-        CountResponse countResponse = new CountResponse(unreadCount);
-        return ResponseEntity.ok(BaseResponse.success("읽지 않은 메시지의 수입니다.", countResponse));
+    public ResponseEntity<BaseResponse<List<UnreadMessageResponse>>> getUnreadCount(@RequestParam String receiver) {
+        // 특정 수신자(receiver)에 대한 모든 sender별 읽지 않은 메시지 수 조회
+//        User user = userService.getUserByUserNickname(receiver);
+//        String receiverName = user.getUsername();
+        List<UnreadMessageResponse> unreadCounts = chatMessageService.getUnreadCountsForReceiver(receiver);
+
+        // 응답 반환
+        return ResponseEntity.ok(BaseResponse.success("읽지 않은 메시지 목록입니다.", unreadCounts));
     }
 
     /**
@@ -66,6 +74,10 @@ public class ChatNotificationController {
     })
     @PutMapping("/mark-as-read")
     public ResponseEntity<Void> markAsRead(@RequestBody ChatUserRequest chatUserRequest) {
+//        User userR = userService.getUserByUserNickname(chatUserRequest.getReceiver());
+//        String receiverName = userR.getUsername();
+//        User userS = userService.getUserByUserNickname(chatUserRequest.getSender());
+//        String senderName = userS.getUsername();
         chatMessageService.markMessagesAsRead(chatUserRequest.getSender(), chatUserRequest.getReceiver());
         return ResponseEntity.noContent().build();
     }
@@ -85,10 +97,10 @@ public class ChatNotificationController {
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping("/history")
-    public ResponseEntity<BaseResponse<List<MessageResponse>>> getChatHistory(@RequestBody ChatUserRequest historyRequest) {
+    public ResponseEntity<BaseResponse<List<MessageResponse>>> getChatHistory(@RequestParam String sender, @RequestParam String receiver) {
         // Redis에서 채팅 기록 조회
-        List<String> chatHistory = chatMessageService.getMessages(historyRequest.getSender(), historyRequest.getReceiver());
-
+        List<String> chatHistory = chatMessageService.getMessages(sender, receiver);
+        System.out.println("ㅎㅇ");
         // 채팅 기록 문자열을 MessageResponse 객체로 변환
         List<MessageResponse> messageResponses = chatHistory.stream()
                 .map(message -> {

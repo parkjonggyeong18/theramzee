@@ -44,3 +44,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 //                .withSockJS(); // SockJS 지원 설정 (fallback 용)
     }
 }
+
