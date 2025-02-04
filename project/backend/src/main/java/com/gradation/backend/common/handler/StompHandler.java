@@ -1,9 +1,6 @@
 package com.gradation.backend.common.handler;
 
 import com.gradation.backend.common.utill.JwtTokenUtil;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -27,36 +24,23 @@ public class StompHandler implements ChannelInterceptor {
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        log.info("StompHandler preSend called, command={}", accessor.getCommand());
+        log.info("🟢 StompHandler preSend called, command={}", accessor.getCommand());
 
-        // CONNECT 시점에만 토큰 검증 로직 수행
         if (accessor.getCommand() == StompCommand.CONNECT) {
+            // STOMP 헤더에서 JWT 추출
             String token = resolveToken(accessor);
-            String senderUserId = null;
-            log.info("Extracted token={}", token);
-
-            if (jwtTokenUtil.validateToken(token)) {
-                // 토큰에서 사용자명을 추출
-                senderUserId = jwtTokenUtil.extractUsername(token);
-                log.info("Extracted username={}", senderUserId);
-
-                // username으로 Principal 생성
-                Principal principal = new StompPrincipal(senderUserId);
-
-                // 세션에 Principal을 설정 → 이후 @MessageMapping 메서드에서 principal 주입 가능
-                accessor.setUser(principal);
+            if (token == null || !jwtTokenUtil.validateToken(token)) {
+                log.error("🚨 WebSocket 연결 거부 - 유효하지 않은 JWT");
+                return null; // JWT가 유효하지 않으면 WebSocket 연결 차단
             }
 
-            // senderUserId 헤더에도 동일 값 추가 (필요 시)
-            accessor.addNativeHeader("senderUserId", senderUserId);
+            String username = jwtTokenUtil.extractUsername(token);
+            log.info("✅ WebSocket 인증 성공 - 사용자: {}", username);
+            accessor.setUser(new UserPrincipal(username));
         }
-
         return message;
     }
 
-    /**
-     * STOMP 헤더에서 "Bearer <token>" 형태로 JWT 토큰을 추출
-     */
     private String resolveToken(StompHeaderAccessor accessor) {
         String bearerToken = accessor.getFirstNativeHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
@@ -65,19 +49,16 @@ public class StompHandler implements ChannelInterceptor {
         return null;
     }
 
-    /**
-     * 사용자명을 담기 위한 Custom Principal 구현체
-     */
-    public static class StompPrincipal implements Principal {
-        private final String name;
+    public static class UserPrincipal implements Principal {
+        private final String username;
 
-        public StompPrincipal(String name) {
-            this.name = name;
+        public UserPrincipal(String username) {
+            this.username = username;
         }
 
         @Override
         public String getName() {
-            return name;
+            return this.username;
         }
     }
 }

@@ -32,15 +32,12 @@ public class GameWebSocketController {
     @MessageMapping("/game/info")
     @SendToUser("/queue/game/info")
     public BaseResponse<Map<String, Object>> handleGameInfo(@Payload GameInfoRequest request, SimpMessageHeaderAccessor headerAccessor) {
-        Principal principal = headerAccessor.getUser();
-        String userId = principal.getName();
         System.out.println("성공!@!@!@!@!!!@!@");
-
         Map<String, Object> roomInfoData = gameService.getRoomInformation(request.getRoomId());
         return BaseResponse.success("방 정보 조회 성공", roomInfoData);
     }
 
-    @MessageMapping("/game/start")
+    @MessageMapping("/game/start/")
     @SendTo("/topic/game/{roomId}/start")
     public BaseResponse<Map<String, Object>> handleGameStart(@Payload GameStartRequest request) {
         Map<String, Object> initializedData = gameService.initializeRoomStructure(request.getRoomId(), request.getNicknames());

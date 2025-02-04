@@ -13,12 +13,20 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
-    @Autowired
-    private StompHandler stompHandler;
+    private final StompHandler stompHandler;
 
-    /**
-     * WebSocket STOMP 엔드포인트 등록 및 설정
-     */
+    @Autowired
+    public WebSocketConfig(StompHandler stompHandler) {
+        this.stompHandler = stompHandler;
+    }
+
+    @Override
+    public void configureMessageBroker(MessageBrokerRegistry config) {
+        config.enableSimpleBroker("/queue", "/topic");
+        config.setApplicationDestinationPrefixes("/app");
+        config.setUserDestinationPrefix("/user"); // 1:1 사용자 메시징
+    }
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
@@ -34,16 +42,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registration.interceptors(stompHandler);
     }
 
-    /**
-     * STOMP 메시지 브로커 설정
-     */
-    @Override
-    public void configureMessageBroker(MessageBrokerRegistry config) {
-        // 메시지 브로커 경로 설정: /queue, /topic은 브로커가 처리, /app은 애플리케이션 엔드포인트
-        config.enableSimpleBroker("/queue", "/topic");
-        config.setApplicationDestinationPrefixes("/app");
-        config.setUserDestinationPrefix("/user"); // 1:1 사용자 메시징
-    }
-
 }
-
