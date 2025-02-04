@@ -165,9 +165,9 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
             int userNum = jsonNode.get("userNum").asInt();
             int newForest = jsonNode.get("newForest").asInt();
 
-            int userLocation = gameService.moveForest(roomId, userNum, newForest);
+            String token = gameService.moveForest(roomId, userNum, newForest);
 
-            BaseResponse<Integer> response = BaseResponse.success("숲 이동 성공", userLocation);
+            BaseResponse<String> response = BaseResponse.success("숲 이동 성공", token);
             session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
         } catch (Exception e) {
             sendErrorResponse(session, "Failed to move forest: " + e.getMessage());

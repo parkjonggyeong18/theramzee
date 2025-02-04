@@ -4,55 +4,67 @@ import { OpenVidu, Publisher } from 'openvidu-browser';
 import styled from 'styled-components';
 
 const VideoComponent = ({ onVideoStateChange }) => {
-  const [publisher, setPublisher] = useState(null);
+  // const [publisher, setPublisher] = useState(null);
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(true);
 
-  useEffect(() => {
-    const initializePublisher = async () => {
-      const OV = new OpenVidu();
-      try {
-        const pub = OV.initPublisher(undefined, {
-          publishAudio: audioEnabled,
-          publishVideo: videoEnabled,
-          resolution: '640x480',
-          frameRate: 30,
-          mirror: false
-        });
-        setPublisher(pub);
-        onVideoStateChange?.({ videoEnabled, audioEnabled });
-      } catch (error) {
-        console.error('Error initializing publisher:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const initializePublisher = async () => {
+  //     const OV = new OpenVidu();
+  //     try {
+  //       const pub = OV.initPublisher(undefined, {
+  //         publishAudio: audioEnabled,
+  //         publishVideo: videoEnabled,
+  //         resolution: '640x480',
+  //         frameRate: 30,
+  //         mirror: false
+  //       });
+  //       setPublisher(pub);
+  //       onVideoStateChange?.({ videoEnabled, audioEnabled });
+  //     } catch (error) {
+  //       console.error('Error initializing publisher:', error);
+  //     }
+  //   };
 
-    initializePublisher();
+  //   initializePublisher();
 
-    return () => {
-      publisher?.stream?.dispose();
-    };
-  }, []);
+  //   return () => {
+  //     publisher?.stream?.dispose();
+  //   };
+  // }, []);
+
+  // 더미 비디오 컴포넌트용 상태
+  const [isDummyMode] = useState(true); // 실제 구현 시에는 환경변수나 props로 관리
 
   const toggleVideo = () => {
     setVideoEnabled(!videoEnabled);
-    publisher?.publishVideo(!videoEnabled);
+    // publisher?.publishVideo(!videoEnabled);
     onVideoStateChange?.({ videoEnabled: !videoEnabled, audioEnabled });
   };
 
   const toggleAudio = () => {
     setAudioEnabled(!audioEnabled);
-    publisher?.publishAudio(!audioEnabled);
+    // publisher?.publishAudio(!audioEnabled);
     onVideoStateChange?.({ videoEnabled, audioEnabled: !audioEnabled });
   };
 
   return (
     <VideoContainer>
       <Video>
-        {publisher && (
+        {/* {publisher && (
           <Publisher
             streamManager={publisher}
             style={{ width: '100%', height: '100%' }}
           />
+        )} */
+          isDummyMode ? (
+            // 더미 비디오 표시
+            <DummyVideo $isDisabled={!videoEnabled}>
+              {!videoEnabled && <CameraOffText>카메라 OFF</CameraOffText>}
+            </DummyVideo>
+          ) : (
+            // 실제 Publisher 컴포넌트는 OpenVidu 연동 후 사용
+            null
         )}
       </Video>
       <ControlsContainer>
@@ -79,6 +91,22 @@ const Video = styled.div`
   background: #000;
   border-radius: 10px;
   overflow: hidden;
+`;
+
+// 더미 1
+const DummyVideo = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: ${props => props.$isDisabled ? '#333' : '#666'};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+// 더미 2
+const CameraOffText = styled.div`
+  color: white;
+  font-size: 1.2rem;
 `;
 
 const ControlsContainer = styled.div`
