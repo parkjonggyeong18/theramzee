@@ -167,7 +167,6 @@ public class GameService {
 
             // 사용자 데이터 가져오기
             Map<Object, Object> userData = redisUtil.hgetAll(userKey);
-
             Object nicknameObj = redisUtil.hget(userKey, "nickname");
             String nickname = (String) nicknameObj;
             if (!userData.isEmpty()) {
