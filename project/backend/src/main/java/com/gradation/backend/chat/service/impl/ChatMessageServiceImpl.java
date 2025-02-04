@@ -42,12 +42,16 @@ package com.gradation.backend.chat.service.impl;
 
 
 
+import com.gradation.backend.chat.model.response.UnreadMessageResponse;
 import com.gradation.backend.chat.service.ChatMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 채팅 메시지 관리 서비스 클래스.
@@ -87,7 +91,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
      * @return 읽지 않은 메시지 카운트를 위한 Redis 키
      */
     public String generateUnreadKey(String sender, String receiver) {
-        return "unread:" + generateChatKey(sender, receiver);
+        return "unread:" + sender + ":" + receiver; // 송신자와 수신자의 순서를 고정
     }
 
     /**
@@ -131,11 +135,49 @@ public class ChatMessageServiceImpl implements ChatMessageService {
      * @param receiver 메시지 수신자
      * @return 읽지 않은 메시지 개수
      */
+    @Override
     public Long getUnreadCount(String sender, String receiver) {
         String unreadKey = generateUnreadKey(sender, receiver);
         String value = redisTemplate.opsForValue().get(unreadKey); // Redis에서 값 가져오기
 
         return value != null ? Long.parseLong(value) : 0L; // 문자열을 Long으로 변환
+    }
+
+    /**
+     * 특정 수신자(receiver)와 관련된 모든 발신자(sender)의 읽지 않은 메시지 개수를 조회합니다.
+     *
+     * @param receiver 메시지 수신자
+     * @return 각 발신자(sender)와 읽지 않은 메시지 수를 담은 리스트
+     */
+    @Override
+    public List<UnreadMessageResponse> getUnreadCountsForReceiver(String receiver) {
+        String pattern = "unread:*:" + receiver; // unread 키 패턴: "unread:{sender}:{receiver}"
+        Set<String> unreadKeys = redisTemplate.keys(pattern);
+
+        if (unreadKeys == null || unreadKeys.isEmpty()) {
+            return Collections.emptyList(); // 읽지 않은 메시지가 없으면 빈 리스트 반환
+        }
+
+        // 각 key에서 `sender`와 읽지 않은 메시지 수를 추출하여 응답 생성
+        return unreadKeys.stream()
+                .map(unreadKey -> {
+                    String sender = extractSenderFromKey(unreadKey); // Redis 키에서 송신자 추출
+                    String value = redisTemplate.opsForValue().get(unreadKey); // Redis에서 읽지 않은 메시지 수 조회
+                    Long unreadCount = value != null ? Long.parseLong(value) : 0L;
+                    return new UnreadMessageResponse(sender, unreadCount); // 응답 객체 생성
+                })
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Redis 키에서 발신자(sender)를 추출합니다.
+     *
+     * @param key Redis 키 (패턴: "unread:{sender}:{receiver}")
+     * @return 발신자(sender)의 이름
+     */
+    private String extractSenderFromKey(String key) {
+        // 키 형식: "unread:{sender}:{receiver}"
+        return key.split(":")[1]; // 두 번째 요소가 sender
     }
 
     /**
