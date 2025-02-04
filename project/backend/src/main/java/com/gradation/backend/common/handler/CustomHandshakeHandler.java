@@ -49,3 +49,4 @@ class UserPrincipal implements Principal {
         return this.username; // Principal의 이름으로 사용자 이름 반환
     }
 }
+

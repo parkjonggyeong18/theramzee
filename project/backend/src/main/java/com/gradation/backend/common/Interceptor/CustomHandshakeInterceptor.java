@@ -1,7 +1,6 @@
 package com.gradation.backend.common.Interceptor;
 
 import com.gradation.backend.common.utill.JwtTokenUtil;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -21,70 +20,29 @@ public class CustomHandshakeInterceptor implements HandshakeInterceptor {
     }
 
     @Override
-    public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
-                                   WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
-        // HTTP 요청에서 Authorization 헤더 추출
-        String authHeader = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+    public boolean beforeHandshake(
+            ServerHttpRequest request,
+            ServerHttpResponse response,
+            WebSocketHandler wsHandler,
+            Map<String, Object> attributes) throws Exception {
 
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            String token = authHeader.substring(7); // "Bearer " 이후 토큰 부분 추출
-            System.out.println(token);
-            attributes.put("accessToken", token);
+        // 요청 URI에서 쿼리 스트링 추출
+        String query = request.getURI().getQuery();
+        System.out.println("쿼리 스트링: " + query);
+
+        // 쿼리 스트링에서 Access Token 추출
+        String token = extractTokenFromQuery(query);
+
+        if (token != null && jwtTokenUtil.validateToken(token)) {
+            // 토큰이 유효한 경우 WebSocket 세션 속성에 Access Token 저장
+            System.out.println("유효한 토큰: " + token);
+            attributes.put("accessToken", token); // Access Token 저장
+            return true; // 핸드셰이크 성공
         } else {
-            return false; // Authorization 헤더가 없으면 연결 거부
+            System.err.println("유효하지 않은 토큰.");
+            return false; // 핸드셰이크 실패
         }
-        return true;
     }
-
-// Header로 token 받는 방법
-// 하지만, front에서 header값이 넘어오지 않는다
-//    @Override
-//    public boolean beforeHandshake(
-//            ServerHttpRequest request,
-//            ServerHttpResponse response,
-//            WebSocketHandler wsHandler,
-//            Map<String, Object> attributes) throws Exception {
-//
-//        HttpHeaders headers = request.getHeaders();
-//        String token = headers.getFirst(HttpHeaders.AUTHORIZATION);
-//
-//        if (token != null && token.startsWith("Bearer ")) {
-//            token = token.substring(7); // "Bearer " 제거
-//            if (jwtTokenUtil.validateToken(token)) {
-//                attributes.put("accessToken", token);
-//                return true;
-//            }
-//        }
-//
-//        System.err.println("유효하지 않은 토큰 또는 토큰 없음.");
-//        System.out.println(token);
-//        return false;
-//    }
-
-//    @Override
-//    public boolean beforeHandshake(
-//            ServerHttpRequest request,
-//            ServerHttpResponse response,
-//            WebSocketHandler wsHandler,
-//            Map<String, Object> attributes) throws Exception {
-//
-//        // 요청 URI에서 쿼리 스트링 추출
-//        String query = request.getURI().getQuery();
-//        System.out.println("쿼리 스트링: " + query);
-//
-//        // 쿼리 스트링에서 Access Token 추출
-//        String token = extractTokenFromQuery(query);
-//
-//        if (token != null && jwtTokenUtil.validateToken(token)) {
-//            // 토큰이 유효한 경우 WebSocket 세션 속성에 Access Token 저장
-//            System.out.println("유효한 토큰: " + token);
-//            attributes.put("accessToken", token); // Access Token 저장
-//            return true; // 핸드셰이크 성공
-//        } else {
-//            System.err.println("유효하지 않은 토큰.");
-//            return false; // 핸드셰이크 실패
-//        }
-//    }
 
     @Override
     public void afterHandshake(
