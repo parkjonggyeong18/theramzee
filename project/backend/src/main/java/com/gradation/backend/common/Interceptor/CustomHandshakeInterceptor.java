@@ -1,6 +1,7 @@
 package com.gradation.backend.common.Interceptor;
 
 import com.gradation.backend.common.utill.JwtTokenUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;

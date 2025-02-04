@@ -158,6 +158,7 @@ public class GameService {
 
             // 사용자 데이터 가져오기
             Map<Object, Object> userData = redisUtil.hgetAll(userKey);
+            Object nickname = redisUtil.hget(userKey, "nickname");
 
             if (!userData.isEmpty()) {
                 // forestLocation을 1로 설정
