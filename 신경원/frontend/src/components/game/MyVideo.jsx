@@ -10,89 +10,102 @@ const MyVideo = () => {
  const [controls, setControls] = useState({
    isCameraOn: true,
    isMicOn: true,
-   showControls: false,
-   publisher: null
+   showControls: false
+  //  publisher: null
  });
 
  const myPlayer = players.find(p => p.isMe);
  const isKilled = gameState.killedPlayers.includes(myPlayer?.id);
 
- useEffect(() => {
-   const OV = new OpenVidu();
+//  useEffect(() => {
+//    const OV = new OpenVidu();
    
-   const initializePublisher = async () => {
-     try {
-       const publisher = OV.initPublisher(undefined, {
-         publishAudio: true,
-         publishVideo: !gameState.forceVideosOff,
-         audioSource: gameState.foggyVoiceEffect ? 'processed-audio' : undefined,
-         resolution: '640x480',
-         frameRate: 30,
-         mirror: false
-       });
+//    const initializePublisher = async () => {
+//      try {
+//        const publisher = OV.initPublisher(undefined, {
+//          publishAudio: true,
+//          publishVideo: !gameState.forceVideosOff,
+//          audioSource: gameState.foggyVoiceEffect ? 'processed-audio' : undefined,
+//          resolution: '640x480',
+//          frameRate: 30,
+//          mirror: false
+//        });
 
-       setControls(prev => ({
-         ...prev,
-         publisher,
-         isCameraOn: !gameState.forceVideosOff
-       }));
-     } catch (error) {
-       console.error('Error initializing publisher:', error);
-     }
-   };
+//        setControls(prev => ({
+//          ...prev,
+//          publisher,
+//          isCameraOn: !gameState.forceVideosOff
+//        }));
+//      } catch (error) {
+//        console.error('Error initializing publisher:', error);
+//      }
+//    };
 
-   initializePublisher();
+//    initializePublisher();
 
-   return () => {
-     controls.publisher?.stream?.dispose();
-   };
- }, []);
+//    return () => {
+//      controls.publisher?.stream?.dispose();
+//    };
+//  }, []);
 
  // 안개 숲 효과 감지
  useEffect(() => {
   if (gameState.forceVideosOff) {
-   setControls(prev => {
-    prev.publisher?.publishVideo(false);
-     return {
+  //  setControls(prev => {
+  //   prev.publisher?.publishVideo(false);
+  //    return {
+  //     ...prev,
+  //     isCameraOn: false
+  //    };
+  //  });
+    setControls(prev => ({
       ...prev,
       isCameraOn: false
-     };
-   });
+    }));
   }
  }, [gameState.forceVideosOff]);
 
  useEffect(() => {
    // 죽었을 때 자동으로 카메라와 마이크 끄기
    if (isKilled) {
-     setControls(prev => {
-       prev.publisher?.publishVideo(false);
-       prev.publisher?.publishAudio(false);
-       return {
-         ...prev,
-         isCameraOn: false,
-         isMicOn: false
-       };
-     });
+    //  setControls(prev => {
+    //    prev.publisher?.publishVideo(false);
+    //    prev.publisher?.publishAudio(false);
+    //    return {
+    //      ...prev,
+    //      isCameraOn: false,
+    //      isMicOn: false
+    //    };
+    //  });
+    setControls(prev => ({
+      ...prev,
+      isCameraOn: false,
+      isMicOn: false
+    }));
    }
  }, [isKilled]);
 
  const toggleControl = (control) => {
    if (isKilled || (control === 'isCameraOn' && gameState.forceVideosOff)) return;
 
-   setControls(prev => {
-     if (control === 'isCameraOn') {
-       prev.publisher?.publishVideo(!prev[control]);
-     } else if (control === 'isMicOn') {
-       prev.publisher?.publishAudio(!prev[control]);
-     }
-     return { ...prev, [control]: !prev[control] };
-   });
+  //  setControls(prev => {
+  //    if (control === 'isCameraOn') {
+  //      prev.publisher?.publishVideo(!prev[control]);
+  //    } else if (control === 'isMicOn') {
+  //      prev.publisher?.publishAudio(!prev[control]);
+  //    }
+  //    return { ...prev, [control]: !prev[control] };
+  //  });
+  setControls(prev => ({
+    ...prev,
+    [control]: !prev[control]
+  }));
  };
 
  return (
    <VideoContainer $isKilled={isKilled}>
      <Video $isDisabled={!controls.isCameraOn || isKilled}>
-       {controls.publisher && (
+       {/* {controls.publisher && (
          <Publisher
            streamManager={controls.publisher}
            style={{ 
@@ -101,13 +114,16 @@ const MyVideo = () => {
              opacity: isKilled ? 0.5 : 1
            }}
          />
-       )}
-       {!controls.isCameraOn && <CameraOffOverlay>카메라 OFF</CameraOffOverlay>}
-       {isKilled && (
-         <DeadOverlay 
-           playerName={myPlayer?.name} 
-         />
-       )}
+       )} */}
+       {/* 더미 데이터 생성 */}
+       <DummyVideo $isDisabled={!controls.isCameraOn}>
+        {!controls.isCameraOn && <CameraOffOverlay>카메라 OFF</CameraOffOverlay>}
+        {isKilled && (
+          <DeadOverlay 
+            playerName={myPlayer?.name} 
+          />
+        )}
+       </DummyVideo>
      </Video>
      {!isKilled && (
        <>
@@ -156,6 +172,16 @@ const Video = styled.div`
  width: 100%;
  height: 100%;
  opacity: ${props => props.$isDisabled ? 0.5 : 1};
+`;
+
+// 더미 비디오
+const DummyVideo = styled.div`
+width: 100%;
+height: 100%;
+background-color: ${props => props.$isDisabled ? '#333' : '#666'};
+display: flex;
+align-items: center;
+justify-content: center;
 `;
 
 const CameraOffOverlay = styled.div`

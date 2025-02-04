@@ -91,6 +91,7 @@ const ButtonContainer = styled.div`
  transform: translateX(-50%);
  display: flex;
  gap: 20px;
+ z-index: 11;
 `;
 
 const BaseButton = styled.button`

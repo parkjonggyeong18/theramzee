@@ -9,6 +9,7 @@ import StatePanel from '../../components/game/StatePanel';
 import MiniMap from '../../components/game/MiniMap';
 import MissionButton from '../../components/game/MissionButton';
 import ColorMatchGame from '../../components/game/missions/ColorMatchGame';
+import { backgroundImages } from '../../assets/images';
 
 const TwistedForest = () => {
  const { gameState } = useGame();
@@ -80,7 +81,7 @@ const BackgroundImage = styled.div`
  left: 0;
  width: 100%;
  height: 100%;
- background-image: url('/src/assets/images/backgrounds/twisted-forest.png');
+ background-image: url(${backgroundImages.twistedForest});
  background-size: cover;
  background-position: center;
  z-index: -1;
