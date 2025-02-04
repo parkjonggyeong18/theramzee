@@ -3,6 +3,7 @@ package com.gradation.backend.common.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -13,6 +14,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @Configuration
 public class RedisConfig {
+    
     /**
      * RedisTemplate Bean 정의.
      *
@@ -25,6 +27,26 @@ public class RedisConfig {
         template.setConnectionFactory(connectionFactory);
 
         // Key와 Value 직렬화 설정
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+
+        return template;
+    }
+
+    @Bean
+    public RedisConnectionFactory redisConnectionFactoryDb1() {
+        LettuceConnectionFactory factory = new LettuceConnectionFactory();
+        factory.setDatabase(1); // 1번 데이터베이스 설정
+        return factory;
+    }
+
+    @Bean(name = "redisTemplateDb1")
+    public RedisTemplate<String, Object> redisTemplateDb1(RedisConnectionFactory redisConnectionFactoryDb1) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisConnectionFactoryDb1);
+
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         template.setHashKeySerializer(new StringRedisSerializer());

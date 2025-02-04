@@ -4,6 +4,9 @@ import com.gradation.backend.common.model.response.BaseResponse;
 //import com.gradation.backend.common.service.RedisService;
 import com.gradation.backend.game.model.request;
 import com.gradation.backend.game.service.GameService;
+import com.gradation.backend.openvidu.service.OpenViduService;
+import io.openvidu.java.client.OpenViduHttpException;
+import io.openvidu.java.client.OpenViduJavaClientException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +26,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/room")
 @Tag(name = "게임 API", description = "게임 관련 API")
 public class GameController {
+
     private final GameService gameService;
 
     @PostMapping("/game-info")
@@ -34,23 +38,24 @@ public class GameController {
 
     @PostMapping("/game-start")
     @Operation(summary = "방 초기화", description = "게임 초기 세팅")
-    public ResponseEntity<BaseResponse<Map<String, Object>>> gameStart(@RequestBody request.GameStartRequest request) {
+    public ResponseEntity<BaseResponse<Map<String, Object>>> gameStart(@RequestBody request.GameStartRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+
         Map<String, Object> initializedData = gameService.initializeRoomStructure(request.getRoomId(), request.getNicknames());
         return ResponseEntity.ok(BaseResponse.success("방 초기화 성공", initializedData));
     }
 
     @PostMapping("/game-emergency")
     @Operation(summary = "긴급 소집", description = "모든 유저 숲1로 이동 & 긴급 불가능으로 변경")
-    public ResponseEntity<BaseResponse<Boolean>> emergency(@RequestBody request.GameEmergencyRequest request) {
+    public ResponseEntity<BaseResponse<Boolean>> emergency(@RequestBody request.GameEmergencyRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
         boolean emergencyPossible = gameService.emergency(request.getRoomId());
         return ResponseEntity.ok(BaseResponse.success("긴급 소집 성공", emergencyPossible));
     }
 
     @PostMapping("/game-move")
     @Operation(summary = "숲 이동", description = "특정 숲으로 이동")
-    public ResponseEntity<BaseResponse<Integer>> move(@RequestBody request.GameMoveRequest request) {
-        int userLocation = gameService.moveForest(request.getRoomId(), request.getUserNum(), request.getNewForest());
-        return ResponseEntity.ok(BaseResponse.success("숲 이동 성공", userLocation));
+    public ResponseEntity<BaseResponse<String>> move(@RequestBody request.GameMoveRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+        String token = gameService.moveForest(request.getRoomId(), request.getUserNum(), request.getNewForest());
+        return ResponseEntity.ok(BaseResponse.success("숲 이동 성공", token));
     }
 
     @PostMapping("/game-get/user-acorns")

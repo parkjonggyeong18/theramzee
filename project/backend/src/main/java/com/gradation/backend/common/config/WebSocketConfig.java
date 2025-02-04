@@ -59,5 +59,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         // StompHandler를 인터셉터로 등록하여 들어오는 메시지를 처리
         registration.interceptors(stompHandler);
     }
-
 }
