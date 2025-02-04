@@ -12,7 +12,7 @@ import StatePanel from '../components/game/StatePanel';
 import MainForestButtons from '../components/game/MainForestButtons';
 import MiniMap from '../components/game/MiniMap';
 
-import mainForestBg from '../assets/images/backgrounds/main-forest.gif';
+import { backgroundImages, characterImages } from '../assets/images';
 
 const GameRoom = () => {
  const navigate = useNavigate();
@@ -44,7 +44,8 @@ const GameRoom = () => {
  // 커서 스타일 변경
  useEffect(() => {
    if (gameState.isStarted && gameState.role) {
-     document.body.style.cursor = `url('/assets/images/characters/${gameState.role}-squirrel.png'), auto`;
+    const cursorImage = gameState.role === 'good' ? characterImages.goodSquirrel : characterImages.badSquirrel;
+    document.body.style.cursor = `url(${cursorImage}), auto`;
    } else {
      document.body.style.cursor = 'auto';
    }
@@ -101,7 +102,7 @@ const GameBackground = styled.div`
  left: 0;
  width: 100%;
  height: 100%;
- background-image: url(${mainForestBg});
+ background-image: url(${backgroundImages.mainForest});
  background-size: cover;
  background-position: center;
  z-index: -1;
@@ -122,11 +123,14 @@ const VideoSection = styled.div`
 `;
 
 const BottomSection = styled.div`
- position: absolute;
- bottom: 20px;
- right: 20px;
- display: flex;
- gap: 20px;
+  position: absolute;
+  bottom: 20px;
+  width: calc(100% - 40px); // 좌우 여백 고려
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between; // MyVideo와 MiniMap을 양쪽 끝으로
+  align-items: flex-end;
+  z-index: 10;
 `;
 
 const ButtonContainer = styled.div`

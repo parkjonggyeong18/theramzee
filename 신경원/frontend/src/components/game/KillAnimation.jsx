@@ -1,6 +1,7 @@
 // components/game/KillAnimation.jsx
 import { useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
+import { animationImages } from '../../assets/images';
 
 const KillAnimation = ({ onAnimationEnd }) => {
  useEffect(() => {
@@ -65,7 +66,7 @@ const AnimationContainer = styled.div`
 const KillEffect = styled.div`
  width: 100%;
  height: 100%;
- background-image: url('/assets/images/animations/kill-animation.gif');
+ background-image: url(${animationImages.kill});
  background-size: contain;
  background-position: center;
  background-repeat: no-repeat;

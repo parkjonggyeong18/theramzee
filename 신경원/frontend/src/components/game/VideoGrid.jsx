@@ -16,84 +16,102 @@ const VideoGrid = () => {
      id: p.id,
      isCameraOn: true,
      isMicOn: true,
-     showControls: false,
-     publisher: null
+     showControls: false
+    //  publisher: null
    }))
  );
 
- useEffect(() => {
-   const OV = new OpenVidu();
+//  useEffect(() => {
+//    const OV = new OpenVidu();
    
-   const initializePublishers = async () => {
-     try {
-       const publishers = await Promise.all(
-         players.filter(p => !p.isMe).map(async player => {
-           const publisher = OV.initPublisher(undefined, {
-             publishAudio: true,
-             publishVideo: !gameState.forceVideosOff,  // 안개 숲에서는 강제 OFF
-             audioSource: gameState.foggyVoiceEffect ? 'processed-audio' : undefined,
-             resolution: '640x480',
-             frameRate: 30,
-             mirror: false
-           });
-           return { id: player.id, publisher };
-         })
-       );
+//    const initializePublishers = async () => {
+//      try {
+//        const publishers = await Promise.all(
+//          players.filter(p => !p.isMe).map(async player => {
+//            const publisher = OV.initPublisher(undefined, {
+//              publishAudio: true,
+//              publishVideo: !gameState.forceVideosOff,  // 안개 숲에서는 강제 OFF
+//              audioSource: gameState.foggyVoiceEffect ? 'processed-audio' : undefined,
+//              resolution: '640x480',
+//              frameRate: 30,
+//              mirror: false
+//            });
+//            return { id: player.id, publisher };
+//          })
+//        );
 
-       setVideoControls(prev => 
-         prev.map(control => {
-           const publisherData = publishers.find(p => p.id === control.id);
-           return {
-             ...control,
-             publisher: publisherData?.publisher || null,
-             isCameraOn: !gameState.forceVideosOff  // 안개 숲 상태 반영
-           };
-         })
-       );
-     } catch (error) {
-       console.error('Error initializing publishers:', error);
-     }
-   };
+//        setVideoControls(prev => 
+//          prev.map(control => {
+//            const publisherData = publishers.find(p => p.id === control.id);
+//            return {
+//              ...control,
+//              publisher: publisherData?.publisher || null,
+//              isCameraOn: !gameState.forceVideosOff  // 안개 숲 상태 반영
+//            };
+//          })
+//        );
+//      } catch (error) {
+//        console.error('Error initializing publishers:', error);
+//      }
+//    };
 
-   initializePublishers();
+//    initializePublishers();
 
-   return () => {
-     videoControls.forEach(control => {
-       control.publisher?.stream?.dispose();
-     });
-   };
- }, []);
+//    return () => {
+//      videoControls.forEach(control => {
+//        control.publisher?.stream?.dispose();
+//      });
+//    };
+//  }, []);
 
  // 안개 숲 효과 감지
  useEffect(() => {
   if (gameState.forceVideosOff) {
-   setVideoControls(prev => 
+  //  setVideoControls(prev => 
+  //   prev.map(control => ({
+  //    ...control,
+  //     isCameraOn: false,
+  //      publisher: control.publisher && {
+  //       ...control.publisher,
+  //       publishVideo: false
+  //      }
+  //   }))
+  //  );
+
+  // 더미
+  setVideoControls(prev => 
     prev.map(control => ({
      ...control,
-      isCameraOn: false,
-       publisher: control.publisher && {
-        ...control.publisher,
-        publishVideo: false
-       }
+     isCameraOn: false
     }))
    );
   }
  }, [gameState.forceVideosOff]);
 
  const toggleControl = (playerId, control) => {
-   setVideoControls(prev =>
-     prev.map(p => {
-       if (p.id === playerId) {
-         if (control === 'isCameraOn') {
-           p.publisher?.publishVideo(!p[control]);
-         } else if (control === 'isMicOn') {
-           p.publisher?.publishAudio(!p[control]);
-         }
-         return { ...p, [control]: !p[control] };
-       }
-       return p;
-     })
-   );
+  //  setVideoControls(prev =>
+  //    prev.map(p => {
+  //      if (p.id === playerId) {
+  //        if (control === 'isCameraOn') {
+  //          p.publisher?.publishVideo(!p[control]);
+  //        } else if (control === 'isMicOn') {
+  //          p.publisher?.publishAudio(!p[control]);
+  //        }
+  //        return { ...p, [control]: !p[control] };
+  //      }
+  //      return p;
+  //    })
+  //  );
+
+  // 더미
+  setVideoControls(prev =>
+    prev.map(p => {
+      if (p.id === playerId) {
+        return { ...p, [control]: !p[control] };
+      }
+      return p;
+    })
+  );
  };
 
  return (
@@ -112,7 +130,7 @@ const VideoGrid = () => {
              $isDragging={isDragging}
            >
              <Video $isDisabled={!controls.isCameraOn || isKilled}>
-               {controls.publisher && (
+               {/* {controls.publisher && (
                  <Publisher
                    streamManager={controls.publisher}
                    style={{ 
@@ -121,9 +139,12 @@ const VideoGrid = () => {
                      opacity: isKilled ? 0.5 : 1
                    }}
                  />
-               )}
-               {!controls.isCameraOn && <CameraOffOverlay>카메라 OFF</CameraOffOverlay>}
-               {isKilled && <DeadOverlay playerName={player.name} />}
+               )} */}
+               {/* 더미 */}
+               <DummyVideo $isDisabled={!controls?.isCameraOn}>
+                {!controls.isCameraOn && <CameraOffOverlay>카메라 OFF</CameraOffOverlay>}
+                {isKilled && <DeadOverlay playerName={player.name} />}
+               </DummyVideo>
              </Video>
              <ControlsButton
                onClick={() => setVideoControls(prev =>
@@ -200,6 +221,15 @@ const Video = styled.div`
  width: 100%;
  height: 100%;
  opacity: ${props => props.$isDisabled ? 0.5 : 1};
+`;
+
+const DummyVideo = styled.div`
+width: 100%;
+height: 100%;
+background-color: ${props => props.$isDisabled ? '#333' : '#666'};
+display: flex;
+align-items: center;
+justify-content: center;
 `;
 
 const CameraOffOverlay = styled.div`

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import forestBg from '../assets/images/backgrounds/forest-bg.gif';
+import { backgroundImages } from '../assets/images';
 
 const ForgotPassword = () => {
  const navigate = useNavigate();
@@ -116,7 +116,7 @@ const BackgroundImage = styled.div`
  left: 0;
  width: 100%;
  height: 100%;
- background-image: url(${forestBg});
+ background-image: url(${backgroundImages.forest});
  background-size: cover;
  z-index: -1;
 `;
