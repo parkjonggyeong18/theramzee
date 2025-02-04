@@ -133,7 +133,7 @@ public class JwtTokenUtil {
      * @param token 클레임을 추출할 JWT 토큰
      * @return 추출된 모든 클레임 (Claims 객체)
      */
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
@@ -168,4 +168,14 @@ public class JwtTokenUtil {
         return refreshTokenExpiration;
     }
 
+    /**
+     * JWT 토큰 추출
+     * "Bearer " 문자열을 제거하고 순수한 JWT 토큰만 반환
+     */
+    public String extractJwt(String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7); // "Bearer " 이후의 토큰만 반환
+        }
+        throw new IllegalArgumentException("Invalid Authorization Header");
+    }
 }

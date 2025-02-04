@@ -2,9 +2,11 @@ package com.gradation.backend.common.config;
 
 import com.gradation.backend.common.Interceptor.CustomHandshakeInterceptor;
 import com.gradation.backend.common.handler.CustomHandshakeHandler;
+import com.gradation.backend.common.handler.StompHandler;
 import com.gradation.backend.common.utill.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -15,10 +17,12 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final JwtTokenUtil jwtTokenUtil;
+    private final StompHandler stompHandler;
 
     @Autowired
-    public WebSocketConfig(JwtTokenUtil jwtTokenUtil) {
+    public WebSocketConfig(JwtTokenUtil jwtTokenUtil, StompHandler stompHandler) {
         this.jwtTokenUtil = jwtTokenUtil;
+        this.stompHandler = stompHandler;
     }
 
     /**
@@ -42,5 +46,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setHandshakeHandler(new CustomHandshakeHandler(jwtTokenUtil)) // JwtTokenUtil 주입된 Custom Principal 핸들러 지정
                 .setAllowedOrigins("http://localhost:3000") // CORS 허용 Origin 설정
                 .withSockJS(); // SockJS 지원 설정 (fallback 용)
+    }
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(stompHandler);
     }
 }
