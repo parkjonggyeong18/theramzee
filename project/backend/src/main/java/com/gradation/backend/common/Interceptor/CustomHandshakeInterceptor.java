@@ -19,31 +19,6 @@ public class CustomHandshakeInterceptor implements HandshakeInterceptor {
         this.jwtTokenUtil = jwtTokenUtil;
     }
 
-// Header로 token 받는 방법
-// 하지만, front에서 header값이 넘어오지 않는다
-//    @Override
-//    public boolean beforeHandshake(
-//            ServerHttpRequest request,
-//            ServerHttpResponse response,
-//            WebSocketHandler wsHandler,
-//            Map<String, Object> attributes) throws Exception {
-//
-//        HttpHeaders headers = request.getHeaders();
-//        String token = headers.getFirst(HttpHeaders.AUTHORIZATION);
-//
-//        if (token != null && token.startsWith("Bearer ")) {
-//            token = token.substring(7); // "Bearer " 제거
-//            if (jwtTokenUtil.validateToken(token)) {
-//                attributes.put("accessToken", token);
-//                return true;
-//            }
-//        }
-//
-//        System.err.println("유효하지 않은 토큰 또는 토큰 없음.");
-//        System.out.println(token);
-//        return false;
-//    }
-
     @Override
     public boolean beforeHandshake(
             ServerHttpRequest request,

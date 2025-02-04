@@ -47,9 +47,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOrigins("http://localhost:3000"); // CORS 허용 Origin 설정
 //                .withSockJS(); // SockJS 지원 설정 (fallback 용)
     }
-    @Override
-    public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(stompHandler);
-    }
+
 }
 
