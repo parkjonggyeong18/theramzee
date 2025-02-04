@@ -52,7 +52,7 @@ public class RoomController {
                 nickname
         );
 
-        String sessionId = String.valueOf(createdRoom.getRoomId());
+        String sessionId = String.valueOf(createdRoom.getRoomId()) + "-1";
 
         // 세션 생성
         Session session = openViduService.createSession(sessionId);

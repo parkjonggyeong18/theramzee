@@ -3,6 +3,9 @@ package com.gradation.backend.game.controller;
 import com.gradation.backend.game.model.request.*;
 import com.gradation.backend.game.service.GameService;
 import com.gradation.backend.common.model.response.BaseResponse;
+import com.gradation.backend.openvidu.service.OpenViduService;
+import io.openvidu.java.client.OpenViduHttpException;
+import io.openvidu.java.client.OpenViduJavaClientException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -21,6 +24,7 @@ public class GameWebSocketController {
 
     private final GameService gameService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final OpenViduService openViduService;
 
     @MessageMapping("/game/info")
     @SendToUser("/queue/game/info")
@@ -34,23 +38,37 @@ public class GameWebSocketController {
 
     @MessageMapping("/game/start")
     @SendTo("/topic/game/{roomId}/start")
-    public BaseResponse<Map<String, Object>> handleGameStart(@Payload GameStartRequest request) {
+    public BaseResponse<Map<String, Object>> handleGameStart(@Payload GameStartRequest request)
+            throws OpenViduJavaClientException, OpenViduHttpException {
         Map<String, Object> initializedData = gameService.initializeRoomStructure(request.getRoomId(), request.getNicknames());
+
+        Integer roomId = request.getRoomId();
+        String sessionId_prefix = String.valueOf(roomId);
+
+        //세션 생성
+        for (int i=2; i<=7; i++){
+            String sessionId_forestId = String.valueOf(i);
+            String sessionId = sessionId_prefix + " - " + sessionId_forestId;
+
+            openViduService.createSession(sessionId);
+            System.out.println("created sessionId = " + sessionId);
+        }
+
         return BaseResponse.success("게임 시작 성공", initializedData);
     }
 
     @MessageMapping("/game/emergency")
     @SendTo("/topic/game/{roomId}/emergency")
-    public BaseResponse<Boolean> handleGameEmergency(@Payload GameEmergencyRequest request) {
+    public BaseResponse<Boolean> handleGameEmergency(@Payload GameEmergencyRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
         boolean result = gameService.emergency(request.getRoomId());
         return BaseResponse.success("긴급 상황 처리", result);
     }
 
     @MessageMapping("/game/move")
     @SendTo("/topic/game/{roomId}/move")
-    public BaseResponse<Integer> handleGameMove(@Payload GameMoveRequest request) {
-        Integer result = gameService.moveForest(request.getRoomId(), request.getUserNum(), request.getNewForest());
-        return BaseResponse.success("사용자 이동", result);
+    public BaseResponse<String> handleGameMove(@Payload GameMoveRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+        String token = gameService.moveForest(request.getRoomId(), request.getUserNum(), request.getNewForest());
+        return BaseResponse.success("사용자 이동", token);
     }
 
     @MessageMapping("/game/acorns")
