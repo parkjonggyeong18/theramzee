@@ -10,6 +10,8 @@ import MiniMap from '../../components/game/MiniMap';
 import MissionButton from '../../components/game/MissionButton';
 import EmptyMissionOverlay from '../../components/game/missions/EmptyMissionOverlay';
 
+import { backgroundImages } from '../../assets/images';
+
 const BreathingForest = () => {
  const { gameState } = useGame();
  const [showMiniGame, setShowMiniGame] = useState(false);
@@ -84,7 +86,7 @@ const BackgroundImage = styled.div`
  left: 0;
  width: 100%;
  height: 100%;
- background-image: url('/src/assets/images/backgrounds/breathing-forest.png');
+ background-image: url(${backgroundImages.breathingForest});
  background-size: cover;
  background-position: center;
  z-index: -1;

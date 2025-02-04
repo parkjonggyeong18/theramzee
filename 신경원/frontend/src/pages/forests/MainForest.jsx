@@ -9,7 +9,7 @@ import GameTimer from '../../components/game/GameTimer';
 import StatePanel from '../../components/game/StatePanel';
 import MiniMap from '../../components/game/MiniMap';
 import VoteScreen from '../../components/game/vote/VoteScreen';
-import mainForestBg from '../../assets/images/backgrounds/main-forest.gif';
+import { backgroundImages } from '../../assets/images';
 
 const MainForest = () => {
  const { gameState, startEmergencyVote, endVote } = useGame();
@@ -66,7 +66,7 @@ const BackgroundImage = styled.div`
  left: 0;
  width: 100%;
  height: 100%;
- background-image: url(${mainForestBg});
+ background-image: url(${backgroundImages.mainForest});
  background-size: cover;
  background-position: center;
  z-index: -1;
