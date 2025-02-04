@@ -15,7 +15,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
-import java.security.Principal;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -99,9 +98,6 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/acorns")
     @SendToUser("/queue/game/{roomId}/acorns")
     public BaseResponse<Integer> handleGetUserAcorns(@Payload getUserAcornsRequest request, SimpMessageHeaderAccessor headerAccessor) {
-        Principal principal = headerAccessor.getUser();
-        String userId = principal.getName();
-
         int acorns = gameService.getUserAcorns(request.getRoomId(), request.getUserNum());
         return BaseResponse.success("도토리 조회 성공", acorns);
     }
@@ -124,9 +120,6 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/fatigue")
     @SendToUser("/queue/game/{roomId}/fatigue")
     public BaseResponse<Integer> handleGetUserFatigue(@Payload getUserFatigueRequest request, SimpMessageHeaderAccessor headerAccessor) {
-        Principal principal = headerAccessor.getUser();
-        String userId = principal.getName();
-
         int fatigue = gameService.getUserFatigue(request.getRoomId(), request.getUserNum());
         return BaseResponse.success("피로도 조회 성공", fatigue);
     }
@@ -160,9 +153,6 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/mission")
     @SendToUser("/queue/game/{roomId}/mission")
     public BaseResponse<Map<String, Map<String, Object>>> handleGetMission(@Payload getMissionRequest request, SimpMessageHeaderAccessor headerAccessor) {
-        Principal principal = headerAccessor.getUser();
-        String userId = principal.getName();
-
         Map<String, Map<String, Object>> missionData = gameService.getForestMissionStatus(request.getRoomId(), request.getForestNum());
         return BaseResponse.success("미션 조회 성공", missionData);
     }
