@@ -97,11 +97,15 @@ public class GameService {
         for (int userNum = 1; userNum <= 6; userNum++) {
             String userKey = roomKey + ":USER:" + userNum;
             Map<String, Object> userData = new HashMap<>();
+
+            //토큰 재발급
+            String token = openViduService.generateToken(roomId+ "-1", nicknames.get(userNum -1));
+
             userData.put("nickname", nicknames.get(userNum - 1));
             userData.put("alive", true);
             userData.put("acorns", 0);
             userData.put("fatigue", 0);
-            userData.put("forestToken", null);
+            userData.put("forestToken", token);
             userData.put("isEvilSquirrel", userNum - 1 == evilSquirrelIndex);
 
             // Redis Hash로 저장
