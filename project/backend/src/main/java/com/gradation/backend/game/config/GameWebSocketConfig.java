@@ -1,7 +1,8 @@
 package com.gradation.backend.game.config;
 
 import com.gradation.backend.game.handler.GameWebSocketHandler;
-import lombok.NoArgsConstructor;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
@@ -12,10 +13,6 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @RequiredArgsConstructor
 public class GameWebSocketConfig implements WebSocketConfigurer {
     private final GameWebSocketHandler gameWebSocketHandler;
-
-    public GameWebSocketConfig(GameWebSocketHandler gameWebSocketHandler) {
-        this.gameWebSocketHandler = gameWebSocketHandler;
-    }
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
