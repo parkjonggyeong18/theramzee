@@ -4,6 +4,7 @@ import com.gradation.backend.game.model.request.*;
 import com.gradation.backend.game.service.GameService;
 import com.gradation.backend.common.model.response.BaseResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -11,9 +12,12 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.socket.messaging.SessionConnectEvent;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 import java.security.Principal;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Controller
 @RequiredArgsConstructor
@@ -22,11 +26,15 @@ public class GameWebSocketController {
     private final GameService gameService;
     private final SimpMessagingTemplate messagingTemplate;
 
+    // 세션 정보를 저장할 Map 선언
+    private final Map<String, Integer> sessions = new ConcurrentHashMap<>();
+
     @MessageMapping("/game/info")
     @SendToUser("/queue/game/info")
     public BaseResponse<Map<String, Object>> handleGameInfo(@Payload GameInfoRequest request, SimpMessageHeaderAccessor headerAccessor) {
         Principal principal = headerAccessor.getUser();
         String userId = principal.getName();
+        System.out.println("성공!@!@!@!@!!!@!@");
 
         Map<String, Object> roomInfoData = gameService.getRoomInformation(request.getRoomId());
         return BaseResponse.success("방 정보 조회 성공", roomInfoData);
