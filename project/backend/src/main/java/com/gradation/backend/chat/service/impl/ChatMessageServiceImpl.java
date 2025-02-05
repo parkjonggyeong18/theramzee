@@ -45,6 +45,7 @@ package com.gradation.backend.chat.service.impl;
 import com.gradation.backend.chat.model.response.UnreadMessageResponse;
 import com.gradation.backend.chat.service.ChatMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -64,7 +65,13 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     private static final String CHAT_PREFIX = "chat:"; // Redis 키 접두사
 
     @Autowired
-    private RedisTemplate<String, String> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate2;
+
+    public ChatMessageServiceImpl(@Qualifier("redisTemplate2")RedisTemplate<String, String> redisTemplate2) {
+        this.redisTemplate2 = redisTemplate2;
+    }
+
+
 
     /**
      * 두 사용자를 기준으로 Redis 채팅 키를 생성합니다.
@@ -107,12 +114,12 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     public void saveMessage(String sender, String receiver, String content) {
         String key = generateChatKey(sender, receiver);
         String message = String.format("%s: %s", sender, content);
-        redisTemplate.opsForList().rightPush(key, message);
+        redisTemplate2.opsForList().rightPush(key, message);
         // 읽지 않은 메시지 카운트 증가
         String unreadKey = generateUnreadKey(sender, receiver);
         // 채팅 키의 TTL(유효 기간) 설정: 24시간
-        redisTemplate.expire(key, 24, java.util.concurrent.TimeUnit.HOURS);
-        redisTemplate.opsForValue().increment(unreadKey);
+        redisTemplate2.expire(key, 24, java.util.concurrent.TimeUnit.HOURS);
+        redisTemplate2.opsForValue().increment(unreadKey);
 
     }
 
@@ -125,7 +132,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
      */
     public List<String> getMessages(String sender, String receiver) {
         String key = generateChatKey(sender, receiver);
-        return redisTemplate.opsForList().range(key, 0, -1);
+        return redisTemplate2.opsForList().range(key, 0, -1);
     }
 
     /**
@@ -138,9 +145,9 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Override
     public Long getUnreadCount(String sender, String receiver) {
         String unreadKey = generateUnreadKey(sender, receiver);
-        String value = redisTemplate.opsForValue().get(unreadKey); // Redis에서 값 가져오기
+        Object value = redisTemplate2.opsForValue().get(unreadKey); // Redis에서 값 가져오기
 
-        return value != null ? Long.parseLong(value) : 0L; // 문자열을 Long으로 변환
+        return value != null ? Long.parseLong(value.toString()) : 0L; // 문자열을 Long으로 변환
     }
 
     /**
@@ -152,7 +159,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
     @Override
     public List<UnreadMessageResponse> getUnreadCountsForReceiver(String receiver) {
         String pattern = "unread:*:" + receiver; // unread 키 패턴: "unread:{sender}:{receiver}"
-        Set<String> unreadKeys = redisTemplate.keys(pattern);
+        Set<String> unreadKeys = redisTemplate2.keys(pattern);
 
         if (unreadKeys == null || unreadKeys.isEmpty()) {
             return Collections.emptyList(); // 읽지 않은 메시지가 없으면 빈 리스트 반환
@@ -162,7 +169,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         return unreadKeys.stream()
                 .map(unreadKey -> {
                     String sender = extractSenderFromKey(unreadKey); // Redis 키에서 송신자 추출
-                    String value = redisTemplate.opsForValue().get(unreadKey); // Redis에서 읽지 않은 메시지 수 조회
+                    String value = redisTemplate2.opsForValue().get(unreadKey); // Redis에서 읽지 않은 메시지 수 조회
                     Long unreadCount = value != null ? Long.parseLong(value) : 0L;
                     return new UnreadMessageResponse(sender, unreadCount); // 응답 객체 생성
                 })
@@ -190,7 +197,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
      */
     public void markMessagesAsRead(String sender, String receiver) {
         String unreadKey = generateUnreadKey(sender, receiver);
-        redisTemplate.delete(unreadKey); // 읽지 않은 카운트 초기화
+        redisTemplate2.delete(unreadKey); // 읽지 않은 카운트 초기화
     }
 
 }
