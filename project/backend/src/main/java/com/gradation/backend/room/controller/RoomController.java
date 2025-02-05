@@ -20,6 +20,7 @@ import io.openvidu.java.client.Session;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.jdt.internal.compiler.lookup.AptSourceLocalVariableBinding;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,11 +57,11 @@ public class RoomController {
 
         // 세션 생성
         Session session = openViduService.createSession(sessionId);
-        System.out.printf(session.getSessionId());
+        System.out.println("RoomController.createRoom");
+        System.out.println("session = " + session);
 
         // 토큰 생성
         String token = openViduService.generateToken(session.getSessionId(), nickname);
-        System.out.println("방장 : " + nickname + "token" + token);
 
         CreateRoomResponse response = new CreateRoomResponse(createdRoom, token);
         return ResponseEntity.ok(BaseResponse.success("success", response));
@@ -73,19 +74,21 @@ public class RoomController {
     @Operation(summary = "방 참여", description = "방에 참여합니다.")
     public ResponseEntity<BaseResponse<JoinRoomResponse>> joinRoom(
             @PathVariable Long roomId,
-            @RequestBody JoinRoomRequest request
+            @RequestBody(required = false) JoinRoomRequest request
     ) throws OpenViduJavaClientException, OpenViduHttpException {
         try {
             User currentUser = userService.getCurrentUser();
             String nickname = currentUser.getNickname();
+            System.out.println("RoomController.joinRoom");
             Room updatedRoom = roomService.joinRoom(roomId, nickname, request.getPassword());
 
             //스트링 변환
             String sessionId = String.valueOf(updatedRoom.getId());
             System.out.println(nickname + ":" + sessionId);
+
             //토큰 생성
             String token = openViduService.generateToken(sessionId, nickname);
-            System.out.println(nickname + ":" + token);
+            System.out.println("token = " + token);
 
             JoinRoomResponse response = new JoinRoomResponse(updatedRoom, token);
 
