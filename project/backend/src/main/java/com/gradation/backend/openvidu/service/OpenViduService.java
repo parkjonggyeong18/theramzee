@@ -17,6 +17,12 @@ public class OpenViduService {
      * @return 생성된 세션 객체
      */
     public Session createSession(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
+        // 먼저 세션이 존재하는지 확인
+        Session session = openVidu.getActiveSession(sessionId);
+        if (session != null) {
+            return session; // 기존 세션 반환
+        }
+
         SessionProperties properties = new SessionProperties.Builder()
                 .customSessionId(sessionId)
                 .mediaMode(MediaMode.ROUTED)

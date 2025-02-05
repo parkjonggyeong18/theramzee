@@ -94,6 +94,13 @@ public class GameService {
         Random random = new Random();
         int evilSquirrelIndex = random.nextInt(6); // 0부터 5 사이의 무작위 숫자 생성
 
+        //세션 생성
+        for (int i=2; i<=7; i++){
+            String sessionId = roomId + "-" + i;
+            openViduService.createSession(sessionId);
+            System.out.println("created sessionId = " + sessionId);
+        }
+
         for (int userNum = 1; userNum <= 6; userNum++) {
             String userKey = roomKey + ":USER:" + userNum;
             Map<String, Object> userData = new HashMap<>();
