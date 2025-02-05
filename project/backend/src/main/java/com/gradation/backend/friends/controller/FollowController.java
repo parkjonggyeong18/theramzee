@@ -3,10 +3,14 @@ package com.gradation.backend.friends.controller;
 import com.gradation.backend.common.model.response.BaseResponse;
 import com.gradation.backend.friends.model.request.FriendRequest;
 import com.gradation.backend.friends.service.FollowService;
+import com.gradation.backend.openvidu.service.OpenViduService;
 import com.gradation.backend.room.model.entity.Room;
 import com.gradation.backend.room.model.response.RoomFollowReesponse;
+import com.gradation.backend.room.service.RoomService;
 import com.gradation.backend.user.model.entity.User;
 import com.gradation.backend.user.service.UserService;
+import io.openvidu.java.client.OpenViduHttpException;
+import io.openvidu.java.client.OpenViduJavaClientException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -14,6 +18,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 public class FollowController {
     private final FollowService followService;
     private final UserService userService;
+    private final RoomService roomService;
+    private final OpenViduService openViduService;
 
     /**
      * 친구의 방에 참여하게 만드는 API.
@@ -37,6 +44,7 @@ public class FollowController {
      */
 
     @PostMapping("/follow")
+    @Transactional
     @Operation(
             summary = "친구의 방에 참가",
             description = "친구의 닉네임을 입력받아 해당 친구가 속한 방에 참가합니다. 게임이 진행 중인 방에는 참가할 수 없습니다."
@@ -56,26 +64,33 @@ public class FollowController {
             // 친구의 방에 입장
             RoomFollowReesponse response = followService.joinRoomByFriend(currentUser, friendNickname);
 
+            // 친구가 속한 방 검색
+            Long roomId = response.getRoomId();
+            System.out.println("roomId = " + roomId);
+
+            // 친구가 속한 방의 비밀번호 가져와서 참가하기
+            Room room = roomService.getRoom(roomId);
+            System.out.println("room = " + room);
+            Room joinedRoom = roomService.joinRoom(roomId, currentUser.getNickname(), room.getPassword());
+
+            // 오픈비두 세션 토큰 발급
+            String sessionId = String.valueOf(roomId) + "-1";
+            System.out.println("sessionId = " + sessionId);
+            String token = openViduService.generateToken(sessionId, currentUser.getNickname());
+            response.setToken(token);
+
             return ResponseEntity.ok(BaseResponse.success("방 참가에 성공했습니다.", response));
+
         } catch (RuntimeException e) {
             // 게임 중인 방에 입장 시 예외 처리
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(BaseResponse.error(e.getMessage()));
         }// 방 정보 반환
+        catch (OpenViduJavaClientException e) {
+            throw new RuntimeException(e);
+        } catch (OpenViduHttpException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(BaseResponse.error(e.getMessage()));
+        }
     }
-
-//    @PostMapping("/follow/{friendNickname}")
-//    public ResponseEntity<BaseResponse<RoomFollowReesponse>> followFriend(@PathVariable String friendNickname) {
-//        try {
-//            User currentUser = userService.getCurrentUser();  // 현재 로그인한 사용자
-//
-//            RoomFollowReesponse response = followService.joinRoomByFriend(currentUser, friendNickname);  // 친구의 방으로 입장
-//
-//            return ResponseEntity.ok(BaseResponse.success("방 참가에 성공했습니다.", response));  // 방 정보 반환
-//        } catch (RuntimeException e) {
-//            // 게임 중인 방에 입장 시 예외 처리
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-//                    .body(BaseResponse.error(e.getMessage()));
-//        }
-//    }
 }

@@ -11,4 +11,5 @@ public class RoomFollowReesponse {
     private String title;
     private Boolean gameStatus;
     private UserDto host;
+    private String token;
 }
