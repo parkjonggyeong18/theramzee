@@ -31,7 +31,6 @@ public class RedisConfig {
      * @return {@link RedisTemplate} 객체로, Redis와의 데이터 작업을 수행할 수 있습니다.
      */
     @Bean
-    @Primary
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         // RedisTemplate 생성 및 설정
         RedisTemplate<String, Object> template = new RedisTemplate<>();
