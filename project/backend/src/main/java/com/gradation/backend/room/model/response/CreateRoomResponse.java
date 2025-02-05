@@ -19,7 +19,7 @@ public class CreateRoomResponse {
 
     // 엔티티 -> DTO
     public CreateRoomResponse(Room room, String token) {
-        this.roomId = room.getRoomId();
+        this.roomId = room.getId();
         this.title = room.getTitle();
         this.gameStatus = room.getGameStatus();
         this.hostNickName = room.getHost().getNickname();

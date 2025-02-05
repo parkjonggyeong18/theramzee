@@ -56,7 +56,7 @@ public class FriendsController {
     @GetMapping("list")
     public ResponseEntity<BaseResponse<List<FriendResponse>>> getFriendsList() {
         User currentUser = userService.getCurrentUser();
-        List<FriendResponse> friendResponse = friendService.getFriends(currentUser.getUserId());
+        List<FriendResponse> friendResponse = friendService.getFriends(currentUser.getId());
         System.out.println(friendResponse);
         return ResponseEntity.ok(BaseResponse.success("친구 찾기 성공적으로 처리되었습니다.", friendResponse));
     }

@@ -18,7 +18,7 @@ public class JoinRoomResponse {
 
     // 엔티티 -> DTO
     public JoinRoomResponse(Room room, String token) {
-        this.roomId = room.getRoomId();
+        this.roomId = room.getId();
         this.title = room.getTitle();
         this.gameStatus = room.getGameStatus();
         this.hostNickName = room.getHost().getNickname();
