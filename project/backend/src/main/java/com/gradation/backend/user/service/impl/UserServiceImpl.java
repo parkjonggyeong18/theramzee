@@ -179,7 +179,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Long getUserId(String username) {
         User user = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
-        return user.getUserId();
+        return user.getId();
     }
 
     /**

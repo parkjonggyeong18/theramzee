@@ -10,9 +10,9 @@ import lombok.*;
 public class Friends {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "INT UNSIGNED")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long friendsId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "FK_Friends_User"), nullable = false)
