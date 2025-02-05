@@ -71,7 +71,6 @@ public class GameService {
         return roomInformation;
     }
 
-
     /**
      * 시작하기 클릭 시 방 초기화
      * 오픈비두 세션 추가 생성 (Forest 2 ~ 7)
@@ -86,20 +85,11 @@ public class GameService {
 
         // 1. Room 기본 정보 저장
         String roomKey = "ROOM:" + roomId;
-//        redisUtil.hset(roomKey, "totalAcorns", 0); // totalAcorns 필드 추가
-//        initializedData.put(roomKey, Map.of("totalAcorns", 0));
 
         // 2. Users 데이터 추가
         Map<String, Object> usersData = new HashMap<>();
         Random random = new Random();
         int evilSquirrelIndex = random.nextInt(6); // 0부터 5 사이의 무작위 숫자 생성
-
-        //세션 생성
-        for (int i=2; i<=7; i++){
-            String sessionId = roomId + "-" + i;
-            openViduService.createSession(sessionId);
-            System.out.println("created sessionId = " + sessionId);
-        }
 
         for (int userNum = 1; userNum <= 6; userNum++) {
             String userKey = roomKey + ":USER:" + userNum;
@@ -148,7 +138,6 @@ public class GameService {
         return initializedData;
     }
 
-
     /**
      * 미션 데이터 value값 사용자 정의
      */
@@ -161,7 +150,7 @@ public class GameService {
     }
 
     /**
-     * 긴급을 누를 시 모든 사용자의 forestToken 1로 설정
+     * 긴급을 누를 시 모든 사용자의 forestToken을 roomId-1세션으로 설정
      * 긴급 상태 불가능으로 변경
      *
      * @param roomId: 해당 방의 Id
@@ -177,14 +166,12 @@ public class GameService {
             String userKey = roomKey + ":USER:" + userNum;
 
             // 사용자 데이터 가져오기
-            Map<Object, Object> userData = redisUtil.hgetAll(userKey);
             Object nicknameObj = redisUtil.hget(userKey, "nickname");
             String nickname = (String) nicknameObj;
-            if (!userData.isEmpty()) {
-                String token = openViduService.generateToken(sessionId, nickname);
-                // forestToken 1로 설정
-                redisUtil.hset(userKey, "forestToken", token);
-            }
+
+            //forestToken을 roomId-1세션으로 설정
+            String token = openViduService.generateToken(sessionId, nickname);
+            redisUtil.hset(userKey, "forestToken", token);
         }
 
         // 앞으로 긴급 불가능
@@ -209,23 +196,17 @@ public class GameService {
         String userKey = roomKey + ":USER:" + userNum;
 
         // 사용자 데이터 가져오기
-        Map<Object, Object> userData = redisUtil.hgetAll(userKey);
         Object nicknameObj = redisUtil.hget(userKey, "nickname");
         String nickname = (String) nicknameObj;
-
 
         //유저의 현재 숲 토큰 반환
         String token = openViduService.generateToken(roomId+ "-" + newForest, nickname);
 
-        if (!userData.isEmpty()) {
-            // forestToken newForest값으로 변경
-            redisUtil.hset(userKey, "forestToken", token);
-        }
+        // forestToken newForest값으로 변경
+        redisUtil.hset(userKey, "forestToken", token);
 
-
-        // 유저의 현재 숲 번호 반환
+        // 유저의 현재 숲 토큰 반환
         Object userTokenObj = redisUtil.hget(userKey, "forestToken");
-
 
         return (String) userTokenObj;
     }
@@ -374,7 +355,6 @@ public class GameService {
         return missionStatus;
     }
 
-
     /**
      * 특정 forest의 특정 mission 상태를 완료로 변경
      * 보상을 유저에게 지급
@@ -414,6 +394,4 @@ public class GameService {
         // 6. 미션의 완료 상태 반환
         return missionData.isCompleted();
     }
-
-
 }
