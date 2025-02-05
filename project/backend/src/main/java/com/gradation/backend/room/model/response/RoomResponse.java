@@ -17,7 +17,7 @@ public class RoomResponse {
 
     // 엔티티 -> DTO
     public RoomResponse(Room room) {
-        this.roomId = room.getRoomId();
+        this.roomId = room.getId();
         this.title = room.getTitle();
         this.gameStatus = room.getGameStatus();
         this.hostNickName = room.getHost().getNickname();

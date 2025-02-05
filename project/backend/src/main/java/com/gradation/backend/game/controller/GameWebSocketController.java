@@ -60,7 +60,7 @@ public class GameWebSocketController {
         //세션 생성
         for (int i=2; i<=7; i++){
             String sessionId_forestId = String.valueOf(i);
-            String sessionId = sessionId_prefix + " - " + sessionId_forestId;
+            String sessionId = sessionId_prefix + "-" + sessionId_forestId;
 
             openViduService.createSession(sessionId);
             System.out.println("created sessionId = " + sessionId);
