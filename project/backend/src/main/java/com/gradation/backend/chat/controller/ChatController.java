@@ -116,6 +116,7 @@ public class ChatController {
     @Tag(name = "친구 관리", description = "친구 관리 API")
     public void sendMessage(ChatMessage chatMessage, Principal principal) {
         String sender = principal.getName();
+        User users = userService.getUserByUserName(sender);
         User user = userService.getUserByUserNickname(chatMessage.getReceiver());
         String receiver = user.getUsername();
 //        String receiver = chatMessage.getReceiver();
@@ -123,10 +124,13 @@ public class ChatController {
         System.out.println("Sender: " + sender + ", Receiver: " + receiver);
         System.out.println("Sender : " + chatMessage.getSender() + ", Receiver: " + chatMessage.getReceiver());
 
-        chatMessageService.saveMessage(chatMessage.getSender(), chatMessage.getReceiver(), chatMessage.getContent());
+//        chatMessageService.saveMessage(chatMessage.getSender(), chatMessage.getReceiver(), chatMessage.getContent());
+//        Long unreadCount = chatMessageService.getUnreadCount(chatMessage.getSender(), chatMessage.getReceiver());
 
-        Long unreadCount = chatMessageService.getUnreadCount(chatMessage.getSender(), chatMessage.getReceiver());
+        chatMessageService.saveMessage(users.getNickname(), chatMessage.getReceiver(), chatMessage.getContent());
+        Long unreadCount = chatMessageService.getUnreadCount(users.getNickname(), chatMessage.getReceiver());
         System.out.println("Unread count: " + unreadCount);
+
         if (unreadCount > 0) {
             messagingTemplate.convertAndSendToUser(
                     receiver,

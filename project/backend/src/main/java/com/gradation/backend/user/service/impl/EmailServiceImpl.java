@@ -1,11 +1,14 @@
 package com.gradation.backend.user.service.impl;
 
+import com.gradation.backend.common.config.RedisConfig;
 import com.gradation.backend.user.model.entity.User;
 import com.gradation.backend.user.repository.UserRepository;
 import com.gradation.backend.user.service.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
@@ -19,22 +22,23 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@RequiredArgsConstructor
+
 public class EmailServiceImpl implements EmailService {
 
     private final JavaMailSender javaMailSender; // 이메일 전송을 위한 JavaMailSender 객체
     private final UserRepository userRepository;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate1;
     private int authNumber; // 생성된 인증 번호를 저장하는 변수
+
     private final PasswordEncoder passwordEncoder;
 
-    /*@Autowired
-    public EmailServiceImpl(JavaMailSender javaMailSender, RedisConfig redisConfig, UserRepository userRepository, RedisTemplate<String, String> redisTemplate) {
+    @Autowired
+    public EmailServiceImpl(JavaMailSender javaMailSender, RedisConfig redisConfig, UserRepository userRepository,@Qualifier("redisTemplate1") RedisTemplate<String, String> redisTemplate1, PasswordEncoder passwordEncoder) {
         this.javaMailSender = javaMailSender;
-        this.redisConfig = redisConfig;
         this.userRepository = userRepository;
-        this.redisTemplate = redisTemplate;
-    }*/
+        this.redisTemplate1 = redisTemplate1;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     /* 이메일 발신자 주소 (application.properties에서 주입) */
     @Value("${spring.mail.username}")
@@ -81,7 +85,7 @@ public class EmailServiceImpl implements EmailService {
         }
 
         // RedisTemplate 사용
-        ValueOperations<String, String> valOperations = redisTemplate.opsForValue();
+        ValueOperations<String, String> valOperations = redisTemplate1.opsForValue();
         String redisKey = "email:auth:" + toMail;
         valOperations.set(redisKey, Integer.toString(authNumber), 300, TimeUnit.SECONDS);
     }
@@ -114,7 +118,7 @@ public class EmailServiceImpl implements EmailService {
      * @return 인증 성공 여부 (true / false)
      */
     public Boolean checkAuthNum(String email, String authNum) {
-        ValueOperations<String, String> valOperations = redisTemplate.opsForValue();
+        ValueOperations<String, String> valOperations = redisTemplate1.opsForValue();
         String code = valOperations.get(email);
 
         return Objects.equals(code, authNum); // 인증 결과 반환
