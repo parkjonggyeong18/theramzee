@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +30,15 @@ import java.util.concurrent.TimeUnit;
  */
 @RestController
 @RequestMapping("/api/v1/email")
-@RequiredArgsConstructor
 @Tag(name = "이메일 인증", description = "이메일 인증 API")
 public class EmailController {
     private final EmailService emailService;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate1;
 
+    public EmailController(EmailService emailService, @Qualifier("redisTemplate1") RedisTemplate<String, String> redisTemplate1) {
+        this.emailService = emailService;
+        this.redisTemplate1 = redisTemplate1;
+    }
     /**
      * 이메일 인증번호 전송 API.
      * 사용자가 회원가입 시 이메일 인증번호 요청을 하면, 해당 이메일로 인증번호를 생성하고 전송합니다.
@@ -70,7 +74,7 @@ public class EmailController {
     public ResponseEntity<BaseResponse<String>> authCheck(@RequestBody @Valid EmailCheckDto emailCheckDto) {
         // Redis에서 저장된 인증번호 조회
         String redisKey = "email:auth:" + emailCheckDto.getEmail();
-        String storedAuthNum = redisTemplate.opsForValue().get(redisKey);
+        String storedAuthNum = redisTemplate1.opsForValue().get(redisKey);
 
         // 인증번호가 Redis에 없을 경우 (만료되었거나 미요청 상태)
         if (storedAuthNum == null) {
@@ -84,7 +88,7 @@ public class EmailController {
 
         // 인증번호 일치 - 이메일 인증 성공 처리
         String verifiedKey = emailCheckDto.getEmail() + ":verified";
-        redisTemplate.opsForValue().set(verifiedKey, "true", 180, TimeUnit.SECONDS); // 인증 상태를 Redis에 저장 (3분간 유효)
+        redisTemplate1.opsForValue().set(verifiedKey, "true", 180, TimeUnit.SECONDS); // 인증 상태를 Redis에 저장 (3분간 유효)
 
         // 성공 응답 반환
         return ResponseEntity.ok(BaseResponse.success("이메일 인증에 성공했습니다.", null));

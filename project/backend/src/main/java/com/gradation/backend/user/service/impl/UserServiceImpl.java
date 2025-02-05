@@ -12,6 +12,7 @@ import com.gradation.backend.user.model.response.StatusResponse;
 import com.gradation.backend.user.repository.UserRepository;
 import com.gradation.backend.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -42,16 +43,16 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate1;
     private final JwtTokenUtil jwtTokenUtil;
     private final RedisUtil redisUtil;
     private final AuthenticationManager authenticationManager;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, RedisTemplate<String, String> redisTemplate, RedisUtil redisUtil, JwtTokenUtil jwtTokenUtil, AuthenticationManager authenticationManager) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, @Qualifier("redisTemplate1")RedisTemplate<String, String> redisTemplate1, RedisUtil redisUtil, JwtTokenUtil jwtTokenUtil, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.redisTemplate = redisTemplate;
+        this.redisTemplate1 = redisTemplate1;
         this.jwtTokenUtil = jwtTokenUtil;
         this.authenticationManager = authenticationManager;
         this.redisUtil = redisUtil;
@@ -71,7 +72,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserResponse registerUser(UserRequest request) {
         // 이메일 인증 여부 확인
-        ValueOperations<String, String> valOperations = redisTemplate.opsForValue();
+        ValueOperations<String, String> valOperations = redisTemplate1.opsForValue();
         String emailVerified = valOperations.get(request.getEmail() + ":verified");
 
         if (emailVerified == null || !emailVerified.equals("true")) {
@@ -103,7 +104,7 @@ public class UserServiceImpl implements UserService {
         // 사용자 저장
         User savedUser = userRepository.save(user);
         // 인증 상태 제거 (회원가입 후 인증 상태 삭제)
-        redisTemplate.delete(request.getEmail() + ":verified");
+        redisTemplate1.delete(request.getEmail() + ":verified");
 
         return toResponseDTO(savedUser);
     }

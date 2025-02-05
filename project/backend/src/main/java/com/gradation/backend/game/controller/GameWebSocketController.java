@@ -3,7 +3,6 @@ package com.gradation.backend.game.controller;
 import com.gradation.backend.game.model.request.*;
 import com.gradation.backend.game.service.GameService;
 import com.gradation.backend.common.model.response.BaseResponse;
-import com.gradation.backend.openvidu.service.OpenViduService;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
 import lombok.RequiredArgsConstructor;
@@ -11,12 +10,10 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 게임 관련 WebSocket 컨트롤러
@@ -27,11 +24,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class GameWebSocketController {
 
     private final GameService gameService;
-    private final SimpMessagingTemplate messagingTemplate;
-    private final OpenViduService openViduService;
-
-    // 세션 정보를 저장할 Map 선언
-    private final Map<String, Integer> sessions = new ConcurrentHashMap<>();
 
     /**
      * 게임 정보 요청 처리
@@ -53,19 +45,6 @@ public class GameWebSocketController {
     public BaseResponse<Map<String, Object>> handleGameStart(@Payload GameStartRequest request)
             throws OpenViduJavaClientException, OpenViduHttpException {
         Map<String, Object> initializedData = gameService.initializeRoomStructure(request.getRoomId(), request.getNicknames());
-
-        Integer roomId = request.getRoomId();
-        String sessionId_prefix = String.valueOf(roomId);
-
-        //세션 생성
-        for (int i=2; i<=7; i++){
-            String sessionId_forestId = String.valueOf(i);
-            String sessionId = sessionId_prefix + "-" + sessionId_forestId;
-
-            openViduService.createSession(sessionId);
-            System.out.println("created sessionId = " + sessionId);
-        }
-
         return BaseResponse.success("게임 시작 성공", initializedData);
     }
 
