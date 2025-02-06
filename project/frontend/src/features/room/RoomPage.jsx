@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchRooms, createRoom } from '../../api/room';
-import RoomList from './RoomList';
-import CreateRoomForm from './CreateRoomForm';
+import RoomList from './components/RoomList';
+import CreateRoomForm from './components/CreateRoomForm';
 
 const RoomPage = () => {
   const { accessToken } = useAuth();
