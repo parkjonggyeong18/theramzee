@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . /app
 
+RUN chmod +x ./gradlew
+
 RUN ./gradlew build -x test
 
 COPY build/libs/*.jar app.jar
