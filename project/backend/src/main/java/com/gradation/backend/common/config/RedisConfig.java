@@ -24,7 +24,7 @@ public class RedisConfig {
         factory.setDatabase(0);
         return factory;
     }
-    
+
     /**
      * RedisTemplate Bean 정의.
      *
@@ -52,7 +52,7 @@ public class RedisConfig {
         return factory;
     }
 
-    @Bean()
+    @Bean
     public RedisTemplate<String, String> redisTemplate1(RedisConnectionFactory redisConnectionFactory1) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory1);
