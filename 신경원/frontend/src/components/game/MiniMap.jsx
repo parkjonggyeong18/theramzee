@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../../contexts/GameContext';
 
+import { backgroundImages } from '../../assets/images';
+
 const MiniMap = () => {
  const navigate = useNavigate();
  const { gameState } = useGame();
@@ -11,37 +13,37 @@ const MiniMap = () => {
    { 
      id: 'twisted', 
      position: 'top-left', 
-     backgroundImage: '/src/assets/images/backgrounds/twisted-forest.png',
+     backgroundImage: backgroundImages.twistedForest,
      name: '뒤틀린 숲'
    },
    { 
      id: 'dry', 
      position: 'top-center', 
-     backgroundImage: '/src/assets/images/backgrounds/dry-forest.png',
+     backgroundImage: backgroundImages.dryForest,
      name: '메마른 숲'
    },
    { 
      id: 'fairy', 
      position: 'top-right', 
-     backgroundImage: '/src/assets/images/backgrounds/fairy-forest.png',
+     backgroundImage: backgroundImages.fairyForest,
      name: '요정의 숲'
    },
    { 
      id: 'time', 
      position: 'bottom-left', 
-     backgroundImage: '/src/assets/images/backgrounds/time-forest.png',
+     backgroundImage: backgroundImages.timeForest,
      name: '시간의 숲'
    },
    { 
      id: 'foggy', 
      position: 'bottom-center', 
-     backgroundImage: '/src/assets/images/backgrounds/foggy-forest.png',
+     backgroundImage: backgroundImages.foggyForest,
      name: '안개낀 숲'
    },
    { 
      id: 'breathing', 
      position: 'bottom-right', 
-     backgroundImage: '/src/assets/images/backgrounds/breathing-forest.png',
+     backgroundImage: backgroundImages.breathingForest,
      name: '숨쉬는 숲'
    }
  ];
@@ -69,7 +71,7 @@ const MiniMap = () => {
        ))}
        <MainForestButton
          onClick={handleMainForestClick}
-         $backgroundImage="/src/assets/images/backgrounds/main-forest.gif"
+         $backgroundImage={backgroundImages.mainForest}
        />
      </ForestGrid>
    </MapContainer>

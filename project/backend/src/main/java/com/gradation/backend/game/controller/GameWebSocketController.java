@@ -3,120 +3,147 @@ package com.gradation.backend.game.controller;
 import com.gradation.backend.game.model.request.*;
 import com.gradation.backend.game.service.GameService;
 import com.gradation.backend.common.model.response.BaseResponse;
+import io.openvidu.java.client.OpenViduHttpException;
+import io.openvidu.java.client.OpenViduJavaClientException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
-import java.security.Principal;
 import java.util.Map;
 
+/**
+ * 게임 관련 WebSocket 컨트롤러
+ * 클라이언트와 서버 간의 실시간 통신을 처리합니다.
+ */
 @Controller
 @RequiredArgsConstructor
 public class GameWebSocketController {
 
     private final GameService gameService;
-    private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/game/info")
-    public void handleGameInfo(@Payload GameInfoRequest request, SimpMessageHeaderAccessor headerAccessor) {
-        Principal principal = headerAccessor.getUser();
-        String userId = principal.getName();
-
+    /**
+     * 게임 정보 요청 처리
+     * 클라이언트가 특정 방의 정보를 요청할 때 호출됩니다.
+     */
+    @MessageMapping("/game/{roomId}/info")
+    @SendToUser("/queue/game/{roomId}/info")
+    public BaseResponse<Map<String, Object>> handleGameInfo(@Payload GameInfoRequest request, SimpMessageHeaderAccessor headerAccessor) {
         Map<String, Object> roomInfoData = gameService.getRoomInformation(request.getRoomId());
-        BaseResponse<Map<String, Object>> response = BaseResponse.success("방 정보 조회 성공", roomInfoData);
-
-        messagingTemplate.convertAndSendToUser(userId, "/queue/game/info", response);
+        return BaseResponse.success("방 정보 조회 성공", roomInfoData);
     }
 
-    @MessageMapping("/game/start")
-    public void handleGameStart(@Payload GameStartRequest request) {
+    /**
+     * 게임 시작 요청 처리
+     * 클라이언트가 게임 시작을 요청할 때 호출됩니다.
+     */
+    @MessageMapping("/game/{roomId}/start")
+    @SendTo("/topic/game/{roomId}/start")
+    public BaseResponse<Map<String, Object>> handleGameStart(@Payload GameStartRequest request)
+            throws OpenViduJavaClientException, OpenViduHttpException {
         Map<String, Object> initializedData = gameService.initializeRoomStructure(request.getRoomId(), request.getNicknames());
-        BaseResponse<Map<String, Object>> response = BaseResponse.success("게임 시작 성공", initializedData);
-
-        messagingTemplate.convertAndSend("/topic/game/" + request.getRoomId() + "/start", response);
+        return BaseResponse.success("게임 시작 성공", initializedData);
     }
 
-    @MessageMapping("/game/emergency")
-    public void handleGameEmergency(@Payload GameEmergencyRequest request) {
+    /**
+     * 긴급 상황 처리
+     * 게임 내 긴급 상황 발생 시 호출됩니다.
+     */
+    @MessageMapping("/game/{roomId}/emergency")
+    @SendTo("/topic/game/{roomId}/emergency")
+    public BaseResponse<Boolean> handleGameEmergency(@Payload GameEmergencyRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
         boolean result = gameService.emergency(request.getRoomId());
-        BaseResponse<Boolean> response = BaseResponse.success("긴급 상황 처리", result);
-
-        messagingTemplate.convertAndSend("/topic/game/" + request.getRoomId() + "/emergency", response);
+        return BaseResponse.success("긴급 상황 처리", result);
     }
 
-    @MessageMapping("/game/move")
-    public void handleGameMove(@Payload GameMoveRequest request) {
-        Integer result = gameService.moveForest(request.getRoomId(), request.getUserNum(), request.getNewForest());
-        BaseResponse<Integer> response = BaseResponse.success("사용자 이동", result);
-
-        messagingTemplate.convertAndSend("/topic/game/" + request.getRoomId() + "/move", response);
+    /**
+     * 사용자 이동 처리
+     * 게임 내에서 사용자가 이동할 때 호출됩니다.
+     */
+    @MessageMapping("/game/{roomId}/move")
+    @SendTo("/topic/game/{roomId}/move")
+    public BaseResponse<String> handleGameMove(@Payload GameMoveRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
+        String token = gameService.moveForest(request.getRoomId(), request.getUserNum(), request.getNewForest());
+        return BaseResponse.success("사용자 이동", token);
     }
 
-    @MessageMapping("/game/acorns")
-    public void handleGetUserAcorns(@Payload getUserAcornsRequest request, SimpMessageHeaderAccessor headerAccessor) {
-        Principal principal = headerAccessor.getUser();
-        String userId = principal.getName();
-
+    /**
+     * 사용자 도토리 조회
+     * 특정 사용자의 도토리 수를 조회합니다.
+     */
+    @MessageMapping("/game/{roomId}/acorns")
+    @SendToUser("/queue/game/{roomId}/acorns")
+    public BaseResponse<Integer> handleGetUserAcorns(@Payload getUserAcornsRequest request, SimpMessageHeaderAccessor headerAccessor) {
         int acorns = gameService.getUserAcorns(request.getRoomId(), request.getUserNum());
-        BaseResponse<Integer> response = BaseResponse.success("도토리 조회 성공", acorns);
-
-        messagingTemplate.convertAndSendToUser(userId, "/queue/game/acorns", response);
+        return BaseResponse.success("도토리 조회 성공", acorns);
     }
 
-    @MessageMapping("/game/save-acorns")
-    public void handleSaveAcorns(@Payload saveAcornsRequest request) {
+    /**
+     * 도토리 저장 처리
+     * 사용자가 도토리를 저장할 때 호출됩니다.
+     */
+    @MessageMapping("/game/{roomId}/save-acorns")
+    @SendTo("/topic/game/{roomId}/save-acorns")
+    public BaseResponse<Integer> handleSaveAcorns(@Payload saveAcornsRequest request) {
         int result = gameService.saveUserAcorns(request.getRoomId(), request.getUserNum());
-        BaseResponse<Integer> response = BaseResponse.success("도토리 저장 성공", result);
-
-        messagingTemplate.convertAndSend("/topic/game/" + request.getRoomId() + "/save-acorns", response);
+        return BaseResponse.success("도토리 저장 성공", result);
     }
 
-    @MessageMapping("/game/fatigue")
-    public void handleGetUserFatigue(@Payload getUserFatigueRequest request, SimpMessageHeaderAccessor headerAccessor) {
-        Principal principal = headerAccessor.getUser();
-        String userId = principal.getName();
-
+    /**
+     * 사용자 피로도 조회
+     * 특정 사용자의 피로도를 조회합니다.
+     */
+    @MessageMapping("/game/{roomId}/fatigue")
+    @SendToUser("/queue/game/{roomId}/fatigue")
+    public BaseResponse<Integer> handleGetUserFatigue(@Payload getUserFatigueRequest request, SimpMessageHeaderAccessor headerAccessor) {
         int fatigue = gameService.getUserFatigue(request.getRoomId(), request.getUserNum());
-        BaseResponse<Integer> response = BaseResponse.success("피로도 조회 성공", fatigue);
-
-        messagingTemplate.convertAndSendToUser(userId, "/queue/game/fatigue", response);
+        return BaseResponse.success("피로도 조회 성공", fatigue);
     }
 
-    @MessageMapping("/game/charge-fatigue")
-    public void handleChargeFatigue(@Payload chargeFatigueRequest request) {
+    /**
+     * 피로도 충전 처리
+     * 사용자의 피로도를 충전할 때 호출됩니다.
+     */
+    @MessageMapping("/game/{roomId}/charge-fatigue")
+    @SendTo("/topic/game/{roomId}/charge-fatigue")
+    public BaseResponse<Integer> handleChargeFatigue(@Payload chargeFatigueRequest request) {
         int result = gameService.incrementUserFatigue(request.getRoomId(), request.getUserNum());
-        BaseResponse<Integer> response = BaseResponse.success("피로도 충전 성공", result);
-
-        messagingTemplate.convertAndSend("/topic/game/" + request.getRoomId() + "/charge-fatigue", response);
+        return BaseResponse.success("피로도 충전 성공", result);
     }
 
-    @MessageMapping("/game/kill")
-    public void handleKill(@Payload killRequest request) {
+    /**
+     * 사용자 제거 처리
+     * 게임에서 사용자를 제거할 때 호출됩니다.
+     */
+    @MessageMapping("/game/{roomId}/kill")
+    @SendTo("/topic/game/{roomId}/kill")
+    public BaseResponse<Boolean> handleKill(@Payload killRequest request) {
         boolean result = gameService.Kill(request.getRoomId(), request.getUserNum(), request.getMyNum());
-        BaseResponse<Boolean> response = BaseResponse.success("사용자 제거", result);
-
-        messagingTemplate.convertAndSend("/topic/game/" + request.getRoomId() + "/kill", response);
+        return BaseResponse.success("사용자 제거", result);
     }
 
-    @MessageMapping("/game/mission")
-    public void handleGetMission(@Payload getMissionRequest request, SimpMessageHeaderAccessor headerAccessor) {
-        Principal principal = headerAccessor.getUser();
-        String userId = principal.getName();
-
+    /**
+     * 미션 정보 조회
+     * 특정 숲의 미션 상태를 조회합니다.
+     */
+    @MessageMapping("/game/{roomId}/mission")
+    @SendToUser("/queue/game/{roomId}/mission")
+    public BaseResponse<Map<String, Map<String, Object>>> handleGetMission(@Payload getMissionRequest request, SimpMessageHeaderAccessor headerAccessor) {
         Map<String, Map<String, Object>> missionData = gameService.getForestMissionStatus(request.getRoomId(), request.getForestNum());
-        BaseResponse<Map<String, Map<String, Object>>> response = BaseResponse.success("미션 조회 성공", missionData);
-
-        messagingTemplate.convertAndSendToUser(userId, "/queue/game/mission", response);
+        return BaseResponse.success("미션 조회 성공", missionData);
     }
 
-    @MessageMapping("/game/complete-mission")
-    public void handleCompleteMission(@Payload completeMissionRequest request) {
+    /**
+     * 미션 완료 처리
+     * 사용자가 미션을 완료했을 때 호출됩니다.
+     */
+    @MessageMapping("/game/{roomId}/complete-mission")
+    @SendTo("/topic/game/{roomId}/complete-mission")
+    public BaseResponse<Boolean> handleCompleteMission(@Payload completeMissionRequest request) {
         boolean result = gameService.completeMission(request.getRoomId(), request.getForestNum(), request.getMissionNum(), request.getUserNum());
-        BaseResponse<Boolean> response = BaseResponse.success("미션 완료", result);
-
-        messagingTemplate.convertAndSend("/topic/game/" + request.getRoomId() + "/complete-mission", response);
+        return BaseResponse.success("미션 완료", result);
     }
 }

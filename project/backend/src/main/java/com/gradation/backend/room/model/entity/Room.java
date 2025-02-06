@@ -15,9 +15,9 @@ import java.util.List;
 public class Room {
 
     @Id
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "INT UNSIGNED")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long roomId;
+    private Long id;
 
     @Column(length = 100)
     private String title;
@@ -29,7 +29,7 @@ public class Room {
     private Boolean gameStatus;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "host_id", foreignKey = @ForeignKey(name = "FK_user_name"), nullable = false)
+    @JoinColumn(name = "host_id", foreignKey = @ForeignKey(name = "FK_user_name"), nullable = false, columnDefinition = "INT UNSIGNED")
     private User host;
 
     @OneToMany(mappedBy = "room", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)

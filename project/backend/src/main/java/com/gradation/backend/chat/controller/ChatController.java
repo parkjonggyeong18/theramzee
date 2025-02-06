@@ -111,30 +111,38 @@ public class ChatController {
 //                receiver, "/queue/messages", chatMessage
 //        );
 //    }
-@MessageMapping("/chat.send")
-@Transactional
+    @MessageMapping("/chat.send")
+    @Transactional
     @Tag(name = "친구 관리", description = "친구 관리 API")
-public void sendMessage(ChatMessage chatMessage, Principal principal) {
-    String sender = principal.getName();
+    public void sendMessage(ChatMessage chatMessage, Principal principal) {
+        String sender = principal.getName();
+        User users = userService.getUserByUserName(sender);
         User user = userService.getUserByUserNickname(chatMessage.getReceiver());
-       String receiver = user.getUsername();
-//    String receiver = chatMessage.getReceiver();
+        String receiver = user.getUsername();
+//        String receiver = chatMessage.getReceiver();
 
-    chatMessageService.saveMessage(sender, receiver, chatMessage.getContent());
+        System.out.println("Sender: " + sender + ", Receiver: " + receiver);
+        System.out.println("Sender : " + chatMessage.getSender() + ", Receiver: " + chatMessage.getReceiver());
 
-    Long unreadCount = chatMessageService.getUnreadCount(receiver, sender);
-    if (unreadCount > 0) {
+//        chatMessageService.saveMessage(chatMessage.getSender(), chatMessage.getReceiver(), chatMessage.getContent());
+//        Long unreadCount = chatMessageService.getUnreadCount(chatMessage.getSender(), chatMessage.getReceiver());
+
+        chatMessageService.saveMessage(users.getNickname(), chatMessage.getReceiver(), chatMessage.getContent());
+        Long unreadCount = chatMessageService.getUnreadCount(users.getNickname(), chatMessage.getReceiver());
+        System.out.println("Unread count: " + unreadCount);
+
+        if (unreadCount > 0) {
+            messagingTemplate.convertAndSendToUser(
+                    receiver,
+                    "/queue/notifications",
+                    "새로운 메시지가 있습니다 (" + unreadCount + "개)"
+            );
+        }
+        System.out.println("ㅎㅇ");
         messagingTemplate.convertAndSendToUser(
                 receiver,
-                "/queue/notifications",
-                "새로운 메시지가 있습니다 (" + unreadCount + "개)"
+                "/queue/messages",
+                chatMessage
         );
     }
-
-    messagingTemplate.convertAndSendToUser(
-            receiver,
-            "/queue/messages",
-            chatMessage
-    );
-}
 }

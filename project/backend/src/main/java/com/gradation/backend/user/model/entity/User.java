@@ -14,9 +14,9 @@ import java.util.List;
 public class User{
 
     @Id
-    @Column(name = "id")
+    @Column(name = "id", columnDefinition = "INT UNSIGNED")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;
 
     @Column(nullable = false, length = 20)
     private String username;
@@ -40,7 +40,7 @@ public class User{
     private Boolean userStatus;
 
     @ManyToOne
-    @JoinColumn(name = "room_id", foreignKey = @ForeignKey(name = "FK_User_Room"))
+    @JoinColumn(name = "room_id", foreignKey = @ForeignKey(name = "FK_User_Room"), columnDefinition = "INT UNSIGNED")
     private Room room;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

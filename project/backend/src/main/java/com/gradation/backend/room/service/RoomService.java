@@ -41,7 +41,7 @@ public class RoomService {
         roomRepository.save(room);
 
         // Fetch Join을 사용하여 fakeUsers를 강제로 로드
-        return roomRepository.findByIdWithUsers(room.getRoomId())
+        return roomRepository.findByIdWithUsers(room.getId())
                 .orElseThrow(() -> new RuntimeException("Room not found after creation"));
 
     }

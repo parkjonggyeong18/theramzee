@@ -31,16 +31,14 @@ export const GameProvider = ({ children }) => {
 
   const [players] = useState([
     // 테스트용 더미 데이터
-    { id: 1, name: '테스트 플레이어', isMe: true }
+    // { id: 1, name: '테스트 플레이어', isMe: true }
     // 추후 6인용
-    /* 
     { id: 1, name: 'Player 1', isMe: true },
     { id: 2, name: 'Player 2', isMe: false },
     { id: 3, name: 'Player 3', isMe: false },
     { id: 4, name: 'Player 4', isMe: false },
     { id: 5, name: 'Player 5', isMe: false },
     { id: 6, name: 'Player 6', isMe: false }
-    */
   ]);
 
   const killPlayer = (playerId) => {

@@ -1,12 +1,16 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/gradation_db
+    url: jdbc:mysql://localhost:3306/gradation
     username: root
+<<<<<<< HEAD
     password : root
+=======
+    password : 8794
+>>>>>>> 5f4543f0aa1018a5bab7e112e6a5c8a3da7e7508
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
       dialect: org.hibernate.dialect.MySQLDialect
   data:
     redis:

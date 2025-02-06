@@ -88,22 +88,24 @@ public class AuthController {
      */
     @PostMapping("/refresh-token")
     @Operation(summary = "Access 토큰 갱신", description = "유효한 Refresh 토큰을 사용하여 새로운 Access 토큰을 발급받습니다.")
-    public ResponseEntity<BaseResponse<TokenResponse>> refreshToken(@RequestBody Map<String, String> request) {
-        String refreshToken = request.get("refreshToken");
-        String username = jwtTokenUtil.extractUsername(refreshToken);
+    public ResponseEntity<BaseResponse<TokenResponse>> refreshToken(@RequestHeader("Authorization") String expiredAccessToken) {
+        String username = jwtTokenUtil.extractUsername(expiredAccessToken);
 
         if (username != null && redisUtil.hasKey(username + ":refresh")) {
+            // Redis에서 Refresh Token을 가져온다
+            String refreshToken = (String) redisUtil.get(username + ":refresh");
             CustomUserDetails userDetails = customUserDetailsServiceImpl.loadUserByUsername(username);
+
             if (jwtTokenUtil.validateToken(refreshToken, userDetails)) {
                 String newAccessToken = jwtTokenUtil.generateAccessToken(userDetails);
-
-                TokenResponse tokenResponse = new TokenResponse(newAccessToken, refreshToken);
+                TokenResponse tokenResponse = new TokenResponse(newAccessToken, null);
                 return ResponseEntity.ok(BaseResponse.success("Access 토큰이 성공적으로 갱신되었습니다.", tokenResponse));
             }
         }
         return ResponseEntity.badRequest().body(
-                BaseResponse.error("유효하지 않은 Refresh 토큰입니다."));
+                BaseResponse.error("유효하지 않은 Access 토큰입니다."));
     }
+
 
     /**
      * 로그아웃 API.

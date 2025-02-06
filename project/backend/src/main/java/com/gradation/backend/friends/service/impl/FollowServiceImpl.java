@@ -1,5 +1,6 @@
-package com.gradation.backend.friends.service;
+package com.gradation.backend.friends.service.impl;
 
+import com.gradation.backend.friends.service.FollowService;
 import com.gradation.backend.room.model.entity.Room;
 import com.gradation.backend.room.model.response.RoomFollowReesponse;
 import com.gradation.backend.room.repository.RoomRepository;
@@ -54,14 +55,14 @@ public class FollowServiceImpl implements FollowService {
 
         // 친구의 방 정보를 DTO로 생성해 반환
         RoomFollowReesponse roomDTO = new RoomFollowReesponse();
-        roomDTO.setRoomId(friendRoom.getRoomId());
+        roomDTO.setRoomId(friendRoom.getId());
         roomDTO.setTitle(friendRoom.getTitle());
         roomDTO.setGameStatus(friendRoom.getGameStatus());
 
         // 방의 호스트 정보를 DTO로 변환하여 추가
         User host = friendRoom.getHost();
         UserDto hostDTO = new UserDto();
-        hostDTO.setUserId(host.getUserId());
+        hostDTO.setUserId(host.getId());
         hostDTO.setNickname(host.getNickname());
         hostDTO.setUserStatus(host.getUserStatus());
         roomDTO.setHost(hostDTO);
