@@ -18,8 +18,8 @@ services:
     depends_on:
       - mysql
       - redis
-  frontend:
-    build: ./frontend # React 프로젝트 Dockerfile 경로
+  frontended:
+    build: ./frontended # React 프로젝트 Dockerfile 경로
     ports:
       - "3000:80" # React는 Nginx를 통해 80 포트로 서비스
     depends_on:
@@ -30,7 +30,7 @@ services:
       - "80:80"
       - "443:443"
     depends_on:
-      - frontend
+      - frontended
       - backend
   openvidu:
     image: openvidu/openvidu-server:2.31.0
