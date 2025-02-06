@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.eclipse.jdt.internal.compiler.lookup.AptSourceLocalVariableBinding;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,6 +44,7 @@ public class RoomController {
      */
     @PostMapping("/rooms")
     @Operation(summary = "방 생성", description = "새로운 방을 생성합니다.")
+    @Transactional
     public ResponseEntity<BaseResponse<CreateRoomResponse>> createRoom(@RequestBody CreateRoomRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
         User currentUser = userService.getCurrentUser();
         String nickname = currentUser.getNickname();
@@ -73,6 +75,7 @@ public class RoomController {
      */
     @PostMapping("/rooms/{roomId}/join")
     @Operation(summary = "방 참여", description = "방에 참여합니다.")
+    @Transactional
     public ResponseEntity<BaseResponse<JoinRoomResponse>> joinRoom(
             @PathVariable Long roomId,
             @RequestBody(required = false) JoinRoomRequest request
@@ -84,7 +87,7 @@ public class RoomController {
             Room updatedRoom = roomService.joinRoom(roomId, nickname, request.getPassword());
 
             //스트링 변환
-            String sessionId = String.valueOf(updatedRoom.getId());
+            String sessionId = String.valueOf(updatedRoom.getId()) + "-1";
             System.out.println(nickname + ":" + sessionId);
 
             //토큰 생성
