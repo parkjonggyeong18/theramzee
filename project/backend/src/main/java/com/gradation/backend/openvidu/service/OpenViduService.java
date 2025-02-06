@@ -54,7 +54,6 @@ public class OpenViduService {
         ConnectionProperties connectionProperties = new ConnectionProperties.Builder()
                 .type(ConnectionType.WEBRTC)
                 .role(OpenViduRole.PUBLISHER) // 동영상 전송과 스트림
-                .data(nickname)
                 .kurentoOptions(
                         new KurentoOptions.Builder()
                                 .allowedFilters(new String[]{"GStreamerFilter", "FaceOverlayFilter"})
