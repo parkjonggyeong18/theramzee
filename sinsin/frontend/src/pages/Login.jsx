@@ -2,31 +2,64 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+<<<<<<< HEAD
 // 배경 이미지 import 추가
+=======
+import { useAuth } from '../hooks/useAuth';
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
 import forestBg from '../assets/images/backgrounds/forest-bg.gif';
 
 const Login = () => {
   const navigate = useNavigate();
+<<<<<<< HEAD
+=======
+  const { handleLogin } = useAuth();
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
   const [formData, setFormData] = useState({
     id: '',
     password: ''
   });
 
+<<<<<<< HEAD
   const handleSubmit = (e) => {
     e.preventDefault();
     // API 연동 후 추가 예정
     navigate('/lobby');
+=======
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await handleLogin(formData.id, formData.password);
+      navigate('/lobby');
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('로그인에 실패했습니다. 다시 시도해주세요.');
+    }
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
   };
 
   return (
     <LoginContainer>
+<<<<<<< HEAD
       <BackgroundImage />
+=======
+      <BackgroundImage src={forestBg} />
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
       <Title>THE RAMZEE STORY</Title>
       
       <FormContainer>
         <form onSubmit={handleSubmit}>
           <Input 
             type="text"
+<<<<<<< HEAD
             placeholder="ID"
             value={formData.id}
             onChange={(e) => setFormData({...formData, id: e.target.value})}
@@ -48,6 +81,21 @@ const Login = () => {
           <RegisterButton onClick={(e) => {e.preventDefault(); navigate('/register')}}>
             REGISTER
           </RegisterButton>
+=======
+            name="id"
+            placeholder="ID"
+            value={formData.id}
+            onChange={handleChange}
+          />
+          <Input 
+            type="password"
+            name="password"
+            placeholder="비밀번호"
+            value={formData.password}
+            onChange={handleChange}
+          />
+          <Button type="submit">로그인</Button>
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
         </form>
       </FormContainer>
     </LoginContainer>
@@ -55,27 +103,44 @@ const Login = () => {
 };
 
 const LoginContainer = styled.div`
+<<<<<<< HEAD
   height: 100vh;
   width: 100vw;
+=======
+  position: relative;
+  width: 100%;
+  height: 100%;
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+<<<<<<< HEAD
   position: relative;
 `;
 
 const BackgroundImage = styled.div`
+=======
+`;
+
+const BackgroundImage = styled.img`
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+<<<<<<< HEAD
   background-image: url(${forestBg}); // 배경 이미지
   background-size: cover;
+=======
+  object-fit: cover;
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
   z-index: -1;
 `;
 
 const Title = styled.h1`
+<<<<<<< HEAD
   font-size: 4rem;
   font-weight: bold;
   color: white;
@@ -156,6 +221,37 @@ const RegisterButton = styled.button`
 
   &:hover {
     color: #90EE90;
+=======
+  color: white;
+  margin-bottom: 20px;
+`;
+
+const FormContainer = styled.div`
+  background: rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  border-radius: 10px;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 5px;
+`;
+
+const Button = styled.button`
+  width: 100%;
+  padding: 10px;
+  background: blue;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+
+  &:hover {
+    background: darkblue;
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
   }
 `;
 

@@ -33,6 +33,7 @@ const MiniMap = () => {
      name: '시간의 숲'
    },
    { 
+<<<<<<< HEAD
      id: 'foggy', 
      position: 'bottom-center', 
      backgroundImage: '/src/assets/images/backgrounds/foggy-forest.png',
@@ -43,20 +44,37 @@ const MiniMap = () => {
      position: 'bottom-right', 
      backgroundImage: '/src/assets/images/backgrounds/breathing-forest.png',
      name: '숨쉬는 숲'
+=======
+     id: 'dark', 
+     position: 'bottom-center', 
+     backgroundImage: '/src/assets/images/backgrounds/dark-forest.png',
+     name: '어둠의 숲'
+   },
+   { 
+     id: 'light', 
+     position: 'bottom-right', 
+     backgroundImage: '/src/assets/images/backgrounds/light-forest.png',
+     name: '빛의 숲'
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
    }
  ];
 
  const handleForestClick = (forestId) => {
+<<<<<<< HEAD
    // 죽었을 때도 관전은 가능하도록 함
    navigate(`/game/${gameState.roomId}/forest/${forestId}`);
  };
 
  const handleMainForestClick = () => {
    navigate(`/game/${gameState.roomId}/main`);
+=======
+   navigate(`/forest/${forestId}`);
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
  };
 
  return (
    <MapContainer>
+<<<<<<< HEAD
      <ForestGrid>
        {forests.map((forest) => (
          <ForestButton
@@ -72,11 +90,24 @@ const MiniMap = () => {
          $backgroundImage="/src/assets/images/backgrounds/main-forest.gif"
        />
      </ForestGrid>
+=======
+     {forests.map(forest => (
+       <ForestButton
+         key={forest.id}
+         position={forest.position}
+         backgroundImage={forest.backgroundImage}
+         onClick={() => handleForestClick(forest.id)}
+       >
+         {forest.name}
+       </ForestButton>
+     ))}
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
    </MapContainer>
  );
 };
 
 const MapContainer = styled.div`
+<<<<<<< HEAD
  position: absolute;
  bottom: 20px;
  right: 20px;
@@ -153,6 +184,31 @@ const MainForestButton = styled.button`
    transform: scale(1.1);
    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
  }
+=======
+ position: relative;
+ width: 300px;
+ height: 300px;
+ background: url('/src/assets/images/backgrounds/map.png') no-repeat center center;
+ background-size: cover;
+ display: flex;
+ flex-wrap: wrap;
+`;
+
+const ForestButton = styled.button`
+ position: absolute;
+ width: 80px;
+ height: 80px;
+ background: url(${({ backgroundImage }) => backgroundImage}) no-repeat center center;
+ background-size: cover;
+ border: none;
+ cursor: pointer;
+ ${({ position }) => position === 'top-left' && 'top: 10px; left: 10px;'}
+ ${({ position }) => position === 'top-center' && 'top: 10px; left: calc(50% - 40px);'}
+ ${({ position }) => position === 'top-right' && 'top: 10px; right: 10px;'}
+ ${({ position }) => position === 'bottom-left' && 'bottom: 10px; left: 10px;'}
+ ${({ position }) => position === 'bottom-center' && 'bottom: 10px; left: calc(50% - 40px);'}
+ ${({ position }) => position === 'bottom-right' && 'bottom: 10px; right: 10px;'}
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
 `;
 
 export default MiniMap;

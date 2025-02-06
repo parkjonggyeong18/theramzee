@@ -23,11 +23,19 @@ const DryForest = () => {
 
  const handleMissionComplete = () => {
    setShowMiniGame(false);
+<<<<<<< HEAD
+=======
+   setCompletedMissions(prev => [...prev, 'mission1']);
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
  };
 
  return (
    <ForestContainer>
+<<<<<<< HEAD
      <BackgroundImage />
+=======
+     <BackgroundImage src="/src/assets/images/backgrounds/dry-forest.png" />
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
      
      <TopSection>
        <GameTimer />
@@ -78,15 +86,23 @@ const ForestContainer = styled.div`
  overflow: hidden;
 `;
 
+<<<<<<< HEAD
 const BackgroundImage = styled.div`
+=======
+const BackgroundImage = styled.img`
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
  position: absolute;
  top: 0;
  left: 0;
  width: 100%;
  height: 100%;
+<<<<<<< HEAD
  background-image: url('/src/assets/images/backgrounds/dry-forest.png');
  background-size: cover;
  background-position: center;
+=======
+ object-fit: cover;
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
  z-index: -1;
 `;
 

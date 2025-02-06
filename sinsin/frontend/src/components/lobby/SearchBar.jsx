@@ -22,7 +22,11 @@ const SearchBar = ({ onSearch }) => {
   );
 };
 
+<<<<<<< HEAD
 const Container = styled.form`  // div에서 form으로 변경
+=======
+const Container = styled.form`
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
   display: flex;
   gap: 10px;
   margin-top: 10px;
@@ -30,11 +34,17 @@ const Container = styled.form`  // div에서 form으로 변경
 
 const Input = styled.input`
   flex: 1;
+<<<<<<< HEAD
   padding: 5px;
+=======
+  padding: 10px;
+  border: 1px solid #ccc;
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
   border-radius: 5px;
 `;
 
 const SearchButton = styled.button`
+<<<<<<< HEAD
   padding: 5px 15px;
   background: #90EE90;
   border: none;
@@ -44,6 +54,14 @@ const SearchButton = styled.button`
   &:hover {
     background: #98FB98;
   }
+=======
+  padding: 10px;
+  background: blue;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
 `;
 
 export default SearchBar;
