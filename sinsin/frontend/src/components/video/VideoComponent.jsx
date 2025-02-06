@@ -1,5 +1,9 @@
 // components/video/VideoComponent.jsx
+<<<<<<< HEAD
 import { useState, useEffect } from 'react';
+=======
+import React, { useState, useEffect, useRef } from 'react';
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
 import { OpenVidu, Publisher } from 'openvidu-browser';
 import styled from 'styled-components';
 
@@ -7,6 +11,11 @@ const VideoComponent = ({ onVideoStateChange }) => {
   const [publisher, setPublisher] = useState(null);
   const [videoEnabled, setVideoEnabled] = useState(true);
   const [audioEnabled, setAudioEnabled] = useState(true);
+<<<<<<< HEAD
+=======
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const videoRef = useRef(null);
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
 
   useEffect(() => {
     const initializePublisher = async () => {
@@ -34,6 +43,15 @@ const VideoComponent = ({ onVideoStateChange }) => {
   }, []);
 
   const toggleVideo = () => {
+<<<<<<< HEAD
+=======
+    if (isVideoPlaying) {
+      videoRef.current.pause();
+    } else {
+      videoRef.current.play();
+    }
+    setIsVideoPlaying(!isVideoPlaying);
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
     setVideoEnabled(!videoEnabled);
     publisher?.publishVideo(!videoEnabled);
     onVideoStateChange?.({ videoEnabled: !videoEnabled, audioEnabled });
@@ -54,10 +72,18 @@ const VideoComponent = ({ onVideoStateChange }) => {
             style={{ width: '100%', height: '100%' }}
           />
         )}
+<<<<<<< HEAD
       </Video>
       <ControlsContainer>
         <ControlButton onClick={toggleVideo}>
           {videoEnabled ? '🎥' : '❌'}
+=======
+        <video ref={videoRef} src="video.mp4" controls />
+      </Video>
+      <ControlsContainer>
+        <ControlButton onClick={toggleVideo}>
+          {isVideoPlaying ? 'Pause' : 'Play'}
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
         </ControlButton>
         <ControlButton onClick={toggleAudio}>
           {audioEnabled ? '🎤' : '🔇'}

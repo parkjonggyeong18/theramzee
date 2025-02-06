@@ -32,6 +32,7 @@ const ColorMatchGame = ({ onComplete, onClose }) => {
 
   return (
     <GameContainer>
+<<<<<<< HEAD
       <GameTitle>같은 색으로 맞추기</GameTitle>
       
       <ColorGrid>
@@ -62,11 +63,30 @@ const ColorMatchGame = ({ onComplete, onClose }) => {
       {isSuccess && <SuccessMessage>성공!</SuccessMessage>}
       
       <CloseButton onClick={onClose}>나가기</CloseButton>
+=======
+      <GameHeader>
+        <h3>색상 맞추기 게임</h3>
+        <CloseButton onClick={onClose}>X</CloseButton>
+      </GameHeader>
+      <GameBody>
+        {colors.map((color, index) => (
+          <ColorButton
+            key={index}
+            color={color}
+            onClick={() => handleColorClick(index, color)}
+          >
+            {color}
+          </ColorButton>
+        ))}
+      </GameBody>
+      {isSuccess && <SuccessMessage>성공!</SuccessMessage>}
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
     </GameContainer>
   );
 };
 
 const GameContainer = styled.div`
+<<<<<<< HEAD
   width: 100%;
   height: 100%;
   display: flex;
@@ -145,11 +165,53 @@ const CloseButton = styled.button`
   right: 20px;
   padding: 10px 20px;
   background: #FF4444;
+=======
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
+
+const GameHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 20px;
+`;
+
+const CloseButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+`;
+
+const GameBody = styled.div`
+  display: flex;
+  gap: 10px;
+`;
+
+const ColorButton = styled.button`
+  padding: 10px;
+  background: ${({ color }) => color};
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+<<<<<<< HEAD
   font-family: 'JejuHallasan';
+=======
+`;
+
+const SuccessMessage = styled.div`
+  margin-top: 20px;
+  color: green;
+  font-size: 18px;
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
 `;
 
 export default ColorMatchGame;

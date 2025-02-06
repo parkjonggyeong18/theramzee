@@ -1,6 +1,10 @@
 // hooks/useOpenVidu.js
 import { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { OpenVidu } from '@openvidu/browser';
+=======
+import { OpenVidu } from 'openvidu-browser';
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
 import { createSession } from '../services/openvidu';
 
 export const useOpenVidu = (sessionId) => {
@@ -24,6 +28,15 @@ export const useOpenVidu = (sessionId) => {
           setPublisher(publisher);
         });
     });
+<<<<<<< HEAD
+=======
+
+    return () => {
+      if (session) {
+        session.disconnect();
+      }
+    };
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
   }, [sessionId]);
 
   return { session, publisher };
