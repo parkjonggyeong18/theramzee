@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 // contexts/GameContext.jsx
 import { createContext, useContext, useState } from 'react';
+=======
+import React, { createContext, useState, useContext } from 'react';
+import { gameStart, saveAcorns, moveForest, completeMission, killPlayer, getGameInfo, getUserFatigue, getUserAcorns, getMissionStatus, emergencyCall, chargeFatigue } from '../api/game';
+>>>>>>> 1a5ec4e9db4db0cb557aa52303ce34f475546c7d
 
 const GameContext = createContext();
 

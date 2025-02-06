@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gradation_db
+    ports:
+      - "3306:3306"
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+  backend:
+    build: ./backend # Spring Boot 프로젝트 Dockerfile 경로
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql
+      - redis
+  frontend:
+    build: ./frontend # React 프로젝트 Dockerfile 경로
+    ports:
+      - "3000:80" # React는 Nginx를 통해 80 포트로 서비스
+    depends_on:
+      - backend
+  nginx:
+    build: ./nginx # Nginx Dockerfile 경로 (nginx.conf 포함)
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - frontend
+      - backend
+  openvidu:
+    image: openvidu/openvidu-server:2.31.0
+    environment:
+      OPENVIDU_SECRET: 1234 # Openvidu 비밀번호 설정
+      OPENVIDU_DOMAIN_OR_PUBLIC_IP: https://d204test.p-e.kr # 도메인 또는 탄력적 IP
+      OPENVIDU_HTTP_PORT: 8081
+      OPENVIDU_HTTPS_PORT: 8443
+    ports:
+      - "8081:8081"
+      - "8443:8443"
+      - "4443:4443" # Openvidu Dashboard 포트 (선택 사항)
+      - "62000-65535:62000-65535/udp" # WebRTC UDP 포트 범위
