@@ -2,14 +2,15 @@ import React from 'react';
 import RoomListItem from './RoomListItem';
 
 const RoomList = ({ rooms }) => {
-  if (rooms.length === 0) {
+  console.log('RoomList:', rooms);
+  if (!rooms || rooms.length === 0) {
     return <p>방 목록이 없습니다.</p>;
   }
 
   return (
-    <div>
+    <div className="room-list">
       {rooms.map((room) => (
-        <RoomListItem key={room.roomId} room={room} />
+        <RoomListItem key={room.id} room={room} />
       ))}
     </div>
   );

@@ -12,7 +12,7 @@ const LoginPage = () => {
     try {
       const response = await login(username, password);
       updateAccessToken(response.data.accessToken);
-      navigate('/user'); // 로그인 후 홈으로 이동
+      navigate('/rooms'); // 로그인 후 홈으로 이동
     } catch (error) {
       console.error('로그인 실패', error);
       // TODO: 사용자에게 에러 메시지 표시
