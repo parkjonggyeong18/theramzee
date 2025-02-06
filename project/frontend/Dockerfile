@@ -1,5 +1,5 @@
 # 빌드 스테이지 (production 빌드)
-FROM node:20-alpine AS builder  # **최신 Node.js 20 LTS 버전 Alpine 이미지 사용!**
+FROM node:20-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm install --unsafe-perm # --unsafe-perm 옵션 유지 (권한 문제 방지, 필요시 제거 가능)
