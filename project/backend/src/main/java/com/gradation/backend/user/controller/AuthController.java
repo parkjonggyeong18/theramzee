@@ -98,7 +98,7 @@ public class AuthController {
 
             if (jwtTokenUtil.validateToken(refreshToken, userDetails)) {
                 String newAccessToken = jwtTokenUtil.generateAccessToken(userDetails);
-                TokenResponse tokenResponse = new TokenResponse(newAccessToken, null);
+                TokenResponse tokenResponse = new TokenResponse(newAccessToken, userDetails.getUserNickName());
                 return ResponseEntity.ok(BaseResponse.success("Access 토큰이 성공적으로 갱신되었습니다.", tokenResponse));
             }
         }

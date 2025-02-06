@@ -2,7 +2,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/gradation
     username: root
-    password : 8794
+    password : root
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -32,7 +32,7 @@ jwt:
     expiration: 604800000 # 1 week in milliseconds
 
 server:
-  port: 8080
+  port: 5000
 
 springdoc:
   api-docs:
@@ -41,5 +41,5 @@ springdoc:
     path: /swagger-ui.html
 
 openvidu:
-  url: ${OPENVIDU_URL:http://localhost:4443/}
-  secret: ${OPENVIDU_SECRET:MY_SECRET}
+  url: ${OPENVIDU_URL:http://d204test.p-e.kr:5443/}
+  secret: ${OPENVIDU_SECRET:1234}

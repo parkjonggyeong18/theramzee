@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
         existingUser.setUserStatus(true); // 상태 업데이트
         userRepository.save(existingUser);
-        return new TokenResponse(accessToken, refreshToken);
+        return new TokenResponse(accessToken, existingUser.getNickname());
     }
 
     /**
