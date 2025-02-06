@@ -3,8 +3,8 @@ FROM node:16-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm install
-RUN ls -al node_modules/.bin/react-scripts  # **`react-scripts` 파일 권한 확인 명령어 (추가 - 진단용)**
-RUN chmod +x node_modules/.bin/react-scripts  # **`react-scripts` 실행 권한 추가 명령어 (중요!)**
+RUN ls -al node_modules/.bin/react-scripts  # `react-scripts` 파일 권한 확인 명령어 (유지)
+RUN chmod +x node_modules/react-scripts/bin/react-scripts.js  # **`chmod +x` 명령어 대상 수정! (실제 파일 경로)**
 COPY . .
 RUN npm run build
 
