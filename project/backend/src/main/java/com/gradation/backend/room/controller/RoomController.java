@@ -50,6 +50,7 @@ public class RoomController {
         Room createdRoom = roomService.createRoom(
                 request.getTitle(),
                 request.getPassword(),
+
                 nickname
         );
 
