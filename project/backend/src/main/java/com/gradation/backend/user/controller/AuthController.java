@@ -89,8 +89,12 @@ public class AuthController {
     @PostMapping("/refresh-token")
     @Operation(summary = "Access 토큰 갱신", description = "유효한 Refresh 토큰을 사용하여 새로운 Access 토큰을 발급받습니다.")
     public ResponseEntity<BaseResponse<TokenResponse>> refreshToken(@RequestHeader("Authorization") String expiredAccessToken) {
-        String username = jwtTokenUtil.extractUsername(expiredAccessToken);
+        if (expiredAccessToken.startsWith("Bearer ")) {
+            expiredAccessToken = expiredAccessToken.substring(7);
+        }
 
+        String username = jwtTokenUtil.extractUsername(expiredAccessToken);
+        System.out.println("expiredAccessToken = " + expiredAccessToken);
         if (username != null && redisUtil.hasKey(username + ":refresh")) {
             // Redis에서 Refresh Token을 가져온다
             String refreshToken = (String) redisUtil.get(username + ":refresh");
@@ -99,6 +103,7 @@ public class AuthController {
             if (jwtTokenUtil.validateToken(refreshToken, userDetails)) {
                 String newAccessToken = jwtTokenUtil.generateAccessToken(userDetails);
                 TokenResponse tokenResponse = new TokenResponse(newAccessToken, userDetails.getUserNickName());
+                System.out.println("newAccessToken = " + newAccessToken);
                 return ResponseEntity.ok(BaseResponse.success("Access 토큰이 성공적으로 갱신되었습니다.", tokenResponse));
             }
         }

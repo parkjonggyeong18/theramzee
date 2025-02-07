@@ -3,6 +3,7 @@ package com.gradation.backend.common.filter;
 
 import com.gradation.backend.common.utill.JwtTokenUtil;
 import com.gradation.backend.user.service.impl.CustomUserDetailsServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -52,29 +53,38 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        // Authorization 헤더에서 JWT 토큰 추출
         final String authorizationHeader = request.getHeader("Authorization");
-
         String username = null;
         String jwt = null;
 
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 값 추출
-            username = jwtTokenUtil.extractUsername(jwt); // 토큰에서 사용자 이름 추출
-        }
-
-        // SecurityContext에 인증 정보가 없는 경우 처리
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-            // JWT 토큰이 유효한 경우 인증 정보 설정
-            if (jwtTokenUtil.validateToken(jwt, userDetails)) {
-                UsernamePasswordAuthenticationToken authenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+        try {
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                jwt = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 값 추출
+                username = jwtTokenUtil.extractUsername(jwt); // 토큰에서 사용자 이름 추출
             }
+
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                if (jwtTokenUtil.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authenticationToken =
+                            new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                }
+            }
+        } catch (ExpiredJwtException ex) {
+            // 만료된 토큰 처리: 401 Unauthorized 반환 및 필터 체인 중단
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Access Token has expired");
+            return; // 필터 체인 중단
+        } catch (Exception ex) {
+            // 기타 오류 처리: 403 Forbidden 반환 및 필터 체인 중단
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().write("Invalid Token");
+            return; // 필터 체인 중단
         }
+
         // 다음 필터로 요청 전달
         chain.doFilter(request, response);
     }

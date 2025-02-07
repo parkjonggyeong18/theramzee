@@ -24,7 +24,7 @@ public class RedisConfig {
         factory.setDatabase(0);
         return factory;
     }
-    
+
     /**
      * RedisTemplate Bean 정의.
      *
