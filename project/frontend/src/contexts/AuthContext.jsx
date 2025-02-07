@@ -1,30 +1,34 @@
-// src/contexts/AuthContext.jsx
 import React, { createContext, useContext, useState } from 'react';
-import { refreshToken } from '../api/auth'; // Assuming you have a function to refresh the token
+import { logout } from '../api/auth'; // 로그아웃 API 호출 함수
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [accessToken, setAccessToken] = useState(sessionStorage.getItem('token') || null);
+  const [accessToken, setAccessToken] = useState(sessionStorage.getItem('accessToken') || null);
 
-  const updateAccessToken = (newToken) => {
-    setAccessToken(newToken);
-    sessionStorage.setItem('token', newToken);
-    console.log('토큰 갱신됨', sessionStorage.getItem('token'));
+  const updateAccessToken = (response) => {
+    setAccessToken(response.accessToken);
+    sessionStorage.setItem('accessToken', response.accessToken);
+    sessionStorage.setItem('nickName', response.usernickname);
+    
   };
 
-  const handleTokenRefresh = async () => {
+  const handleLogout = async () => {
     try {
-      const { accessToken: newAccessToken } = await refreshToken();
-      updateAccessToken(newAccessToken);
+      await logout(); // 서버에 로그아웃 요청
     } catch (error) {
-      console.error('토큰 갱신 실패', error);
-      // 필요 시 로그아웃 처리 등 추가
+      console.error('로그아웃 실패', error);
     }
+    // 토큰 삭제 및 로그인 페이지로 리다이렉트
+    setAccessToken(null);
+    sessionStorage.removeItem('accessToken')
+    sessionStorage.removeItem('nickName')
+    sessionStorage.removeItem('openViduToken');
+    window.location.href = '/login'; // ✅ useNavigate 대신 사용
   };
 
   return (
-    <AuthContext.Provider value={{ accessToken, updateAccessToken, handleTokenRefresh }}>
+    <AuthContext.Provider value={{ accessToken, updateAccessToken, handleLogout }}>
       {children}
     </AuthContext.Provider>
   );
@@ -38,4 +42,4 @@ export const useAuth = () => {
   return context;
 };
 
-export default AuthContext; // <== export default 추가
+export default AuthContext;

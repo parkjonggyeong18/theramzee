@@ -1,87 +1,227 @@
 import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import styled from 'styled-components';
 import { fetchRooms, createRoom } from '../../api/room';
 import RoomList from './components/RoomList';
 import CreateRoomForm from './components/CreateRoomForm';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import forestBg from "../../assets/images/backgrounds/forest-bg.gif";
+import { useAuth } from '../../contexts/AuthContext'; // 추가
 
 const RoomPage = () => {
-  const { accessToken } = useAuth();
+  const { handleLogout } = useAuth();
   const [rooms, setRooms] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true); // Add loading state
-  const [error, setError] = useState(null); // Add error state
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("방 목록 불러오기");
-    if (!accessToken) {
-      setLoading(false); // If no token, no need to fetch
-      return;
-    }
-
-    const fetchRoomsList = async () => {
-      setLoading(true); // Set loading to true before fetching
-      setError(null); // Clear any previous errors
+    const loadRooms = async () => {
       try {
         const response = await fetchRooms();
-        const roomsList = response.data;
-        setRooms(roomsList);
-        console.log('방 목록:', roomsList);
+        setRooms(response.data);
       } catch (err) {
-        console.error('방 목록 불러오기 실패', err);
-        setError(err); // Set the error state
+        setError('방 목록을 불러오는데 실패했습니다');
       } finally {
-        setLoading(false); // Set loading to false regardless of success/failure
+        setLoading(false);
       }
     };
 
-    fetchRoomsList();
+    loadRooms();
+    // 주기적으로 방 목록 업데이트
+    const interval = setInterval(loadRooms, 500000);
+    return () => clearInterval(interval);
   }, []);
 
-  const handleRoomCreated = async (newRoomTitle) => {
+  const handleRoomCreated = async (title) => {
     try {
-      const response = await createRoom(newRoomTitle);
-      const roomId = response.data.roomId
+      const response = await createRoom(title);
+      const roomId = response.data.roomId;
       const openViduToken = response.data.token;
-      sessionStorage.setItem('openViduToken', openViduToken); 
-      // setRooms((prevRooms) => [...prevRooms, room]);
-
-      // Use useNavigate for navigation:
+      sessionStorage.setItem('openViduToken', openViduToken);
       navigate(`/room/${roomId}`);
-
     } catch (error) {
-      console.error('방 생성 실패', error);
-      // Consider displaying an error message to the user
-      alert("방 생성에 실패했습니다."); // Simple alert, could be a more sophisticated notification
+      setError('방 생성에 실패했습니다');
     }
   };
 
-  if (loading) {
-    return <div>Loading rooms...</div>; // Display loading message
-  }
-
-  if (error) {
-    return <div>Error: {error.message}</div>; // Display error message
-  }
-
   return (
-    <div>
-      <h1>방 목록</h1>
-      <button onClick={() => setIsModalOpen(true)}>방 만들기</button>
+    <PageContainer>
+      <BackgroundImage />
+      
+      <ContentWrapper>
+        <Header>
+          <Title>THE RAMZEE</Title>
+          <ButtonGroup>
+          <CreateRoomButton onClick={() => setIsModalOpen(true)}>
+            방 만들기
+          </CreateRoomButton>
+          <LogoutButton onClick={handleLogout}>
+              로그아웃
+            </LogoutButton>
+            </ButtonGroup>
+        </Header>
 
-      {isModalOpen && (
-        <div className="modal">
-          <div className="modal-content">
-            <button className="close" onClick={() => setIsModalOpen(false)}>X</button>
-            <CreateRoomForm onRoomCreated={handleRoomCreated} />
-          </div>
-        </div>
-      )}
+        {error && <ErrorMessage>{error}</ErrorMessage>}
+        
+        {loading ? (
+          <LoadingMessage>방 목록을 불러오는 중...</LoadingMessage>
+        ) : (
+          <RoomListContainer>
+            <RoomList rooms={rooms} />
+          </RoomListContainer>
+        )}
 
-      <RoomList rooms={rooms} />
-    </div>
+        {isModalOpen && (
+          <ModalOverlay>
+            <ModalContent>
+              <CloseButton onClick={() => setIsModalOpen(false)}>×</CloseButton>
+              <CreateRoomForm onRoomCreated={handleRoomCreated} />
+            </ModalContent>
+          </ModalOverlay>
+        )}
+      </ContentWrapper>
+    </PageContainer>
   );
 };
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+`;
+
+const LogoutButton = styled.button`
+  background-color: #ff6b6b;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #ff8787;
+  }
+`;
+
+
+const PageContainer = styled.div`
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+`;
+
+const BackgroundImage = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url(${forestBg});
+  background-size: cover;
+  z-index: -1;
+`;
+
+const ContentWrapper = styled.div`
+  width: 90%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  z-index: 1;
+`;
+
+const Header = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+`;
+
+const Title = styled.h1`
+  font-size: 3rem;
+  font-weight: bold;
+  color: white;
+  text-shadow: 
+    0 0 10px #00ff00,
+    0 0 20px #00ff00,
+    0 0 30px #00ff00;
+`;
+
+const CreateRoomButton = styled.button`
+  background-color: #2d1810;
+  color: white;
+  padding: 1rem 2rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #3d2218;
+  }
+`;
+
+const RoomListContainer = styled.div`
+  background-color: rgba(139, 69, 19, 0.9);
+  padding: 2rem;
+  border-radius: 15px;
+  min-height: 400px;
+`;
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const ModalContent = styled.div`
+  background-color: rgba(139, 69, 19, 0.95);
+  padding: 2rem;
+  border-radius: 15px;
+  width: 400px;
+  position: relative;
+`;
+
+const CloseButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  
+  &:hover {
+    color: #ff6b6b;
+  }
+`;
+
+const ErrorMessage = styled.div`
+  color: #ff6b6b;
+  text-align: center;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background-color: rgba(255, 107, 107, 0.1);
+  border-radius: 10px;
+`;
+
+const LoadingMessage = styled.div`
+  color: white;
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+`;
 
 export default RoomPage;

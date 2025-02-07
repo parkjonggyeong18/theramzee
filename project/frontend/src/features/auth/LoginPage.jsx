@@ -21,7 +21,7 @@ const LoginPage = () => {
 
     try {
       const response = await login(username, password);
-      updateAccessToken(response.data.accessToken);
+      updateAccessToken(response.data);
       navigate('/rooms');
     } catch (error) {
       console.error('로그인 실패', error);
