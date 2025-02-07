@@ -2,7 +2,6 @@ package com.gradation.backend.common.config;
 
 import com.gradation.backend.common.handler.StompHandler;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -19,14 +18,6 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final StompHandler stompHandler;
-
-//    /**
-//     * StompHandler 의존성 주입
-//     */
-//    @Autowired
-//    public WebSocketConfig(StompHandler stompHandler) {
-//        this.stompHandler = stompHandler;
-//    }
 
     /**
      * STOMP 메시지 브로커 설정
