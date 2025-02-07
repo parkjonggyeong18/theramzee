@@ -1,14 +1,17 @@
 package com.gradation.backend.friends.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gradation.backend.friends.model.entitiy.FriendStatus;
 import com.gradation.backend.friends.model.entitiy.Friends;
 import com.gradation.backend.friends.model.response.FriendRequestListResponse;
+import com.gradation.backend.friends.model.response.FriendRequestResponse;
 import com.gradation.backend.friends.model.response.FriendResponse;
 import com.gradation.backend.friends.repository.FriendsRepository;
 import com.gradation.backend.friends.service.FriendsService;
 import com.gradation.backend.user.model.entity.User;
 import com.gradation.backend.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +31,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class FriendsServiceImpl implements FriendsService {
 
+    @Autowired
+    private ObjectMapper objectMapper;
     private final UserRepository userRepository;
     private final FriendsRepository friendsRepository;
     private final SimpMessagingTemplate messagingTemplate;
@@ -71,10 +76,14 @@ public class FriendsServiceImpl implements FriendsService {
         friendRequest.setStatus(FriendStatus.REQUESTED);
         friendsRepository.save(friendRequest);
 
+        FriendRequestResponse response = new FriendRequestResponse(
+                sender.getNickname(),
+                FriendStatus.REQUESTED.toString()
+        );
         // 친구 요청 실시간 알림 전송
         messagingTemplate.convertAndSend(
                 "/topic/friend-requests/" + receiver.getUsername(),
-                sender.getNickname());
+                response);
     }
 
     /**
@@ -113,8 +122,8 @@ public class FriendsServiceImpl implements FriendsService {
                 .collect(Collectors.toList());
 
         // 친구 목록 갱신 알림 전송
-        messagingTemplate.convertAndSend("/topic/friends/" + sender.getNickname(), updatedSenderFriends);
-        messagingTemplate.convertAndSend("/topic/friends/" + receiver.getNickname(), updatedReceiverFriends);
+        messagingTemplate.convertAndSend("/topic/friends/" + sender.getUsername(), updatedSenderFriends);
+        messagingTemplate.convertAndSend("/topic/friends/" + receiver.getUsername(), updatedReceiverFriends);
     }
 
     /**
