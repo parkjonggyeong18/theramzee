@@ -2,6 +2,7 @@ package com.gradation.backend.common.utill;
 
 import com.gradation.backend.user.model.entity.CustomUserDetails;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,16 +81,22 @@ public class JwtTokenUtil {
      * @param userDetails 인증된 사용자의 정보를 담고 있는 UserDetails 객체
      * @return 토큰이 유효하면 true, 그렇지 않으면 false
      */
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public boolean validateToken(String token, UserDetails userDetails) {
+        try {
+            final String username = extractUsername(token);
+            return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        } catch (ExpiredJwtException ex) {
+            return false;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
     public boolean validateToken(String token) {
         try {
             extractAllClaims(token); // 토큰 디코딩
             return !isTokenExpired(token); // 만료되지 않았는지 확인
-        } catch (Exception ex) {
+        } catch (ExpiredJwtException ex) {
             return false; // 예외 발생 시 유효하지 않음
         }
     }
@@ -101,7 +108,12 @@ public class JwtTokenUtil {
      * @return 추출된 사용자 이름
      */
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        try {
+            return extractClaim(token, Claims::getSubject);
+        } catch (ExpiredJwtException e) {
+            // 만료된 토큰에서도 클레임 정보 추출 가능
+            return e.getClaims().getSubject();
+        }
     }
 
     /**
@@ -136,6 +148,7 @@ public class JwtTokenUtil {
     public Claims extractAllClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(secret)
+                .setAllowedClockSkewSeconds(60)
                 .parseClaimsJws(token)
                 .getBody();
     }

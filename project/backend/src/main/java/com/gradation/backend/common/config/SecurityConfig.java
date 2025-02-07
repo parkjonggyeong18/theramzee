@@ -1,6 +1,7 @@
 package com.gradation.backend.common.config;
 
 
+import com.gradation.backend.common.filter.CustomAuthenticationEntryPoint;
 import com.gradation.backend.common.filter.JwtAuthenticationFilter;
 import com.gradation.backend.common.utill.JwtTokenUtil;
 import com.gradation.backend.user.service.impl.CustomUserDetailsServiceImpl;
@@ -34,14 +35,15 @@ import java.util.List;
 public class SecurityConfig {
 
     private final CustomUserDetailsServiceImpl userDetailsService;
-
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     /**
      * SecurityConfig 생성자.
      *
      * @param userDetailsService 사용자 인증 정보를 제공하는 UserDetailsService 구현체
      */
-    public SecurityConfig(CustomUserDetailsServiceImpl userDetailsService) {
+    public SecurityConfig(CustomUserDetailsServiceImpl userDetailsService, CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
         this.userDetailsService = userDetailsService;
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil) {
@@ -85,7 +87,7 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter, CorsConfigurationSource corsConfigurationSource) throws Exception {
-        http    .exceptionHandling(exception -> {})
+        http    .exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint) )
                 // CSRF 보호 비활성화 (JWT는 CSRF 토큰이 필요하지 않음)
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
