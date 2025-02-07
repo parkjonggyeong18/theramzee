@@ -13,6 +13,7 @@ services:
       - "6379:6379"
   backend:
     build: ./backend # Spring Boot 프로젝트 Dockerfile 경로
+    image: ${DOCKER_IMAGE_PREFIX}-backend:latest # backend 이미지를 DOCKER_IMAGE_PREFIX로 태그
     ports:
       - "5000:5000"
     depends_on:
@@ -20,12 +21,14 @@ services:
       - redis
   frontended:
     build: ./frontended # React 프로젝트 Dockerfile 경로
+    image: ${DOCKER_IMAGE_PREFIX}-frontend:latest # frontended 이미지를 DOCKER_IMAGE_PREFIX로 태그
     ports:
       - "3000:80" # React는 Nginx를 통해 80 포트로 서비스
     depends_on:
       - backend
   nginx:
     build: ./nginx # Nginx Dockerfile 경로 (nginx.conf 포함)
+    image: ${DOCKER_IMAGE_PREFIX}-nginx:latest # nginx 이미지를 DOCKER_IMAGE_PREFIX로 태그
     ports:
       - "80:80"
       - "443:443"
