@@ -154,33 +154,37 @@ public class GameService {
      * 긴급 상태 불가능으로 변경
      *
      * @param roomId: 해당 방의 Id
-     * @return 긴급 상태
+     * @return 모든 사용자의 닉네임과 새로운 토큰 값
      */
-    public boolean emergency(int roomId) throws OpenViduJavaClientException, OpenViduHttpException {
+    public Map<String, String> emergency(int roomId) throws OpenViduJavaClientException, OpenViduHttpException {
         String roomKey = "ROOM:" + roomId;
         String forestKey = roomKey + ":FOREST:1";
 
         String sessionId = roomId + "-1";
+        Map<String, String> userTokens = new HashMap<>();
 
         for (int userNum = 1; userNum <= 6; userNum++) {
             String userKey = roomKey + ":USER:" + userNum;
 
             // 사용자 데이터 가져오기
-            Object nicknameObj = redisUtil.hget(userKey, "nickname");
-            String nickname = (String) nicknameObj;
+            String nickname = (String) redisUtil.hget(userKey, "nickname");
 
-            //forestToken을 roomId-1세션으로 설정
-            String token = openViduService.generateToken(sessionId, nickname);
-            redisUtil.hset(userKey, "forestToken", token);
+            if (nickname != null) {
+                //forestToken을 roomId-1세션으로 설정
+                String token = openViduService.generateToken(sessionId, nickname);
+                redisUtil.hset(userKey, "forestToken", token);
+
+                // 닉네임과 토큰을 맵에 저장
+                userTokens.put(nickname, token);
+            }
         }
 
         // 앞으로 긴급 불가능
         redisUtil.hset(forestKey, "emergencyPossible", false);
 
-        //현재 긴급 상태 반환
-        Object emergencyPossibleObj = redisUtil.hget(forestKey, "emergencyPossible");
-        return (Boolean) emergencyPossibleObj;
+        return userTokens;
     }
+
 
     /**
      * 특정 유저가 특정 숲으로 이동
@@ -189,7 +193,7 @@ public class GameService {
      * @param roomId: 해당 방의 Id
      * @param userNum: 유저 번호 (1-6)
      * @param newForest: 새로운 forestToken 값
-     * @return 해당 유저가 이동한 숲 번호
+     * @return 해당 유저가 이동한 숲의 세션토큰
      */
     public String moveForest(int roomId, int userNum, int newForest) throws OpenViduJavaClientException, OpenViduHttpException {
         String roomKey = "ROOM:" + roomId;

@@ -32,7 +32,7 @@ jwt:
     expiration: 604800000 # 1 week in milliseconds
 
 server:
-  port: 5000
+  port: 8080
 
 springdoc:
   api-docs:
@@ -41,5 +41,5 @@ springdoc:
     path: /swagger-ui.html
 
 openvidu:
-  url: ${OPENVIDU_URL:http://d204test.p-e.kr:5443/}
+  url: ${OPENVIDU_URL:http://localhost:4443/}
   secret: ${OPENVIDU_SECRET:1234}
