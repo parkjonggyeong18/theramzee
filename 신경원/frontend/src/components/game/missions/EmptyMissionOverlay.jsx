@@ -1,5 +1,6 @@
 // components/game/missions/EmptyMissionOverlay.jsx
 import styled from 'styled-components';
+import { Z_INDEX } from '../../../constants/zIndex';
 
 const EmptyMissionOverlay = ({ onClose }) => {
   return (
@@ -18,6 +19,7 @@ const OverlayContainer = styled.div`
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.8);
+  z-index: ${Z_INDEX.OVERLAY};  // z-index 추가
 `;
 
 const Message = styled.div`

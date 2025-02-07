@@ -3,8 +3,8 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../contexts/GameContext';
 
-const MainForestButtons = ({ onEmergencyClick, emergencyDisabled }) => {
- const { gameState, setGameState } = useGame();
+const MainForestButtons = () => {
+ const { gameState, setGameState, startEmergencyVote } = useGame();
  const [isStorageActive, setIsStorageActive] = useState(false);
  const [isEnergyActive, setIsEnergyActive] = useState(false);
  const [timer, setTimer] = useState(null);
@@ -46,49 +46,45 @@ const MainForestButtons = ({ onEmergencyClick, emergencyDisabled }) => {
  };
 
  return (
-   <ButtonContainer>
-     {gameState.role === 'good' && (
-       <StorageButton 
-         onClick={handleStorageClick}
-         disabled={isStorageActive || gameState.heldAcorns === 0}
-         $isActive={isStorageActive}
-       >
-         {isStorageActive ? '저장중...' : '창고'}
-         {isStorageActive && <ProgressBar />}
-       </StorageButton>
-     )}
+  <ButtonContainer>
+    {gameState.role === 'good' && (
+      <StorageButton 
+        onClick={handleStorageClick}
+        disabled={isStorageActive || gameState.heldAcorns === 0}
+        $isActive={isStorageActive}
+      >
+        {isStorageActive ? '저장중...' : '창고'}
+        {isStorageActive && <ProgressBar />}
+      </StorageButton>
+    )}
 
-     <EnergyButton 
-       onClick={handleEnergyClick}
-       disabled={isEnergyActive || gameState.fatigue >= 3}
-       $isActive={isEnergyActive}
-       $role={gameState.role}
-     >
-       {isEnergyActive ? '충전중...' : '에너지'}
-       {isEnergyActive && <ProgressBar />}
-     </EnergyButton>
+    <EnergyButton 
+      onClick={handleEnergyClick}
+      disabled={isEnergyActive || gameState.fatigue >= 3}
+      $isActive={isEnergyActive}
+      $role={gameState.role}
+    >
+      {isEnergyActive ? '충전중...' : '에너지'}
+      {isEnergyActive && <ProgressBar />}
+    </EnergyButton>
 
-     <EmergencyButton 
-       onClick={onEmergencyClick}
-       disabled={emergencyDisabled}
-     >
-       긴급
-     </EmergencyButton>
+    <EmergencyButton 
+      onClick={startEmergencyVote}
+      disabled={gameState.hasUsedEmergency}
+    >
+      긴급
+    </EmergencyButton>
 
-     {(isStorageActive || isEnergyActive) && (
-       <CancelButton onClick={cancelAction}>
-         취소
-       </CancelButton>
-     )}
-   </ButtonContainer>
+    {(isStorageActive || isEnergyActive) && (
+      <CancelButton onClick={cancelAction}>
+        취소
+      </CancelButton>
+    )}
+  </ButtonContainer>
  );
 };
 
 const ButtonContainer = styled.div`
- position: absolute;
- left: 50%;
- bottom: 100px;
- transform: translateX(-50%);
  display: flex;
  gap: 20px;
  z-index: 11;

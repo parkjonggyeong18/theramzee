@@ -1,6 +1,7 @@
 // components/game/MyVideo.jsx
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
+// OpenVidu 관련 import 유지
 import { OpenVidu, Publisher } from 'openvidu-browser';
 import { useGame } from '../../contexts/GameContext';
 import DeadOverlay from './DeadOverlay';
@@ -11,101 +12,121 @@ const MyVideo = () => {
    isCameraOn: true,
    isMicOn: true,
    showControls: false
-  //  publisher: null
+   // publisher: null  // OpenVidu 구현 시 필요
  });
 
  const myPlayer = players.find(p => p.isMe);
  const isKilled = gameState.killedPlayers.includes(myPlayer?.id);
 
-//  useEffect(() => {
-//    const OV = new OpenVidu();
+ // OpenVidu 초기화 및 설정 (주석 유지)
+ /*
+ useEffect(() => {
+   const OV = new OpenVidu();
    
-//    const initializePublisher = async () => {
-//      try {
-//        const publisher = OV.initPublisher(undefined, {
-//          publishAudio: true,
-//          publishVideo: !gameState.forceVideosOff,
-//          audioSource: gameState.foggyVoiceEffect ? 'processed-audio' : undefined,
-//          resolution: '640x480',
-//          frameRate: 30,
-//          mirror: false
-//        });
+   const initializePublisher = async () => {
+     try {
+       const publisher = OV.initPublisher(undefined, {
+         publishAudio: true,
+         publishVideo: !gameState.forceVideosOff,
+         audioSource: gameState.foggyVoiceEffect ? 'processed-audio' : undefined,
+         resolution: '640x480',
+         frameRate: 30,
+         mirror: false
+       });
 
-//        setControls(prev => ({
-//          ...prev,
-//          publisher,
-//          isCameraOn: !gameState.forceVideosOff
-//        }));
-//      } catch (error) {
-//        console.error('Error initializing publisher:', error);
-//      }
-//    };
+       setControls(prev => ({
+         ...prev,
+         publisher,
+         isCameraOn: !gameState.forceVideosOff
+       }));
+     } catch (error) {
+       console.error('Error initializing publisher:', error);
+     }
+   };
 
-//    initializePublisher();
+   initializePublisher();
 
-//    return () => {
-//      controls.publisher?.stream?.dispose();
-//    };
-//  }, []);
+   return () => {
+     controls.publisher?.stream?.dispose();
+   };
+ }, []);
+ */
 
  // 안개 숲 효과 감지
  useEffect(() => {
-  if (gameState.forceVideosOff) {
-  //  setControls(prev => {
-  //   prev.publisher?.publishVideo(false);
-  //    return {
-  //     ...prev,
-  //     isCameraOn: false
-  //    };
-  //  });
-    setControls(prev => ({
-      ...prev,
-      isCameraOn: false
-    }));
-  }
+   if (gameState.forceVideosOff) {
+     // OpenVidu 구현 시 사용할 코드 (주석 유지)
+     /*
+     setControls(prev => {
+       prev.publisher?.publishVideo(false);
+       return {
+         ...prev,
+         isCameraOn: false
+       };
+     });
+     */
+
+     // 더미 모드용 코드
+     setControls(prev => ({
+       ...prev,
+       isCameraOn: false
+     }));
+   }
  }, [gameState.forceVideosOff]);
 
+ // 사망 시 카메라/마이크 처리
  useEffect(() => {
-   // 죽었을 때 자동으로 카메라와 마이크 끄기
    if (isKilled) {
-    //  setControls(prev => {
-    //    prev.publisher?.publishVideo(false);
-    //    prev.publisher?.publishAudio(false);
-    //    return {
-    //      ...prev,
-    //      isCameraOn: false,
-    //      isMicOn: false
-    //    };
-    //  });
-    setControls(prev => ({
-      ...prev,
-      isCameraOn: false,
-      isMicOn: false
-    }));
+     // OpenVidu 구현 시 사용할 코드 (주석 유지)
+     /*
+     setControls(prev => {
+       prev.publisher?.publishVideo(false);
+       prev.publisher?.publishAudio(false);
+       return {
+         ...prev,
+         isCameraOn: false,
+         isMicOn: false
+       };
+     });
+     */
+
+     // 더미 모드용 코드
+     setControls(prev => ({
+       ...prev,
+       isCameraOn: false,
+       isMicOn: false
+     }));
    }
  }, [isKilled]);
 
  const toggleControl = (control) => {
    if (isKilled || (control === 'isCameraOn' && gameState.forceVideosOff)) return;
 
-  //  setControls(prev => {
-  //    if (control === 'isCameraOn') {
-  //      prev.publisher?.publishVideo(!prev[control]);
-  //    } else if (control === 'isMicOn') {
-  //      prev.publisher?.publishAudio(!prev[control]);
-  //    }
-  //    return { ...prev, [control]: !prev[control] };
-  //  });
-  setControls(prev => ({
-    ...prev,
-    [control]: !prev[control]
-  }));
+   // OpenVidu 구현 시 사용할 코드 (주석 유지)
+   /*
+   setControls(prev => {
+     if (control === 'isCameraOn') {
+       prev.publisher?.publishVideo(!prev[control]);
+     } else if (control === 'isMicOn') {
+       prev.publisher?.publishAudio(!prev[control]);
+     }
+     return { ...prev, [control]: !prev[control] };
+   });
+   */
+
+   // 더미 모드용 코드
+   setControls(prev => ({
+     ...prev,
+     [control]: !prev[control]
+   }));
  };
 
  return (
    <VideoContainer $isKilled={isKilled}>
      <Video $isDisabled={!controls.isCameraOn || isKilled}>
-       {/* {controls.publisher && (
+       {/* OpenVidu 구현 시 사용할 코드 (주석 유지) */}
+       {/*
+       {controls.publisher && (
          <Publisher
            streamManager={controls.publisher}
            style={{ 
@@ -114,17 +135,16 @@ const MyVideo = () => {
              opacity: isKilled ? 0.5 : 1
            }}
          />
-       )} */}
-       {/* 더미 데이터 생성 */}
+       )}
+       */}
+       
+       {/* 더미 모드용 비디오 */}
        <DummyVideo $isDisabled={!controls.isCameraOn}>
-        {!controls.isCameraOn && <CameraOffOverlay>카메라 OFF</CameraOffOverlay>}
-        {isKilled && (
-          <DeadOverlay 
-            playerName={myPlayer?.name} 
-          />
-        )}
+         {!controls.isCameraOn && <CameraOffOverlay>카메라 OFF</CameraOffOverlay>}
+         {isKilled && <DeadOverlay playerName={myPlayer?.name} />}
        </DummyVideo>
      </Video>
+
      {!isKilled && (
        <>
          <ControlsButton
@@ -174,14 +194,13 @@ const Video = styled.div`
  opacity: ${props => props.$isDisabled ? 0.5 : 1};
 `;
 
-// 더미 비디오
 const DummyVideo = styled.div`
-width: 100%;
-height: 100%;
-background-color: ${props => props.$isDisabled ? '#333' : '#666'};
-display: flex;
-align-items: center;
-justify-content: center;
+ width: 100%;
+ height: 100%;
+ background-color: ${props => props.$isDisabled ? '#333' : '#666'};
+ display: flex;
+ align-items: center;
+ justify-content: center;
 `;
 
 const CameraOffOverlay = styled.div`

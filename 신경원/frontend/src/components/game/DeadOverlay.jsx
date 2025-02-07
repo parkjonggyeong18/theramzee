@@ -1,5 +1,6 @@
 // components/game/DeadOverlay.jsx
 import styled, { keyframes } from 'styled-components';
+import { Z_INDEX } from '../../constants/zIndex';
 
 const DeadOverlay = ({ playerName }) => {
  return (
@@ -36,7 +37,7 @@ const OverlayContainer = styled.div`
  display: flex;
  justify-content: center;
  align-items: center;
- z-index: 10;
+ z-index: ${Z_INDEX.OVERLAY};  // z-index 추가
 `;
 
 const Content = styled.div`

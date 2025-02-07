@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
+import { Z_INDEX } from '../../../constants/zIndex';
 
 const ColorMatchGame = ({ onComplete, onClose }) => {
   const { gameState, setGameState } = useGame();
@@ -75,6 +76,7 @@ const GameContainer = styled.div`
   justify-content: center;
   background: rgba(0, 0, 0, 0.8);
   padding: 20px;
+  z-index: ${Z_INDEX.OVERLAY};  // z-index 추가
 `;
 
 const GameTitle = styled.h2`
