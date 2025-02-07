@@ -16,6 +16,6 @@ export const sendEmailVerification = async (email) => {
 };
 
 // 이메일 인증번호 검증
-export const verifyEmailCode = async (email, code) => {
-  return await apiRequest('/api/v1/email/email-auth', 'POST', { email, code });
+export const verifyEmailCode = async (email, authNum) => {
+  return await apiRequest('/api/v1/email/email-auth', 'POST', { email, authNum });
 };
