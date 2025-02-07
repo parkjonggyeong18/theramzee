@@ -42,4 +42,4 @@ springdoc:
 
 openvidu:
   url: ${OPENVIDU_URL:http://localhost:4443/}
-  secret: ${OPENVIDU_SECRET:1234}
+  secret: ${OPENVIDU_SECRET:MY_SECRET}

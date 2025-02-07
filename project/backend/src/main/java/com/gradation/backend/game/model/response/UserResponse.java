@@ -3,7 +3,7 @@ package com.gradation.backend.game.model.response;
 import lombok.Data;
 
 @Data
-public class UserResponseDto {
+public class UserResponse {
     private String nickname;
     private boolean alive;
     private int acorns;
