@@ -371,28 +371,28 @@ function GameStart() {
       {savedAcorns !== null && (
         <div>
           <h3>Saved Acorns:</h3>
-          <p>{savedAcorns}</p>
+          <p>{JSON.stringify(savedAcorns, null, 2)}</p>
         </div>
       )}
 
       {fatigue !== null && (
         <div>
           <h3>User Fatigue:</h3>
-          <p>{fatigue}</p>
+          <p>{JSON.stringify(fatigue, null, 2)}</p>
         </div>
       )}
 
       {chargedFatigue !== null && (
         <div>
           <h3>Charged Fatigue:</h3>
-          <p>{chargedFatigue}</p>
+          <p>{JSON.stringify(chargedFatigue, null, 2)}</p>
         </div>
       )}
 
       {killResult !== null && (
         <div>
           <h3>Kill Result:</h3>
-          <p>{killResult ? 'Success' : 'Failed'}</p>
+          <p>{JSON.stringify(killResult, null, 2)}</p>
         </div>
       )}
 
@@ -406,7 +406,7 @@ function GameStart() {
       {completeMissionResult !== null && (
         <div>
           <h3>Mission Completion Result:</h3>
-          <p>{completeMissionResult ? 'Success' : 'Failed'}</p>
+          <p>{JSON.stringify(completeMissionResult, null, 2)}</p>
         </div>
       )}
     </div>
