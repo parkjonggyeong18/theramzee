@@ -2,7 +2,6 @@
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../../contexts/GameContext';
-
 import { backgroundImages } from '../../assets/images';
 
 const MiniMap = () => {
@@ -50,38 +49,43 @@ const MiniMap = () => {
 
  const handleForestClick = (forestId) => {
    // 죽었을 때도 관전은 가능하도록 함
+   if (!gameState.isStarted && !gameState.isDead) return;
+   if (!gameState.roomId) return;
    navigate(`/game/${gameState.roomId}/forest/${forestId}`);
  };
 
  const handleMainForestClick = () => {
+   if (!gameState.isStarted && !gameState.isDead) return;
+   if (!gameState.roomId) return;
    navigate(`/game/${gameState.roomId}/main`);
  };
 
  return (
-   <MapContainer>
-     <ForestGrid>
-       {forests.map((forest) => (
-         <ForestButton
-           key={forest.id}
-           $position={forest.position}
-           $backgroundImage={forest.backgroundImage}
-           onClick={() => handleForestClick(forest.id)}
-           title={forest.name}
-         />
-       ))}
-       <MainForestButton
-         onClick={handleMainForestClick}
-         $backgroundImage={backgroundImages.mainForest}
-       />
-     </ForestGrid>
-   </MapContainer>
+  <MapContainer>
+    <ForestGrid>
+      {forests.map((forest) => (
+        <ForestButton
+          key={forest.id}
+          $position={forest.position}
+          $backgroundImage={forest.backgroundImage}
+          onClick={() => handleForestClick(forest.id)}
+          title={forest.name}
+          disabled={!gameState.isStarted && !gameState.isDead}
+          $isDisabled={!gameState.isStarted && !gameState.isDead}
+        />
+      ))}
+      <MainForestButton
+        onClick={handleMainForestClick}
+        $backgroundImage={backgroundImages.mainForest}
+        disabled={!gameState.isStarted && !gameState.isDead}
+        $isDisabled={!gameState.isStarted && !gameState.isDead}
+      />
+    </ForestGrid>
+  </MapContainer>
  );
 };
 
 const MapContainer = styled.div`
- position: absolute;
- bottom: 20px;
- right: 20px;
  width: 200px;
  height: 200px;
 `;
@@ -104,6 +108,8 @@ const ForestButton = styled.button`
  border-radius: 5px;
  cursor: pointer;
  transition: transform 0.2s;
+ opacity: ${props => props.$isDisabled ? 0.5 : 1};
+ cursor: ${props => props.$isDisabled ? 'not-allowed' : 'pointer'};
  grid-area: ${props => {
    switch (props.$position) {
      case 'top-left': return '1 / 1 / 2 / 2';
@@ -149,6 +155,8 @@ const MainForestButton = styled.button`
  border-radius: 50%;
  cursor: pointer;
  transition: transform 0.2s;
+ opacity: ${props => props.$isDisabled ? 0.5 : 1};
+ cursor: ${props => props.$isDisabled ? 'not-allowed' : 'pointer'};
  grid-area: 2 / 2 / 3 / 3;
 
  &:hover {

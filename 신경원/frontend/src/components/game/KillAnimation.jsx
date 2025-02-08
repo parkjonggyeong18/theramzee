@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { animationImages } from '../../assets/images';
+import { Z_INDEX } from '../../constants/zIndex';
 
 const KillAnimation = ({ onAnimationEnd }) => {
  useEffect(() => {
@@ -49,7 +50,7 @@ const AnimationOverlay = styled.div`
  width: 100vw;
  height: 100vh;
  background: rgba(0, 0, 0, 0.8);
- z-index: 1000;
+ z-index: ${Z_INDEX.KILL_ANIMATION};  // z-index 추가, 가장 높은 우선순위
  display: flex;
  justify-content: center;
  align-items: center;
