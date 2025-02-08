@@ -115,7 +115,8 @@ public class ChatController {
     @Transactional
     @Tag(name = "친구 관리", description = "친구 관리 API")
     public void sendMessage(ChatMessage chatMessage, Principal principal) {
-        String sender = principal.getName();
+        String sender = chatMessage.getSender();
+        System.out.println("Sender: " + sender);
         User users = userService.getUserByUserName(sender);
         User user = userService.getUserByUserNickname(chatMessage.getReceiver());
         String receiver = user.getUsername();
@@ -139,9 +140,8 @@ public class ChatController {
             );
         }
         System.out.println("ㅎㅇ");
-        messagingTemplate.convertAndSendToUser(
-                receiver,
-                "/queue/messages",
+        messagingTemplate.convertAndSend(
+                "/topic/messages/" + receiver,
                 chatMessage
         );
     }
