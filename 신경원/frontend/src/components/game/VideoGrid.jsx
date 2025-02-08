@@ -1,192 +1,215 @@
 // components/game/VideoGrid.jsx
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { OpenVidu, Publisher } from 'openvidu-browser';
+// OpenVidu 관련 import 유지
+import { OpenVidu, Publisher } from 'openvidu-browser'; 
 import { useGame } from '../../contexts/GameContext';
 import { useKillSystem } from '../../hooks/useKillSystem';
 import DeadOverlay from './DeadOverlay';
 import KillAnimation from './KillAnimation';
 
-const VideoGrid = () => {
- const { gameState, players } = useGame();
+const VideoGrid = ({ players, gridPosition }) => {
+ const { gameState } = useGame();
  const { killingPlayer, handleDragStart, isKillable, isDragging } = useKillSystem();
  
+ // 비디오 컨트롤 초기 상태
  const [videoControls, setVideoControls] = useState(
    players.filter(p => !p.isMe).map(p => ({
      id: p.id,
      isCameraOn: true,
      isMicOn: true,
      showControls: false
-    //  publisher: null
+     // publisher: null  // OpenVidu 구현 시 필요
    }))
  );
 
-//  useEffect(() => {
-//    const OV = new OpenVidu();
+ // 플레이어 필터링 (좌/우 구역에 따라)
+ const filteredPlayers = players.filter(p => !p.isMe).slice(
+   gridPosition === 'left' ? 0 : 3,
+   gridPosition === 'left' ? 3 : 5
+ );
+
+ // OpenVidu 초기화 및 설정 (주석 유지)
+ /*
+ useEffect(() => {
+   const OV = new OpenVidu();
    
-//    const initializePublishers = async () => {
-//      try {
-//        const publishers = await Promise.all(
-//          players.filter(p => !p.isMe).map(async player => {
-//            const publisher = OV.initPublisher(undefined, {
-//              publishAudio: true,
-//              publishVideo: !gameState.forceVideosOff,  // 안개 숲에서는 강제 OFF
-//              audioSource: gameState.foggyVoiceEffect ? 'processed-audio' : undefined,
-//              resolution: '640x480',
-//              frameRate: 30,
-//              mirror: false
-//            });
-//            return { id: player.id, publisher };
-//          })
-//        );
+   const initializePublishers = async () => {
+     try {
+       const publishers = await Promise.all(
+         players.filter(p => !p.isMe).map(async player => {
+           const publisher = OV.initPublisher(undefined, {
+             publishAudio: true,
+             publishVideo: !gameState.forceVideosOff,
+             audioSource: gameState.foggyVoiceEffect ? 'processed-audio' : undefined,
+             resolution: '640x480',
+             frameRate: 30,
+             mirror: false
+           });
+           return { id: player.id, publisher };
+         })
+       );
 
-//        setVideoControls(prev => 
-//          prev.map(control => {
-//            const publisherData = publishers.find(p => p.id === control.id);
-//            return {
-//              ...control,
-//              publisher: publisherData?.publisher || null,
-//              isCameraOn: !gameState.forceVideosOff  // 안개 숲 상태 반영
-//            };
-//          })
-//        );
-//      } catch (error) {
-//        console.error('Error initializing publishers:', error);
-//      }
-//    };
+       setVideoControls(prev => 
+         prev.map(control => {
+           const publisherData = publishers.find(p => p.id === control.id);
+           return {
+             ...control,
+             publisher: publisherData?.publisher || null,
+             isCameraOn: !gameState.forceVideosOff
+           };
+         })
+       );
+     } catch (error) {
+       console.error('Error initializing publishers:', error);
+     }
+   };
 
-//    initializePublishers();
+   initializePublishers();
 
-//    return () => {
-//      videoControls.forEach(control => {
-//        control.publisher?.stream?.dispose();
-//      });
-//    };
-//  }, []);
+   return () => {
+     videoControls.forEach(control => {
+       control.publisher?.stream?.dispose();
+     });
+   };
+ }, []);
+ */
 
  // 안개 숲 효과 감지
  useEffect(() => {
-  if (gameState.forceVideosOff) {
-  //  setVideoControls(prev => 
-  //   prev.map(control => ({
-  //    ...control,
-  //     isCameraOn: false,
-  //      publisher: control.publisher && {
-  //       ...control.publisher,
-  //       publishVideo: false
-  //      }
-  //   }))
-  //  );
+   if (gameState.forceVideosOff) {
+     // OpenVidu 구현 시 사용할 코드 (주석 유지)
+     /*
+     setVideoControls(prev => 
+       prev.map(control => ({
+         ...control,
+         isCameraOn: false,
+         publisher: control.publisher && {
+           ...control.publisher,
+           publishVideo: false
+         }
+       }))
+     );
+     */
 
-  // 더미
-  setVideoControls(prev => 
-    prev.map(control => ({
-     ...control,
-     isCameraOn: false
-    }))
-   );
-  }
+     // 더미 모드용 코드
+     setVideoControls(prev => 
+       prev.map(control => ({
+         ...control,
+         isCameraOn: false
+       }))
+     );
+   }
  }, [gameState.forceVideosOff]);
 
+ // 컨트롤 토글
  const toggleControl = (playerId, control) => {
-  //  setVideoControls(prev =>
-  //    prev.map(p => {
-  //      if (p.id === playerId) {
-  //        if (control === 'isCameraOn') {
-  //          p.publisher?.publishVideo(!p[control]);
-  //        } else if (control === 'isMicOn') {
-  //          p.publisher?.publishAudio(!p[control]);
-  //        }
-  //        return { ...p, [control]: !p[control] };
-  //      }
-  //      return p;
-  //    })
-  //  );
+   // OpenVidu 구현 시 사용할 코드 (주석 유지)
+   /*
+   setVideoControls(prev =>
+     prev.map(p => {
+       if (p.id === playerId) {
+         if (control === 'isCameraOn') {
+           p.publisher?.publishVideo(!p[control]);
+         } else if (control === 'isMicOn') {
+           p.publisher?.publishAudio(!p[control]);
+         }
+         return { ...p, [control]: !p[control] };
+       }
+       return p;
+     })
+   );
+   */
 
-  // 더미
-  setVideoControls(prev =>
-    prev.map(p => {
-      if (p.id === playerId) {
-        return { ...p, [control]: !p[control] };
-      }
-      return p;
-    })
-  );
+   // 더미 모드용 코드
+   setVideoControls(prev =>
+     prev.map(p => {
+       if (p.id === playerId) {
+         return { ...p, [control]: !p[control] };
+       }
+       return p;
+     })
+   );
  };
 
  return (
-   <>
-     <GridContainer>
-       {players.filter(p => !p.isMe).map((player) => {
-         const controls = videoControls.find(c => c.id === player.id);
-         const isKilled = gameState.killedPlayers.includes(player.id);
-         const isBeingKilled = killingPlayer === player.id;
+   <GridContainer $gridPosition={gridPosition}>
+     {filteredPlayers.map((player) => {
+       const controls = videoControls.find(c => c.id === player.id);
+       const isKilled = gameState.killedPlayers.includes(player.id);
+       const isBeingKilled = killingPlayer === player.id;
 
-         return (
-           <VideoContainer 
-             key={player.id}
-             onMouseDown={(e) => handleDragStart(e, player.id)}
-             $isKillable={isKillable && !isKilled}
-             $isDragging={isDragging}
-           >
-             <Video $isDisabled={!controls.isCameraOn || isKilled}>
-               {/* {controls.publisher && (
-                 <Publisher
-                   streamManager={controls.publisher}
-                   style={{ 
-                     width: '100%', 
-                     height: '100%',
-                     opacity: isKilled ? 0.5 : 1
-                   }}
-                 />
-               )} */}
-               {/* 더미 */}
-               <DummyVideo $isDisabled={!controls?.isCameraOn}>
-                {!controls.isCameraOn && <CameraOffOverlay>카메라 OFF</CameraOffOverlay>}
-                {isKilled && <DeadOverlay playerName={player.name} />}
-               </DummyVideo>
-             </Video>
-             <ControlsButton
-               onClick={() => setVideoControls(prev =>
-                 prev.map(p => 
-                   p.id === player.id
-                     ? { ...p, showControls: !p.showControls }
-                     : p
-                 )
-               )}
-             >
-               ⚙️
-             </ControlsButton>
-             {controls.showControls && (
-               <ControlsPanel>
-                 <ControlButton
-                   onClick={() => toggleControl(player.id, 'isCameraOn')}
-                   $isOn={controls.isCameraOn}
-                 >
-                   🎥
-                 </ControlButton>
-                 <ControlButton
-                   onClick={() => toggleControl(player.id, 'isMicOn')}
-                   $isOn={controls.isMicOn}
-                 >
-                   🎤
-                 </ControlButton>
-               </ControlsPanel>
+       return (
+         <VideoContainer 
+           key={player.id}
+           onMouseDown={(e) => handleDragStart(e, player.id)}
+           $isKillable={isKillable && !isKilled}
+           $isDragging={isDragging}
+         >
+           <Video $isDisabled={!controls?.isCameraOn || isKilled}>
+             {/* OpenVidu 구현 시 사용할 코드 (주석 유지) */}
+             {/*
+             {controls.publisher && (
+               <Publisher
+                 streamManager={controls.publisher}
+                 style={{ 
+                   width: '100%', 
+                   height: '100%',
+                   opacity: isKilled ? 0.5 : 1
+                 }}
+               />
              )}
-           </VideoContainer>
-         );
-       })}
-     </GridContainer>
+             */}
+             
+             {/* 더미 모드용 비디오 */}
+             <DummyVideo $isDisabled={!controls?.isCameraOn}>
+               {!controls?.isCameraOn && <CameraOffOverlay>카메라 OFF</CameraOffOverlay>}
+               {isKilled && <DeadOverlay playerName={player.name} />}
+             </DummyVideo>
+           </Video>
+
+           <ControlsButton
+             onClick={() => setVideoControls(prev =>
+               prev.map(p => 
+                 p.id === player.id
+                   ? { ...p, showControls: !p.showControls }
+                   : p
+               )
+             )}
+           >
+             ⚙️
+           </ControlsButton>
+
+           {controls?.showControls && (
+             <ControlsPanel>
+               <ControlButton
+                 onClick={() => toggleControl(player.id, 'isCameraOn')}
+                 $isOn={controls.isCameraOn}
+               >
+                 🎥
+               </ControlButton>
+               <ControlButton
+                 onClick={() => toggleControl(player.id, 'isMicOn')}
+                 $isOn={controls.isMicOn}
+               >
+                 🎤
+               </ControlButton>
+             </ControlsPanel>
+           )}
+         </VideoContainer>
+       );
+     })}
      {killingPlayer && <KillAnimation />}
-   </>
+   </GridContainer>
  );
 };
 
+// styled-components 수정
 const GridContainer = styled.div`
  display: grid;
- grid-template-columns: repeat(3, 1fr);
+ grid-template-columns: ${props => props.$gridPosition === 'left' ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)'};
  gap: 10px;
- padding: 20px;
+//  padding: 0 20px;
 `;
 
 const VideoContainer = styled.div`

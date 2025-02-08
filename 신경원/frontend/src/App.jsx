@@ -15,27 +15,26 @@ import TimeForest from './pages/forests/TimeForest';
 import { GameProvider } from 'contexts/GameContext';
 
 function App() {
- return (
-   <GameProvider>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/lobby" element={<Lobby />} />
-        <Route path="/game/:roomId" element={<GameRoom />}>
-          <Route path="main" element={<MainForest />} />
-          <Route path="twisted" element={<TwistedForest />} />
-          <Route path="dry" element={<DryForest />} />
-          <Route path="breathing" element={<BreathingForest />} />
-          <Route path="foggy" element={<FoggyForest />} />
-          <Route path="fairy" element={<FairyForest />} />
-          <Route path="time" element={<TimeForest />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-   </GameProvider>
- );
+  return (
+    <GameProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/lobby" element={<Lobby />} />
+          <Route path="/game/:roomId" element={<GameRoom />} />
+          <Route path="/game/:roomId/main" element={<MainForest />} />
+          <Route path="/game/:roomId/forest/twisted" element={<TwistedForest />} />
+          <Route path="/game/:roomId/forest/dry" element={<DryForest />} />
+          <Route path="/game/:roomId/forest/breathing" element={<BreathingForest />} />
+          <Route path="/game/:roomId/forest/foggy" element={<FoggyForest />} />
+          <Route path="/game/:roomId/forest/fairy" element={<FairyForest />} />
+          <Route path="/game/:roomId/forest/time" element={<TimeForest />} />
+        </Routes>
+      </BrowserRouter>
+    </GameProvider>
+  );
 }
 
 export default App;
