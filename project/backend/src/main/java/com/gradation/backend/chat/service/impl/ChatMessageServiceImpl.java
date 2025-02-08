@@ -164,12 +164,12 @@ public class ChatMessageServiceImpl implements ChatMessageService {
         if (unreadKeys == null || unreadKeys.isEmpty()) {
             return Collections.emptyList(); // 읽지 않은 메시지가 없으면 빈 리스트 반환
         }
-
+        System.out.println(unreadKeys);
         // 각 key에서 `sender`와 읽지 않은 메시지 수를 추출하여 응답 생성
         return unreadKeys.stream()
                 .map(unreadKey -> {
                     String sender = extractSenderFromKey(unreadKey); // Redis 키에서 송신자 추출
-                    String value = redisTemplate2.opsForValue().get(unreadKey); // Redis에서 읽지 않은 메시지 수 조회
+                    String value = String.valueOf(redisTemplate2.opsForValue().get(unreadKey)); // Redis에서 읽지 않은 메시지 수 조회
                     Long unreadCount = value != null ? Long.parseLong(value) : 0L;
                     return new UnreadMessageResponse(sender, unreadCount); // 응답 객체 생성
                 })

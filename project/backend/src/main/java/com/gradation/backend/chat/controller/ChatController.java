@@ -133,9 +133,8 @@ public class ChatController {
         System.out.println("Unread count: " + unreadCount);
 
         if (unreadCount > 0) {
-            messagingTemplate.convertAndSendToUser(
-                    receiver,
-                    "/queue/notifications",
+            messagingTemplate.convertAndSend(
+                    "/topic/notifications" + receiver,
                     "새로운 메시지가 있습니다 (" + unreadCount + "개)"
             );
         }
