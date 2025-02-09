@@ -6,7 +6,7 @@ import { backgroundImages } from '../../assets/images';
 
 const MiniMap = () => {
  const navigate = useNavigate();
- const { gameState } = useGame();
+ const { gameState, moveForest } = useGame();
 
  const forests = [
    { 
@@ -47,35 +47,37 @@ const MiniMap = () => {
    }
  ];
 
- const handleForestClick = (forestId) => {
+ const clkForest = (forestId, forestNum) => {
    // 죽었을 때도 관전은 가능하도록 함
    if (!gameState.isStarted && !gameState.isDead) return;
    if (!gameState.roomId) return;
+   moveForest(forestNum);
    navigate(`/game/${gameState.roomId}/forest/${forestId}`);
  };
 
- const handleMainForestClick = () => {
+ const clkMainForest = () => {
    if (!gameState.isStarted && !gameState.isDead) return;
    if (!gameState.roomId) return;
+   moveForest(1);
    navigate(`/game/${gameState.roomId}/main`);
  };
 
  return (
   <MapContainer>
     <ForestGrid>
-      {forests.map((forest) => (
+      {forests.map((forest, index) => (
         <ForestButton
           key={forest.id}
           $position={forest.position}
           $backgroundImage={forest.backgroundImage}
-          onClick={() => handleForestClick(forest.id)}
+          onClick={() => clkForest(forest.id, index+2)}
           title={forest.name}
           disabled={!gameState.isStarted && !gameState.isDead}
           $isDisabled={!gameState.isStarted && !gameState.isDead}
         />
       ))}
       <MainForestButton
-        onClick={handleMainForestClick}
+        onClick={clkMainForest}
         $backgroundImage={backgroundImages.mainForest}
         disabled={!gameState.isStarted && !gameState.isDead}
         $isDisabled={!gameState.isStarted && !gameState.isDead}
