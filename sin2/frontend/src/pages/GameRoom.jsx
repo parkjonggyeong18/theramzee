@@ -20,7 +20,7 @@ const GameRoom = () => {
   const navigate = useNavigate();
   const { 
     gameState, 
-    handleGameStart,   // startGame 함수 사용
+    startGame,   // startGame 함수 사용
     players,
     setGameState,
     setRoomId
@@ -28,19 +28,19 @@ const GameRoom = () => {
   const { roomId } = useParams();  // roomId 가져오기
 
   useEffect(() => {
-    setRoomId(29);
+    setRoomId(31);
     setGameState(prev => ({
       ...prev,
       roomId
     }));
   }, [roomId, setRoomId, setGameState]);
 
-  const handleStart = () => {
-    handleGameStart();
+  const clkStart = () => {
+    startGame();
     navigate(`/game/${roomId}/main`);
   };
 
-  const handleExit = () => {
+  const clkExit = () => {
     navigate('/lobby');
   };
 
@@ -65,8 +65,8 @@ const GameRoom = () => {
     statePanel: <StatePanel />,
     buttonContainer: (
       <ButtonContainer>
-        <StartButton onClick={handleStart}>GAME START</StartButton>
-        <ExitButton onClick={handleExit}>나가기</ExitButton>
+        <StartButton onClick={clkStart}>GAME START</StartButton>
+        <ExitButton onClick={clkExit}>나가기</ExitButton>
       </ButtonContainer>
     ),
     myVideo: <MyVideo />,

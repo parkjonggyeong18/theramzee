@@ -18,7 +18,7 @@ export const startGame = async (roomId, nicknames) => {
   }
 };
 
-export const handleEmergency = async (roomId) => {
+export const startEmergency = async (roomId) => {
     try {
       await sendMessage(`/app/game/${roomId}/emergency`, { roomId });
     } catch (error) {

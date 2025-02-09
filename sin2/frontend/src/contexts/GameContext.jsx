@@ -11,6 +11,7 @@ export const GameProvider = ({ children }) => {
   const [gameState, setGameState] = useState({
     // 유저 정보
     userNum: 3,
+    nickName: 'Player 3',
 
     // 게임 진행 상태
     isStarted: false, // 게임 시작 여부
@@ -62,7 +63,6 @@ export const GameProvider = ({ children }) => {
     { id: 6, nickName: 'Player 6', isMe: false }
   ]);
   
-  // const [isConnected, setIsConnected] = useState(false);
   const [roomId, setRoomId] = useState(null);
   const [nicknames, setNicknames] = useState('');
 
@@ -93,7 +93,7 @@ const { isConnected, initializeSocket } = useGameSocket(roomId, {
 ////////////////////////////////////이벤트 함수////////////////////////////////////////////////////////////
 
   // 게임 시작 처리
-  const handleGameStart = useCallback(async () => {
+  const startGame = useCallback(async () => {
     console.log('Attempting to start game:', roomId, players.map(p => p.nickName));
     
     let connected;
@@ -105,7 +105,7 @@ const { isConnected, initializeSocket } = useGameSocket(roomId, {
       }
     }
 
-    if (true && roomId) {
+    if (connected && roomId) {
       try {
         await gameService.startGame(roomId, players.map(p => p.nickName));
         console.log('Game start request sent successfully');
@@ -116,6 +116,33 @@ const { isConnected, initializeSocket } = useGameSocket(roomId, {
       console.error('Socket connection not initialized');
     }
   }, [isConnected, roomId, players, initializeSocket]);
+
+  // 피로도 충전 처리
+  const chargeFatigue = useCallback(async () => {
+    if (isConnected && roomId && gameState.userNum) {
+      try {
+        await gameService.chargeFatigue(roomId, gameState.userNum);
+      } catch (error) {
+        console.error('Failed to get user fatigue:', error);
+      }
+    } else {
+      console.error('WebSocket is not connected or required fields are empty');
+    }
+  }, [isConnected, roomId, gameState.userNum]);
+
+  // 도토리 저장 처리
+  const saveUserAcorns = useCallback(async () => {
+    if (isConnected && roomId && gameState.userNum) {
+      try {
+        await gameService.saveUserAcorns(roomId, gameState.userNum);
+      } catch (error) {
+        console.error('Failed to get user fatigue:', error);
+      }
+    } else {
+      console.error('WebSocket is not connected or required fields are empty');
+    }
+  }, [isConnected, roomId, gameState.userNum]);
+  
 
   // 플레이어 사망 처리
   const killPlayer = (playerId) => {
@@ -128,15 +155,17 @@ const { isConnected, initializeSocket } = useGameSocket(roomId, {
   };
 
   // 긴급 투표 시작
-  const startEmergencyVote = () => {
-    setGameState(prev => ({
-      ...prev,
-      isVoting: true,
-      isEmergencyVote: true,
-      hasUsedEmergency: true,
-      timerRunning: false  // 게임 타이머 일시 정지
-    }));
-  };
+  const startEmergency = useCallback(async () => {
+    if (isConnected && roomId) {
+      try {
+        await gameService.startEmergency(roomId);
+      } catch (error) {
+        console.error('Failed to get user fatigue:', error);
+      }
+    } else {
+      console.error('WebSocket is not connected or required fields are empty');
+    }
+  }, [isConnected, roomId]);
 
   // 투표 종료
   const endVote = (result) => {
@@ -176,9 +205,11 @@ const { isConnected, initializeSocket } = useGameSocket(roomId, {
     gameState,         // 게임 전체 상태
     setGameState,      // 게임 상태 변경
     players,          // 플레이어 정보
-    handleGameStart,        // 게임 시작
+    startGame,        // 게임 시작
+    chargeFatigue,       // 피로도 충전
+    saveUserAcorns,       // 도토리 저장
     killPlayer,       // 플레이어 사망 처리
-    startEmergencyVote, // 긴급 투표 시작
+    startEmergency, // 긴급 투표 시작
     endVote,          // 투표 종료
     startFinalVote,   // 일반 투표 시작
     toggleFoggyEffects, // 안개 숲 효과
