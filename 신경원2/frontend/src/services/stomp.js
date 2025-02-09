@@ -8,7 +8,7 @@ let stompClient = null;
 export const connectSocket = async () => {
   return new Promise((resolve, reject) => {
     // let token = sessionStorage.getItem('token');
-    let token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJVc2VyVGVzdDEiLCJuaWNrbmFtZSI6IlRlc3RVc2VyMSIsImV4cCI6MTczOTQ0NDk3MCwiaWF0IjoxNzM5MDg0OTcwfQ.o059cbBPIZzA7c3Nwcrh6EWgD7ycQaPJrx5TrlJmtlJA_gd8LHTE1LjhTddjkKF8tgciOxHBtd8kwOI_3PjZ7w'
+    let token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJVc2VyVGVzdDEiLCJuaWNrbmFtZSI6IlRlc3RVc2VyMSIsImV4cCI6MTczOTQ2ODY5NCwiaWF0IjoxNzM5MTA4Njk0fQ.swEHYP2M6bLcafvQFdN2Mqk3LOD_HvYs3Jh5_EXH45LcAtPDnSMjsLqGkjTu_XrUzbGmwhEts2dW7mhj6tHGSA'
     const socket = new SockJS(`${BASE_URL}/ws`);
 
     stompClient = new Client({

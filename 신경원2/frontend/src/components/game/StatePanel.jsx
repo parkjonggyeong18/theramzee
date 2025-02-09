@@ -9,7 +9,7 @@ const StatePanel = () => {
  // 나쁜 다람쥐의 경우 피로도만 표시
  return (
    <StatePanelContainer>
-     {gameState.role === 'good' && (
+     {gameState.evilSquirrel === false && (
        <>
          <StateItem>
            <StateLabel>총 도토리 수:</StateLabel>
@@ -28,12 +28,12 @@ const StatePanel = () => {
            <FatiguePoint 
              key={index}
              $isFilled={index < gameState.fatigue}
-             $role={gameState.role}
+             $evilSquirrel={gameState.evilSquirrel}
            />
          ))}
        </FatigueBar>
      </StateItem>
-     {gameState.role === 'bad' && gameState.fatigue >= 3 && (
+     {gameState.evilSquirrel === true && gameState.fatigue >= 3 && (
        <KillModeText>킬 모드 활성화!</KillModeText>
      )}
    </StatePanelContainer>
@@ -77,7 +77,7 @@ const FatiguePoint = styled.div`
  border-radius: 50%;
  background-color: ${props => 
    props.$isFilled 
-     ? props.$role === 'good' 
+     ? props.$evilSquirrel === false
        ? '#90EE90' 
        : '#FF4444'
      : 'rgba(255, 255, 255, 0.2)'

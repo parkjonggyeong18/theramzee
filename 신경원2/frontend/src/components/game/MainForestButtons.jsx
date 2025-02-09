@@ -4,39 +4,36 @@ import styled from 'styled-components';
 import { useGame } from '../../contexts/GameContext';
 
 const MainForestButtons = () => {
- const { gameState, setGameState, startEmergencyVote } = useGame();
+ const { gameState, chargeFatigue, saveUserAcorns, startEmergency } = useGame();
  const [isStorageActive, setIsStorageActive] = useState(false);
  const [isEnergyActive, setIsEnergyActive] = useState(false);
  const [timer, setTimer] = useState(null);
 
- const handleStorageClick = () => {
-   if (gameState.role !== 'good' || gameState.heldAcorns === 0 || isStorageActive) return;
+ const clkSave = () => {
+   if (gameState.evilSquirrel !== false || gameState.heldAcorns === 0 || isStorageActive) return;
    
    setIsStorageActive(true);
    const storageTimer = setTimeout(() => {
-     setGameState(prev => ({
-       ...prev,
-       totalAcorns: prev.totalAcorns + prev.heldAcorns,
-       heldAcorns: 0
-     }));
-     setIsStorageActive(false);
+    saveUserAcorns();
+    setIsStorageActive(false);
    }, 10000); // 10초
    setTimer(storageTimer);
  };
 
- const handleEnergyClick = () => {
+ const clkFatigue = () => {
    if (gameState.fatigue >= 3 || isEnergyActive) return;
 
    setIsEnergyActive(true);
    const energyTimer = setTimeout(() => {
-     setGameState(prev => ({
-       ...prev,
-       fatigue: prev.fatigue + 1
-     }));
-     setIsEnergyActive(false);
-   }, gameState.role === 'good' ? 5000 : 10000); // 착한 다람쥐 5초, 나쁜 다람쥐 10초
+    chargeFatigue();
+    setIsEnergyActive(false);
+   }, gameState.evilSquirrel === false ? 5000 : 10000); // 착한 다람쥐 5초, 나쁜 다람쥐 10초
    setTimer(energyTimer);
  };
+
+ const clkEmergency = () => {
+  startEmergency();
+ }
 
  const cancelAction = () => {
    clearTimeout(timer);
@@ -47,9 +44,9 @@ const MainForestButtons = () => {
 
  return (
   <ButtonContainer>
-    {gameState.role === 'good' && (
+    {gameState.evilSquirrel === false && (
       <StorageButton 
-        onClick={handleStorageClick}
+        onClick={clkSave}
         disabled={isStorageActive || gameState.heldAcorns === 0}
         $isActive={isStorageActive}
       >
@@ -59,17 +56,17 @@ const MainForestButtons = () => {
     )}
 
     <EnergyButton 
-      onClick={handleEnergyClick}
+      onClick={clkFatigue}
       disabled={isEnergyActive || gameState.fatigue >= 3}
       $isActive={isEnergyActive}
-      $role={gameState.role}
+      $evilSquirrel={gameState.evilSquirrel}
     >
       {isEnergyActive ? '충전중...' : '에너지'}
       {isEnergyActive && <ProgressBar />}
     </EnergyButton>
 
     <EmergencyButton 
-      onClick={startEmergencyVote}
+      onClick={clkEmergency}
       disabled={gameState.hasUsedEmergency}
     >
       긴급
@@ -113,8 +110,8 @@ const StorageButton = styled(BaseButton)`
 `;
 
 const EnergyButton = styled(BaseButton)`
- background-color: ${props => props.$role === 'good' ? '#90EE90' : '#FF4444'};
- color: ${props => props.$role === 'good' ? 'black' : 'white'};
+ background-color: ${props => props.$evilSquirrel === false ? '#90EE90' : '#FF4444'};
+ color: ${props => props.$evilSquirrel === false ? 'black' : 'white'};
  opacity: ${props => props.$isActive ? 0.8 : 1};
 `;
 

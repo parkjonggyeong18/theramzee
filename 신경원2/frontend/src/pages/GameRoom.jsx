@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../contexts/GameContext';
 import { backgroundImages, characterImages } from '../assets/images';
+import { connectSocket, disconnectSocket } from '../services/stomp';
 
 // 공통 레이아웃 import
 import GameLayout from '../components/game/common/GameLayout';
@@ -20,34 +21,33 @@ const GameRoom = () => {
   const navigate = useNavigate();
   const { 
     gameState, 
-    handleGameStart,   // startGame 함수 사용
+    startGame,   // startGame 함수 사용
     players,
-    setGameState,
-    setRoomId
+    setRoomId,
+    setIsConnected
   } = useGame();
   const { roomId } = useParams();  // roomId 가져오기
 
   useEffect(() => {
-    setRoomId(29);
-    setGameState(prev => ({
-      ...prev,
-      roomId
-    }));
-  }, [roomId, setRoomId, setGameState]);
+    setRoomId(35);
+    connectSocket();
+    setIsConnected(true);
+  }, []);
 
-  const handleStart = () => {
-    handleGameStart();
+  const clkStart = () => {
+    startGame();
     navigate(`/game/${roomId}/main`);
   };
 
-  const handleExit = () => {
+  const clkExit = () => {
+    disconnectSocket();
     navigate('/lobby');
   };
 
   // 커서 스타일 변경
   useEffect(() => {
-    if (gameState.isStarted && gameState.role) {
-      document.body.style.cursor = `url(${gameState.role === 'good' ? characterImages.goodSquirrel : characterImages.badSquirrel}), auto`;
+    if (gameState.isStarted && gameState.evilSquirrel) {
+      document.body.style.cursor = `url(${gameState.evilSquirrel === false ? characterImages.goodSquirrel : characterImages.badSquirrel}), auto`;
     } else {
       document.body.style.cursor = 'auto';
     }
@@ -55,7 +55,7 @@ const GameRoom = () => {
     return () => {
       document.body.style.cursor = 'auto';
     };
-  }, [gameState.isStarted, gameState.role]);
+  }, [gameState.isStarted, gameState.evilSquirrel]);
 
   // GameLayout에 전달할 컴포넌트들
   const gameLayoutProps = {
@@ -65,8 +65,8 @@ const GameRoom = () => {
     statePanel: <StatePanel />,
     buttonContainer: (
       <ButtonContainer>
-        <StartButton onClick={handleStart}>GAME START</StartButton>
-        <ExitButton onClick={handleExit}>나가기</ExitButton>
+        <StartButton onClick={clkStart}>GAME START</StartButton>
+        <ExitButton onClick={clkExit}>나가기</ExitButton>
       </ButtonContainer>
     ),
     myVideo: <MyVideo />,
