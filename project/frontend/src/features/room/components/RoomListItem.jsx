@@ -61,12 +61,12 @@ const RoomListItem = ({ room }) => {
     <RoomCard>
       <RoomHeader>
         <RoomTitle>{room.title || '제목 없음'}</RoomTitle>
-        {room.password ? 'y' : 'n'}
+        {room.password ? '🔒' : '🔓'}
       </RoomHeader>
       <RoomInfo>
         <RoomDetails>
-          <DetailItem>방장: {hostNickname}</DetailItem>
-          <DetailItem>참가자: {userCount}/6</DetailItem>
+          <DetailItem>방장: {room.hostNickName}</DetailItem>
+          <DetailItem>참가자: {room.currentParticipantCount}/6</DetailItem>
         </RoomDetails>
       </RoomInfo>
       

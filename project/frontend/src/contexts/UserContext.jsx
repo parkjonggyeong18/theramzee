@@ -6,26 +6,12 @@ const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
   const { accessToken } = useAuth();
-  const [user, setUser] = useState(null);
+  const [nickname, setNickname] = useState(null);
 
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      if (accessToken) {
-        try {
-          const userProfile = await getCurrentUser();
-          setUser(userProfile);
-        } catch (error) {
-          console.error('사용자 프로필 불러오기 실패', error);
-        }
-      }
-    };
-
-    fetchUserProfile();
-  }, [accessToken]);
 
   const value = {
-    user,
-    setUser,
+    nickname,
+    setNickname,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
