@@ -24,9 +24,9 @@ export default class UserVideoComponent extends Component {
         {/* OpenViduVideoComponent에 ref를 전달하여 내부 video element에 접근할 수 있도록 합니다. */}
         <OpenViduVideoComponent streamManager={this.props.streamManager} ref={this.videoRef} />
         {/* videoRef를 MediaPipeOverlay에 전달하여 video의 프레임을 처리하고 canvas를 오버레이합니다. */}
-        <MediaPipeOverlay videoRef={this.videoRef} width={640} height={480} />
+        {/* <MediaPipeOverlay videoRef={this.videoRef} width={640} height={480} /> */}
         <div>
-          <p>{this.getNicknameTag()}</p>
+          {/* <p>{this.getNicknameTag()}</p> */}
         </div>
       </div>
     );
