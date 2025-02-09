@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   mysql:
     image: mysql:latest
@@ -59,3 +58,7 @@ services:
       - frontend
       - backend
     restart: unless-stopped
+
+volumes:
+  mysql_data:
+  redis_data:
