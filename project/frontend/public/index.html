@@ -25,6 +25,13 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+    <script>
+      // MediaPipe wasm 파일이 로드되기 전에 전역 Module 객체를 설정
+      window.Module = {
+        arguments_: []  // 빈 배열을 할당하여 기본값을 제공
+      };
+    </script>
+    
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

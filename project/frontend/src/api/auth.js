@@ -4,8 +4,8 @@ export const login = async (username, password) => {
   return await apiRequest('/api/v1/auth/login', 'POST', { username, password });
 };
 
-export const register = async (username, password) => {
-  return await apiRequest('/api/v1/auth/register', 'POST', { username, password });
+export const register = async (userData) => {
+  return await apiRequest('/api/v1/auth/register', 'POST', userData);
 };
 
 export const refreshToken = async () => {

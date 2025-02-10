@@ -7,16 +7,18 @@ import OpenViduPageWrapper from '../features/openVidu/OpenViduPage';
 import GamePage from '../features/game/GamePage';
 import ChatPage from '../features/chat/ChatPage';
 import FriendPage from '../features/friend/FriendPage';
+import RegisterPage from '../features/auth/RegisterPage';
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/user" element={<UserPage />} />
         <Route path="/rooms" element={<RoomPage />} />
         <Route path="/room/:roomId" element={<OpenViduPageWrapper />} />
-        <Route path="/game" element={<GamePage />} />
+        <Route path="/room/:roomId/game" element={<GamePage />} />
         <Route path="/chat" element={<ChatPage />} />
         <Route path="/friends" element={<FriendPage />} />
         <Route path="/" element={<Navigate to="/login" />} />

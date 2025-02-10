@@ -12,7 +12,7 @@ export const leaveRoom = async (roomId) => {
   return await apiRequest(`/api/v1/rooms/${roomId}/leave`, 'POST');
 };
 
-export const joinRoom = async (roomId, password=null) => {
+export const joinRoom = async (roomId, password="") => {
   return await apiRequest(`/api/v1/rooms/${roomId}/join`, 'POST', {password: password});
 };
 
