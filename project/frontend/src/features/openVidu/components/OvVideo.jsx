@@ -6,7 +6,7 @@ export default class OpenViduVideoComponent extends Component {
         super(props);
         this.videoRef = React.createRef();
     }
-  }
+  
 
     componentDidMount() {
         // Mount 시점에 video 요소 등록
@@ -27,6 +27,7 @@ export default class OpenViduVideoComponent extends Component {
         }
     }
 
+
     render() {
         return (
             <video
@@ -42,5 +43,6 @@ export default class OpenViduVideoComponent extends Component {
                 }}
             />
         );
-    }
+    };
+}
 
