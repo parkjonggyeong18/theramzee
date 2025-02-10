@@ -1,8 +1,8 @@
 // components/game/KillAnimation.jsx
 import { useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
-import { animationImages } from '../../assets/images';
-import { Z_INDEX } from '../../constants/zIndex';
+import { animationImages } from '../../../assets/images';
+import { Z_INDEX } from '../../../constants/zIndex';
 
 const KillAnimation = ({ onAnimationEnd }) => {
  useEffect(() => {

@@ -1,18 +1,18 @@
 // pages/forests/MainForest.jsx
-import { useEffect } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
-import { useGame } from '../../contexts/GameContext';
-import { backgroundImages } from '../../assets/images';
-import GameLayout from '../../components/game/common/GameLayout';
+import { useGame } from '../../../contexts/GameContext';
+import { backgroundImages } from '../../../assets/images';
+import GameLayout from '../components/common/GameLayout';
 
 // components import
-import VideoGrid from '../../components/game/VideoGrid';
-import MyVideo from '../../components/game/MyVideo';
-import GameTimer from '../../components/game/GameTimer';
-import StatePanel from '../../components/game/StatePanel';
-import MainForestButtons from '../../components/game/MainForestButtons';
-import MiniMap from '../../components/game/MiniMap';
-import VoteScreen from '../../components/game/vote/VoteScreen';
+import VideoGrid from '../components/VideoGrid';
+import MyVideo from '../components/MyVideo';
+import GameTimer from '../components/GameTimer';
+import StatePanel from '../components/StatePanel';
+import MainForestButtons from '../components/MainForestButtons';
+import MiniMap from '../components/MiniMap';
+import VoteScreen from '../components/vote/VoteScreen';
 
 const MainForest = () => {
   const { 

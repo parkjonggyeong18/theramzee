@@ -1,5 +1,6 @@
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
+//npm install --save-dev @babel/plugin-proposal-private-property-in-object 이것도 깔아라!
 
 const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
@@ -7,8 +8,7 @@ let stompClient = null;
 
 export const connectSocket = async () => {
   return new Promise((resolve, reject) => {
-    // let token = sessionStorage.getItem('token');
-    let token = 'eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJVc2VyVGVzdDEiLCJuaWNrbmFtZSI6IlRlc3RVc2VyMSIsImV4cCI6MTczOTUwNTQ5NiwiaWF0IjoxNzM5MTQ1NDk2fQ.EJNGqoLjVtKxtSRLnJikP3pyBu7SkQu7bU7Lm_l06_sfgA75Dmu8y0K7CsHjBRm-Jpz8499YgF7nbEWVVsLuTw'
+    let token = sessionStorage.getItem('accessToken');
     const socket = new SockJS(`${BASE_URL}/ws`);
 
     stompClient = new Client({

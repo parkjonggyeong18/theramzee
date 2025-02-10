@@ -1,6 +1,6 @@
 // components/game/missions/EmptyMissionOverlay.jsx
 import styled from 'styled-components';
-import { Z_INDEX } from '../../../constants/zIndex';
+import { Z_INDEX } from '../../../../constants/zIndex';
 
 const EmptyMissionOverlay = ({ onClose }) => {
   return (

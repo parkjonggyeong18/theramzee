@@ -1,6 +1,6 @@
 // components/game/MissionButton.jsx
 import styled from 'styled-components';
-import { useGame } from '../../contexts/GameContext';
+import { useGame } from '../../../contexts/GameContext';
 
 const MissionButton = ({ 
  onClick, 

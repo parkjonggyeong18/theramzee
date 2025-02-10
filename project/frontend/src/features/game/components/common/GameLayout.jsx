@@ -1,6 +1,6 @@
 // components/game/common/GameLayout.jsx
 import styled from 'styled-components';
-import { Z_INDEX } from '../../../constants/zIndex';
+import { Z_INDEX } from '../../../../constants/zIndex';
 
 const GameLayout = ({
   // 기본 구성요소

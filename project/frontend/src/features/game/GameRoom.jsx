@@ -6,15 +6,15 @@ import { backgroundImages, characterImages } from '../../assets/images';
 import { connectSocket, disconnectSocket } from '../../api/stomp';
 
 // 공통 레이아웃 import
-import GameLayout from '../../components/game/common/GameLayout';
+import GameLayout from './components/common/GameLayout';
 
 // components import
-import VideoGrid from '../../components/game/VideoGrid';
-import MyVideo from '../../components/game/MyVideo';
-import GameTimer from '../../components/game/GameTimer';
-import StatePanel from '../../components/game/StatePanel';
-import MainForestButtons from '../../components/game/MainForestButtons';
-import MiniMap from '../../components/game/MiniMap';
+import VideoGrid from './components/VideoGrid';
+import MyVideo from './components/MyVideo';
+import GameTimer from './components/GameTimer';
+import StatePanel from './components/StatePanel';
+import MainForestButtons from './components/MainForestButtons';
+import MiniMap from './components/MiniMap';
 
 const GameRoom = () => {
   const navigate = useNavigate();
@@ -29,7 +29,7 @@ const GameRoom = () => {
   const { roomId } = useParams();  // roomId 가져오기
 
   useEffect(() => {
-    setRoomId(37);
+    setRoomId(roomId);
     setGameState((prev) => ({
       ...prev,
       roomId: roomId,

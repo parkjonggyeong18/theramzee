@@ -1,8 +1,8 @@
 // components/game/MiniMap.jsx
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { useGame } from '../../contexts/GameContext';
-import { backgroundImages } from '../../assets/images';
+import { useGame } from '../../../contexts/GameContext';
+import { backgroundImages } from '../../../assets/images';
 
 const MiniMap = () => {
  const navigate = useNavigate();

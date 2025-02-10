@@ -1,7 +1,7 @@
 // components/game/MainForestButtons.jsx
 import { useState } from 'react';
 import styled from 'styled-components';
-import { useGame } from '../../contexts/GameContext';
+import { useGame } from '../../../contexts/GameContext';
 
 const MainForestButtons = () => {
  const { gameState, chargeFatigue, saveUserAcorns, startEmergency } = useGame();

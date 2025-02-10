@@ -1,7 +1,7 @@
 // components/game/GameTimer.jsx
 import { useEffect } from 'react';
 import styled from 'styled-components';
-import { useGame } from '../../contexts/GameContext';
+import { useGame } from '../../../contexts/GameContext';
 
 const GameTimer = () => {
   const { gameState, setGameState, startFinalVote } = useGame();

@@ -1,8 +1,8 @@
 // components/game/vote/VoteScreen.jsx
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { useGame } from '../../../contexts/GameContext';
-import { Z_INDEX } from '../../../constants/zIndex';
+import { useGame } from '../../../../contexts/GameContext';
+import { Z_INDEX } from '../../../../constants/zIndex';
 
 const VoteScreen = ({ 
  onVoteEnd,
