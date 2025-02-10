@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { OpenVidu } from 'openvidu-browser';
 
 // Filter.js에서 createFaceLandmarkerStream  함수를 가져옴
-import { createFaceLandmarkerStream  } from './components/Filter';
+// import { createFaceLandmarkerStream  } from './components/Filter';
 
 import UserVideoComponent from './components/UserVideoComponent';
 
@@ -56,7 +56,13 @@ class OpenViduPage extends Component {
   initPreview = async () => {
     try {
       // (A) Mediapipe로 AI 처리된 스트림 생성
-      const processedStream = await createFaceLandmarkerStream ();
+      // const processedStream = await createFaceLandmarkerStream ();
+      
+      //필터 적용 해제제
+      const processedStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
 
       // (B) 그 스트림으로 프리뷰용 Publisher 만들기
       const previewPublisher = await this.OV.initPublisherAsync(undefined, {
