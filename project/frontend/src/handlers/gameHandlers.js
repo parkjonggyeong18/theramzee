@@ -96,7 +96,7 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
           if (message.data['nickname'] === gameState.nickName) {
             setGameState((prev) => ({
               ...prev,
-              heldAcorns: initializedData.userAcorns,
+              heldAcorns: 0,
             }));
           } 
         } else {

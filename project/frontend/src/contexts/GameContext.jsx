@@ -45,9 +45,10 @@ export const GameProvider = ({ children }) => {
     miniMapEnabled: false,  // 미니맵 활성화 상태 (게임 시작 후 true)
 
     //미션 상태
-    2_1: [false, 1], // 2번 숲 1번 미션
-    2_2: [false, 2], // 2번 숲 2번 미션
-    2_3: [false, 3], // 2번 숲 3번 미션
+    
+    "2_1": [false, 1], // 2번 숲 1번 미션
+    "2_2": [false, 2], // 2번 숲 2번 미션
+    "2_3": [false, 3], // 2번 숲 3번 미션
     3_1: [false, 1], // 3번 숲 1번 미션
     3_2: [false, 2], // 3번 숲 2번 미션
     3_3: [false, 3], // 3번 숲 3번 미션
