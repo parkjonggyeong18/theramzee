@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useGame } from '../contexts/GameContext';
 
 export const useKillSystem = () => {
- const { gameState, killUser } = useGame();
+ const { gameState, killUser, players } = useGame();
  const [killingPlayer, setKillingPlayer] = useState(null);
  const [dragStart, setDragStart] = useState(null);
  const [isDragging, setIsDragging] = useState(false);
@@ -33,7 +33,8 @@ export const useKillSystem = () => {
 
    // 50px 이상 아래로 드래그하고, 드래그 시간이 200ms 이상일 때
    if (dragDistance > 50 && dragTime > 200) {
-     startKillAnimation(dragStart.playerId);
+    const player = players.find((p) => p.id === dragStart.playerId);
+     startKillAnimation(player.nickName);
      setDragStart(null);
      setIsDragging(false);
    }
@@ -46,14 +47,14 @@ export const useKillSystem = () => {
  };
 
  // 킬 애니메이션 시작
- const startKillAnimation = async (playerId) => {
-   setKillingPlayer(playerId);
+ const startKillAnimation = async (victimNickname) => {
+   setKillingPlayer(victimNickname);
    
    // 3초 동안 애니메이션 재생
    await new Promise(resolve => setTimeout(resolve, 3000));
    
    // 플레이어 죽음 처리
-   killUser(playerId);
+   killUser(victimNickname);
    setKillingPlayer(null);
  };
 
