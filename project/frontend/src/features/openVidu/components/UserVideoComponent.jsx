@@ -1,7 +1,13 @@
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 import OpenViduVideoComponent from './OvVideo';
+import MediaPipeOverlay from './MediaPipeOverlay';
 
 export default class UserVideoComponent extends Component {
+  constructor(props) {
+    super(props);
+    // video element의 참조를 생성합니다.
+    this.videoRef = createRef();
+  }
 
     getNicknameTag() {
         return this.props.streamManager?.stream?.connection?.data
