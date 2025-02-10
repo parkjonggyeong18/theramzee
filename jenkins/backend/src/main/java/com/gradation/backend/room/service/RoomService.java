@@ -28,11 +28,8 @@ public class RoomService {
      */
     @Transactional
     public Room createRoom(String title, Integer password, String nickname) {
-        // 예시: SecurityContext 에서 현재 사용자 ID를 가져와 DB 조회
-//        Long userId = SecurityContextHolder.getContext().getAuthentication().getId();
-//        User user = userRepository.find(userId)
-//                .orElseThrow(() -> new RuntimeException("User not found"));
 
+        // 생성자 닉네임을 받아서 생성자로 가져옴
         User host = userRepository.findByNickname(nickname)
                 .orElseThrow(() -> new RuntimeException("생성자 닉네임이 필요합니다."));
 
@@ -67,6 +64,11 @@ public class RoomService {
         //비번방일 경우 비밀번호 검증
         if(room.getPassword() != null && !password.equals(room.getPassword())){
             throw new IllegalArgumentException("비밀번호 오류!");
+        }
+
+        // 방 인원이 이미 6명일 경우 참가 불가
+        if(room.getUsers().size() == 6){
+            throw new RuntimeException("방 인원이 다 찼습니다!");
         }
 
         // 참여자 추가
