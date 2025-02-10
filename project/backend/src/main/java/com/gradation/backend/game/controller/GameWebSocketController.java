@@ -56,7 +56,7 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/emergency")
     @SendTo("/topic/game/{roomId}/emergency")
     public BaseResponse<EmergencyResponse> handleGameEmergency(@Payload GameEmergencyRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-        EmergencyResponse userTokens = gameService.emergency(request.getRoomId());
+        EmergencyResponse userTokens = gameService.emergency(request.getRoomId(), request.getNicknames());
         return BaseResponse.success("긴급 상황 처리", userTokens);
     }
 
@@ -67,7 +67,7 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/move")
     @SendTo("/topic/game/{roomId}/move")
     public BaseResponse<MoveForestResponse> handleGameMove(@Payload GameMoveRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-        MoveForestResponse token = gameService.moveForest(request.getRoomId(), request.getUserNum(), request.getNewForest());
+        MoveForestResponse token = gameService.moveForest(request.getRoomId(), request.getNickname(), request.getNewForest());
         return BaseResponse.success("사용자 이동", token);
     }
 
@@ -89,7 +89,7 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/save-acorns")
     @SendTo("/topic/game/{roomId}/save-acorns")
     public BaseResponse<SaveUserAcornsResponse> handleSaveAcorns(@Payload saveAcornsRequest request) {
-        SaveUserAcornsResponse result = gameService.saveUserAcorns(request.getRoomId(), request.getUserNum());
+        SaveUserAcornsResponse result = gameService.saveUserAcorns(request.getRoomId(), request.getNickname());
         return BaseResponse.success("도토리 저장 성공", result);
     }
 
@@ -111,7 +111,7 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/charge-fatigue")
     @SendTo("/topic/game/{roomId}/charge-fatigue")
     public BaseResponse<IncrementUserFatigueResponse> handleChargeFatigue(@Payload chargeFatigueRequest request) {
-        IncrementUserFatigueResponse result = gameService.incrementUserFatigue(request.getRoomId(), request.getUserNum());
+        IncrementUserFatigueResponse result = gameService.incrementUserFatigue(request.getRoomId(), request.getNickname());
         return BaseResponse.success("피로도 충전 성공", result);
     }
 
@@ -122,7 +122,7 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/kill")
     @SendTo("/topic/game/{roomId}/kill")
     public BaseResponse<KillResponse> handleKill(@Payload killRequest request) {
-        KillResponse result = gameService.Kill(request.getRoomId(), request.getUserNum(), request.getMyNum());
+        KillResponse result = gameService.Kill(request.getRoomId(), request.getVictimNickname(), request.getKillerNickname());
         return BaseResponse.success("사용자 제거", result);
     }
 
@@ -144,7 +144,7 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/complete-mission")
     @SendTo("/topic/game/{roomId}/complete-mission")
     public BaseResponse<CompleteMissionResponse> handleCompleteMission(@Payload completeMissionRequest request) {
-        CompleteMissionResponse result = gameService.completeMission(request.getRoomId(), request.getForestNum(), request.getMissionNum(), request.getUserNum());
+        CompleteMissionResponse result = gameService.completeMission(request.getRoomId(), request.getForestNum(), request.getMissionNum(), request.getNickname());
         return BaseResponse.success("미션 완료", result);
     }
 }

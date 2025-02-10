@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class killRequest {
     private int roomId;
-    private int userNum;
-    private int myNum;
+    private String victimNickname;
+    private String killerNickname;
 }
