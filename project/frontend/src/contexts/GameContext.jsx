@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import * as gameService from '../api/gameService';
+import { fetchRoomById } from '../api/room';
 import { useGameHandlers } from '../handlers/gameHandlers';
 import { subscribeToTopic } from '../api/stomp';
 
@@ -9,8 +10,8 @@ export const GameProvider = ({ children }) => {
   // 게임의 전체 상태 관리
   const [gameState, setGameState] = useState({
     // 유저 정보
-    userNum: 3,
-    nickName: 'Player 3',
+    userNum: null,
+    nickName: null,
 
     // 게임 진행 상태
     isStarted: false, // 게임 시작 여부
@@ -71,20 +72,20 @@ export const GameProvider = ({ children }) => {
     audioEnabled: true
   });
 
-  const [players] = useState([
-    // 테스트용 더미 데이터
-    // { id: 1, name: '테스트 플레이어', isMe: true }
-    // 추후 6인용
-    { id: 1, nickName: 'Player 1', isMe: true },
-    { id: 2, nickName: 'Player 2', isMe: false },
-    { id: 3, nickName: 'Player 3', isMe: false },
-    { id: 4, nickName: 'Player 4', isMe: false },
-    { id: 5, nickName: 'Player 5', isMe: false },
-    { id: 6, nickName: 'Player 6', isMe: false }
-  ]);
+  // const [players] = useState([
+  //   // 테스트용 더미 데이터
+  //   // { id: 1, name: '테스트 플레이어', isMe: true }
+  //   // 추후 6인용
+  //   { id: 1, nickName: 'Player 1', isMe: true },
+  //   { id: 2, nickName: 'Player 2', isMe: false },
+  //   { id: 3, nickName: 'Player 3', isMe: false },
+  //   { id: 4, nickName: 'Player 4', isMe: false },
+  //   { id: 5, nickName: 'Player 5', isMe: false },
+  //   { id: 6, nickName: 'Player 6', isMe: false }
+  // ]);
   
   const [roomId, setRoomId] = useState(null);
-  const [nicknames, setNicknames] = useState('');
+  const [players, setPlayers] = useState(['a', 'b', 'c', 'd', 'e']);
   // ✅ 게임 핸들러 (GameRoom이랑 공유됨)
   const handlers = useGameHandlers(roomId, gameState, setGameState);
   const [isConnected, setIsConnected] = useState(false);
@@ -151,15 +152,58 @@ export const GameProvider = ({ children }) => {
     subscribeToTopic(`/topic/game/${roomId}/complete-mission`, handlers.handleCompleteMissionResponse);
   }, [isConnected, roomId]);
 
+  // 최신 닉네임 리스트 가져오기 (startGame을 누를 때 실행됨)
+  const getPlayers = useCallback(async () => {
+    if (isConnected && roomId) {
+      try {
+        const response = await fetchRoomById(roomId);
+        console.log('Member players:', response.data['nicknames']);
+        
+        // 최신 닉네임 리스트 생성
+        const updatedPlayers = [...players, ...response.data['nicknames']]
+          .map((nick, index) => ({
+            id: index + 1, // ✅ 1부터 시작하는 id 부여
+            nickName: nick,
+            isMe: nick === gameState.nickName // 현재 사용자 닉네임과 비교하여 isMe 설정
+          }));
+
+        // 현재 사용자 닉네임과 매칭되는 userNum 업데이트
+        const currentUser = updatedPlayers.find(player => player.nickName === gameState.nickName);
+        if (currentUser) {
+          gameState.userNum = currentUser.id;
+        }
+
+        // 상태 업데이트
+        setPlayers(updatedPlayers);
+
+        // 최신 값 반환
+        return updatedPlayers;
+      } catch (error) {
+        console.error('Failed to get member nicknames:', error);
+        return players; // 에러 발생 시 기존 nicknames 반환
+      }
+    } else {
+      console.error('WebSocket is not connected or required fields are empty');
+      return players;
+    }
+  }, [isConnected, roomId, players, gameState.nickName, gameState.userNum]);
+
+
   // 게임 시작 처리
   const startGame = useCallback(async () => {
-    console.log('Attempting to start game:', roomId, players.map(p => p.nickName));
+    console.log('Attempting to start game:', roomId);
     
     if (isConnected && roomId) {
       try {
+        // ✅ 최신 nicknames 값을 받아오기
+        const updatedNicknames = await getPlayers();
+        console.log('Member nicknames2:', updatedNicknames);
+        // ✅ nickName 값만 추출하여 배열 형태로 변환
+        const nicknameList = updatedNicknames.map(player => player.nickName);
+
         // ✅ 게임 시작 전에 WebSocket 구독 실행
         await subscribeToGameTopics();
-        await gameService.startGame(roomId, players.map(p => p.nickName));
+        await gameService.startGame(roomId, nicknameList);
         console.log('Game start request sent successfully');
       } catch (error) {
         console.error('Failed to start game:', error);
@@ -167,7 +211,7 @@ export const GameProvider = ({ children }) => {
     } else {
       console.error('Socket connection not initialized');
     }
-  }, [isConnected, roomId, players, subscribeToGameTopics]);
+  }, [isConnected, roomId, subscribeToGameTopics, getPlayers]);
 
   // 피로도 충전 처리
   const chargeFatigue = useCallback(async () => {
@@ -305,7 +349,6 @@ export const GameProvider = ({ children }) => {
   const value = {
     gameState,         // 게임 전체 상태
     setGameState,      // 게임 상태 변경
-    players,          // 플레이어 정보
     startGame,        // 게임 시작
     chargeFatigue,       // 피로도 충전
     saveUserAcorns,       // 도토리 저장
@@ -322,6 +365,7 @@ export const GameProvider = ({ children }) => {
     setRoomId,
     roomId,
     setIsConnected,
+    players,
     // setNicknames,  // nicknames를 설정할 수 있는 함수 추가
   };
 
