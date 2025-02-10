@@ -1,18 +1,18 @@
 // pages/forests/TwistedForest.jsx
 import { useState } from 'react';
 import styled from 'styled-components';
-import { useGame } from '../../contexts/GameContext';
-import { backgroundImages } from '../../assets/images';
-import GameLayout from '../../components/game/common/GameLayout';
+import { useGame } from '../../../contexts/GameContext';
+import { backgroundImages } from '../../../assets/images';
+import GameLayout from '../components/common/GameLayout';
 
 // components import
-import VideoGrid from '../../components/game/VideoGrid';
-import MyVideo from '../../components/game/MyVideo';
-import GameTimer from '../../components/game/GameTimer';
-import StatePanel from '../../components/game/StatePanel';
-import MiniMap from '../../components/game/MiniMap';
-import MissionButton from '../../components/game/MissionButton';
-import ColorMatchGame from '../../components/game/missions/ColorMatchGame';
+import VideoGrid from '../components/VideoGrid';
+import MyVideo from '../components/MyVideo';
+import GameTimer from '../components/GameTimer';
+import StatePanel from '../components/StatePanel';
+import MiniMap from '../components/MiniMap';
+import MissionButton from '../components/MissionButton';
+import ColorMatchGame from '../components/missions/ColorMatchGame';
 
 const TwistedForest = () => {
  const { gameState, players } = useGame();

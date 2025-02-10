@@ -1,5 +1,5 @@
 // components/game/StatePanel.jsx
-import { useGame } from '../../contexts/GameContext';
+import { useGame } from '../../../contexts/GameContext';
 import styled from 'styled-components';
 
 const StatePanel = () => {

@@ -1,6 +1,6 @@
-// components/game/DeadOverlay.jsx
+
 import styled, { keyframes } from 'styled-components';
-import { Z_INDEX } from '../../constants/zIndex';
+import { Z_INDEX } from '../../../constants/zIndex';
 
 const DeadOverlay = ({ playerName }) => {
  return (

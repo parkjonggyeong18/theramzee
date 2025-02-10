@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 // OpenVidu 관련 import 유지
 import { OpenVidu, Publisher } from 'openvidu-browser';
-import { useGame } from '../../contexts/GameContext';
+import { useGame } from '../../../contexts/GameContext';
 import DeadOverlay from './DeadOverlay';
 
 const MyVideo = () => {
