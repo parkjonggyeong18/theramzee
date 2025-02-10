@@ -635,7 +635,60 @@ const GamePage = () => {
           </BottomSection>
         </>
       )}
+<<<<<<< HEAD
     </GameRoomContainer>
+=======
+
+      {acorns && (
+        <div>
+          <h3>User Acorns:</h3>
+          <p>{acorns}</p>
+        </div>
+      )}
+
+      {savedAcorns !== null && (
+        <div>
+          <h3>Saved Acorns:</h3>
+          <p>{JSON.stringify(savedAcorns, null, 2)}</p>
+        </div>
+      )}
+
+      {fatigue !== null && (
+        <div>
+          <h3>User Fatigue:</h3>
+          <p>{JSON.stringify(fatigue, null, 2)}</p>
+        </div>
+      )}
+
+      {chargedFatigue !== null && (
+        <div>
+          <h3>Charged Fatigue:</h3>
+          <p>{JSON.stringify(chargedFatigue, null, 2)}</p>
+        </div>
+      )}
+
+      {killResult !== null && (
+        <div>
+          <h3>Kill Result:</h3>
+          <p>{JSON.stringify(killResult, null, 2)}</p>
+        </div>
+      )}
+
+      {missionStatus && (
+        <div>
+          <h3>Mission Status:</h3>
+          <pre>{JSON.stringify(missionStatus, null, 2)}</pre>
+        </div>
+      )}
+
+      {completeMissionResult !== null && (
+        <div>
+          <h3>Mission Completion Result:</h3>
+          <p>{JSON.stringify(completeMissionResult, null, 2)}</p>
+        </div>
+      )}
+    </div>
+>>>>>>> f24b753e4fe35d50ec127bc65dcdfd6e210f78ee
   );
 };
 
