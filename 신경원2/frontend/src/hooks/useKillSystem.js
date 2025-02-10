@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useGame } from '../contexts/GameContext';
 
 export const useKillSystem = () => {
- const { gameState, killPlayer } = useGame();
+ const { gameState, killUser } = useGame();
  const [killingPlayer, setKillingPlayer] = useState(null);
  const [dragStart, setDragStart] = useState(null);
  const [isDragging, setIsDragging] = useState(false);
@@ -11,7 +11,7 @@ export const useKillSystem = () => {
  // 드래그 시작 핸들러
  const handleDragStart = (e, playerId) => {
    // 나쁜 다람쥐이고 피로도가 3일때만 가능
-   if (gameState.role !== 'bad' || gameState.fatigue < 3) return;
+   if (gameState.evilSquirrel !== true || gameState.fatigue < 3) return;
    
    // 이미 죽은 플레이어는 제외
    if (gameState.killedPlayers.includes(playerId)) return;
@@ -53,7 +53,7 @@ export const useKillSystem = () => {
    await new Promise(resolve => setTimeout(resolve, 3000));
    
    // 플레이어 죽음 처리
-   killPlayer(playerId);
+   killUser(playerId);
    setKillingPlayer(null);
  };
 
@@ -73,7 +73,7 @@ export const useKillSystem = () => {
  return {
    killingPlayer,
    handleDragStart,
-   isKillable: gameState.role === 'bad' && gameState.fatigue >= 3,
+   isKillable: gameState.evilSquirrel === true && gameState.fatigue >= 3,
    isDragging
  };
 };
