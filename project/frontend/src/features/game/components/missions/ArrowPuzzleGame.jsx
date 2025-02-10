@@ -122,27 +122,27 @@ const ArrowPuzzleGame = ({ onComplete, onClose }) => {
       <GameContent onClick={e => e.stopPropagation()}>
         <GameTitle>화살표 맞추기</GameTitle>
         <PuzzleContainer
-          ref={puzzleRef}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-        >
-          <ArrowShadow>
-            <ArrowShape />
-          </ArrowShadow>
-          
-          <DraggableArrow
-            ref={arrowRef}
-            onMouseDown={handleMouseDown}
-            $isDragging={isDragging}
-            $isSolved={isSolved}
-            style={{
-              left: `${position.x}px`,
-              top: `${position.y}px`,
-            }}
-          >
-            <ArrowShape />
-          </DraggableArrow>
-        </PuzzleContainer>
+  ref={puzzleRef}
+  onMouseMove={handleMouseMove}
+  onMouseUp={handleMouseUp}
+>
+  <ArrowShadow className="arrow-shadow">
+    <ArrowShape />
+  </ArrowShadow>
+  
+  <DraggableArrow
+    ref={arrowRef}
+    onMouseDown={handleMouseDown}
+    $isDragging={isDragging}
+    $isSolved={isSolved}
+    style={{
+      left: `${position.x}px`,
+      top: `${position.y}px`,
+    }}
+  >
+    <ArrowShape />
+  </DraggableArrow>
+</PuzzleContainer>
         <Instruction>화살표를 드래그하여 그림자에 맞추세요</Instruction>
         {isSolved && (
           <SuccessMessage>완료!</SuccessMessage>

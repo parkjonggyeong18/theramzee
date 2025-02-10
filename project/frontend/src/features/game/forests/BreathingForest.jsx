@@ -12,21 +12,39 @@ import GameTimer from '../components/GameTimer';
 import StatePanel from '../components/StatePanel';
 import MiniMap from '../components/MiniMap';
 import MissionButton from '../components/MissionButton';
-import EmptyMissionOverlay from '../components/missions/EmptyMissionOverlay';
+import MazeGame from '../components/missions/MazeGame';
+import VineSlashGame from '../components/missions/VineSlashGame';
+
 
 const BreathingForest = () => {
-  const { gameState, players } = useGame();
+  const { gameState, players, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
+  const [currentMission, setCurrentMission] = useState(null);
   const [completedMissions, setCompletedMissions] = useState([]);
-
+  const isMissionCompleted = (missionId) => {
+    const missionNum = missionId === 'maze' ? 1 : 
+                      missionId === 'vine' ? 2 : 3;
+    return gameState[`7_${missionNum}`][0]; // gameState에서 미션 완료 상태 확인
+  };
   const handleMissionClick = (missionId) => {
-    if (completedMissions.includes(missionId)) return;
-    if (gameState.evilSquirrel === true && gameState.fatigue < 1) return;
+    if (isMissionCompleted(missionId)) return;
+    if (gameState.fatigue < 1) return;
+    setCurrentMission(missionId);
     setShowMiniGame(true);
   };
 
-  const handleMissionComplete = () => {
-    setShowMiniGame(false);
+
+  const handleMissionComplete = async () => {
+    try {
+      const missionNum = currentMission === 'maze' ? 1 : 
+                        currentMission === 'vine' ? 2 : 3;
+      
+      await completeMission(7, missionNum);
+      setShowMiniGame(false);
+      setCurrentMission(null);
+    } catch (error) {
+      console.error('Failed to complete mission:', error);
+    }
   };
 
   const gameLayoutProps = {
@@ -42,25 +60,38 @@ const BreathingForest = () => {
     missionButtons: (
       <MissionButtons>
         <MissionButton 
-          onClick={() => handleMissionClick('mission1')}
-          completed={completedMissions.includes('mission1')}
+          onClick={() => handleMissionClick('maze')}
+          completed={isMissionCompleted('maze')}
         />
         <MissionButton 
-          onClick={() => handleMissionClick('mission2')}
-          completed={completedMissions.includes('mission2')}
+          onClick={() => handleMissionClick('vine')}
+          completed={isMissionCompleted('vine')}
         />
-        <MissionButton 
-          onClick={() => handleMissionClick('mission3')}
-          completed={completedMissions.includes('mission3')}
+        <MissionButton isDisabled
+    
         />
       </MissionButtons>
     ),
     
     // 미니게임 오버레이
     miniGameOverlay: showMiniGame && (
-      <EmptyMissionOverlay 
-        onClose={() => setShowMiniGame(false)}
-      />
+      currentMission === 'maze' ? (
+        <MazeGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
+      ) : currentMission === 'vine' ? (
+        <VineSlashGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
+      ) : null
     ),
     
     // 기타

@@ -45,21 +45,20 @@ const MatchingGame = ({ onComplete, onClose }) => {
         <CloseButton onClick={onClose}>×</CloseButton>
         <GameTitle>카드 짝 맞추기</GameTitle>
         <GameGrid>
-          {cards.map((card, index) => (
-            <Card
-              key={index}
-              $isFlipped={flipped.includes(index) || matched.includes(index)}
-              onClick={() => handleCardClick(index)}
-              aria-label={flipped.includes(index) || matched.includes(index) ? `카드 ${card}` : '뒤집힌 카드'}
-              role="button"
-            >
-              <CardInner>
-                <CardFront>?</CardFront>
-                <CardBack>{card}</CardBack>
-              </CardInner>
-            </Card>
-          ))}
-        </GameGrid>
+  {cards.map((card, index) => (
+    <Card
+      key={index}
+      onClick={() => handleCardClick(index)}
+      aria-label={flipped.includes(index) || matched.includes(index) ? `카드 ${card}` : '뒤집힌 카드'}
+      role="button"
+    >
+      <CardInner $isFlipped={flipped.includes(index) || matched.includes(index)}>
+        <CardFront>?</CardFront>
+        <CardBack>{card}</CardBack>
+      </CardInner>
+    </Card>
+  ))}
+</GameGrid>
         {matched.length === cards.length && (
           <GameOver>
             <h3>게임 종료!</h3>
