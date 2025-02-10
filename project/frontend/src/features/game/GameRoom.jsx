@@ -33,6 +33,7 @@ const GameRoom = () => {
     setGameState((prev) => ({
       ...prev,
       roomId: roomId,
+      nickName: sessionStorage.getItem('nickName'),
     }));
     connectSocket();
     setIsConnected(true);
