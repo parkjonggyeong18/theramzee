@@ -4,7 +4,7 @@ import LoginPage from '../features/auth/LoginPage';
 import UserPage from '../features/user/UserPage';
 import RoomPage from '../features/room/RoomPage';
 import OpenViduPageWrapper from '../features/openVidu/OpenViduPage';
-import GamePage from '../features/game/GamePage';
+import GamePage from '../features/game/GameRoom';
 import ChatPage from '../features/chat/ChatPage';
 import FriendPage from '../features/friend/FriendPage';
 import RegisterPage from '../features/auth/RegisterPage';
