@@ -1,6 +1,11 @@
 import { useCallback } from "react";
+import { useNavigate } from 'react-router-dom';
 
 export const useGameHandlers = (roomId, gameState, setGameState) => {
+
+  const nickName = sessionStorage.getItem('nickName');
+  const navigate = useNavigate();
+
   // 게임 정보 응답 처리
   const handleGameInfo = useCallback((response) => {
     console.log("Game Info:", response);
@@ -12,9 +17,8 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
       try {
         if (message.success) {
           const initializedData = message.data;
-          const userKey = `ROOM:${roomId}:USER:${gameState.userNum}`;
-          console.log("Game initialized successfully:", initializedData.users[userKey]);
-          console.log("dfdffdsa", initializedData.users[userKey].evilSquirrel);
+          const userKey = `ROOM:${roomId}:USER:${nickName}`;
+          console.log("게임 초기화 성공:", initializedData.users[userKey]);
 
           setGameState((prev) => ({
             ...prev,
@@ -30,20 +34,21 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [roomId, gameState.userNum, setGameState]
+    [roomId, setGameState, nickName]
   );
 
   // 비상 상황 응답 처리
   const handleEmergencyResponse = useCallback(
     (message) => {
       try {
+        navigate(`/game/${gameState.roomId}/main`);
         if (message.success) {
           const initializedData = message.data.userTokens;
-          console.log("Game initialized successfully:", initializedData);
+          console.log("긴급 요청 성공:", initializedData);
 
           setGameState((prev) => ({
             ...prev,
-            forestToken: initializedData[gameState.nickName],
+            forestToken: initializedData[nickName],
             timerRunning: false,
             isVoting: true, 
             isEmergencyVote: true,
@@ -57,16 +62,17 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [gameState.nickName, setGameState]
+    [nickName, setGameState]
   );
 
   // 숲 이동 응답 처리
   const handleMoveResponse = useCallback(
     (message) => {
       try {
-        if (message.success && message.data['nickname'] === gameState.nickName) {
+        console.log(nickName);
+        if (message.success && message.data['nickname'] === nickName) {
           const initializedData = message.data;
-          console.log("Game initialized successfully:", initializedData);
+          console.log("숲 이동 성공:", initializedData);
 
           setGameState((prev) => ({
             ...prev,
@@ -79,7 +85,7 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [gameState.nickName, setGameState]
+    [setGameState, nickName]
   );
 
   // 도토리 저장 응답 처리
@@ -88,12 +94,12 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("Game initialized successfully:", initializedData);
+          console.log("도토리 저장 성공:", initializedData);
           setGameState((prev) => ({
             ...prev,
             totalAcorns: initializedData.newTotalAcorns,
           }));
-          if (message.data['nickname'] === gameState.nickName) {
+          if (message.data['nickname'] === nickName) {
             setGameState((prev) => ({
               ...prev,
               heldAcorns: 0,
@@ -106,16 +112,16 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [gameState.nickName, setGameState]
+    [setGameState, nickName]
  );
 
   // 피로도 충전 응답 처리
   const handleChargeFatigueResponse = useCallback(
     (message) => {
       try {
-        if (message.success && message.data['nickname'] === gameState.nickName) {
+        if (message.success && message.data['nickname'] === nickName) {
           const initializedData = message.data;
-          console.log("Game initialized successfully:", initializedData);
+          console.log("피로도 충전 성공:", initializedData);
 
           setGameState((prev) => ({
             ...prev,
@@ -128,7 +134,7 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [gameState.nickName, setGameState]
+    [setGameState, nickName]
 );
 
   // 킬 응답 처리
@@ -137,17 +143,17 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("Game initialized successfully:", initializedData);
+          console.log("킬 성공:", initializedData);
           setGameState((prev) => ({
             ...prev,
             killedPlayers: [...prev.killedPlayers, initializedData['victimNickname']]
           }));
-          if (message.data['killerNickname'] === gameState.nickName) {
+          if (message.data['killerNickname'] === nickName) {
             setGameState((prev) => ({
               ...prev,
               fatigue: initializedData['killerFatigue'],
             }));
-          } else if (message.data['victimNickname'] === gameState.nickName) {
+          } else if (message.data['victimNickname'] === nickName) {
             setGameState((prev) => ({
               ...prev,
               isDead: true,
@@ -161,21 +167,22 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [gameState.nickName, setGameState]
+    [setGameState, nickName]
   );
 
+  // 미션 완료 응답 처리
   const handleCompleteMissionResponse = useCallback(
     (message) => {
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("Game initialized successfully:", initializedData);
+          console.log("미션 완료 성공:", initializedData);
           const missionKey = `${initializedData['forestNum']}_${initializedData['missionNum']}`;
           setGameState((prev) => ({
             ...prev,
             missionKey: [true, prev[missionKey][1]],
           }));
-          if (message.data['nickname'] === gameState.nickName) {
+          if (message.data['nickname'] === nickName) {
             setGameState((prev) => ({
               ...prev,
               fatigue: prev.fatigue - 1,
@@ -189,7 +196,7 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [gameState.nickName, setGameState]
+    [setGameState, nickName]
   );
 
   return {
