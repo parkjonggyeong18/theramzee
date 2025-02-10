@@ -1,242 +1,223 @@
-import { OpenVidu } from 'openvidu-browser';
 import React, { Component } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { OpenVidu } from 'openvidu-browser';
+
+// Filter.js에서 createFaceLandmarkerStream  함수를 가져옴
+// import { createFaceLandmarkerStream  } from './components/Filter';
+
 import UserVideoComponent from './components/UserVideoComponent';
 
 class OpenViduPage extends Component {
   constructor(props) {
     super(props);
-    this.navigate = props.navigate; // useNavigate 훅을 받아오기
+
+    // ----- 세션 ID / 닉네임 세팅 -----
+    const { roomId } = this.props; // React Router의 useParams로 받아온 값
+    const sessionId = `${roomId}-1`; // "roomId-1" 형식으로 세션 ID 설정
+    const nickname = sessionStorage.getItem('nickName') || 'Guest';
+
     this.state = {
-      mySessionId: props.roomId + '-1',  // 세션 ID (방번호-1)
-      session: undefined,               // 세션 객체
-      previewPublisher: undefined,      // 미리보기용 퍼블리셔
-      publisher: undefined,            // 세션 publish용 퍼블리셔
-      mainStreamManager: undefined,     // 내 카메라 스트림
-      subscribers: [],                  // 다른 참가자들의 스트림
-      randomNick: 'Participant_' + Math.floor(Math.random() * 100000), // 임의 닉네임
+      mySessionId: sessionId,
+      myUserName: nickname,
+      session: undefined,
+      mainStreamManager: undefined,
+      publisher: undefined,
+      subscribers: [],
+
+      // 미리보기 상태
+      isPreview: true,
+      previewPublisher: null,
     };
+
+    this.OV = null;
   }
 
   componentDidMount() {
-    // 새로고침/창닫기 시 leaveSession
+    // 페이지 이탈 시 세션 해제
     window.addEventListener('beforeunload', this.leaveSession);
+
+    // 1) OpenVidu 객체 생성
+    this.OV = new OpenVidu();
+
+    // 2) 미리보기용 스트림 준비
+    this.initPreview();
   }
+
   componentWillUnmount() {
     window.removeEventListener('beforeunload', this.leaveSession);
   }
 
   /**
-   * 카메라 미리보기
-   * - 미리보기용 퍼블리셔 생성
+   * 미리보기(Preview) 단계에서
+   * - Mediapipe 스트림 생성
+   * - 이 스트림으로 Publisher 초기화
+   * - state.previewPublisher에 저장 -> 화면에 표출
    */
   initPreview = async () => {
     try {
-      this.OV = new OpenVidu();
+      // (A) Mediapipe로 AI 처리된 스트림 생성
+      // const processedStream = await createFaceLandmarkerStream ();
+      
+      //필터 적용 해제제
+      const processedStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+
+      // (B) 그 스트림으로 프리뷰용 Publisher 만들기
       const previewPublisher = await this.OV.initPublisherAsync(undefined, {
-        videoSource: undefined,
+        videoSource: processedStream.getVideoTracks()[0],
+        audioSource: processedStream.getAudioTracks()[0],
         publishAudio: true,
         publishVideo: true,
-        resolution: '640x480',
-        frameRate: 30,
-        mirror: false,
+        mirror: true, // 웹캠처럼 좌우반전
       });
+
+      // (C) state에 저장 -> 프리뷰 모드에서 <UserVideoComponent>로 표시
       this.setState({ previewPublisher });
-    } catch (err) {
-      console.error('카메라 미리보기 실패:', err);
+    } catch (error) {
+      console.error('Preview init error:', error);
     }
   };
 
   /**
-   * 방에 입장
-   * - 세션 생성, 토큰으로 connect, 미리보기 퍼블리셔 publish
+   * "게임에 입장하기" 버튼 클릭
+   * - 미리보기 유지 (dispose 안 함)
+   * - 세션에 접속하고, previewPublisher를 publish
+   */
+  enterGame = async () => {
+    await this.joinSession();
+    this.setState({ isPreview: false });
+  };
+
+  /**
+   * 실제 세션 접속 로직
    */
   joinSession = async () => {
-    const { previewPublisher, randomNick } = this.state;
-    if (!previewPublisher) {
-      alert("먼저 카메라 미리보기를 진행해주세요.");
-      return;
-    }
+    const session = this.OV.initSession();
+
+    // 새 스트림 생성 이벤트
+    session.on('streamCreated', (event) => {
+      const subscriber = session.subscribe(event.stream, undefined);
+      this.setState({
+        subscribers: [...this.state.subscribers, subscriber],
+      });
+    });
+
+    // 상대방 스트림 끊김
+    session.on('streamDestroyed', (event) => {
+      this.deleteSubscriber(event.stream.streamManager);
+    });
+
+    session.on('exception', (exception) => {
+      console.warn(exception);
+    });
+
+    // 백엔드에서 가져온 토큰이라고 가정
+    const token = sessionStorage.getItem('openViduToken');
+
     try {
-      // OpenVidu 객체가 없으면 재생성
-      if (!this.OV) this.OV = new OpenVidu();
-      const session = this.OV.initSession();
+      // 1) 세션 연결
+      await session.connect(token, { clientData: this.state.myUserName });
 
-      // 이벤트 리스너 등록
-      session.on('streamCreated', (e) => {
-        const subscriber = session.subscribe(e.stream, undefined);
-        this.setState((prev) => ({
-          subscribers: [...prev.subscribers, subscriber],
-        }));
-      });
-      session.on('streamDestroyed', (e) => {
-        this.setState((prev) => ({
-          subscribers: prev.subscribers.filter((sub) => sub !== e.stream.streamManager),
-        }));
-      });
-      // session.on('connectionCreated', () => {
-      //   if (session.connections.size > 6) {
-      //     alert('이미 6명이 접속중입니다.');
-      //     session.disconnect();
-      //   }
-      // });
+      // 2) 이미 만들어둔 previewPublisher를 publish
+      const { previewPublisher } = this.state;
+      session.publish(previewPublisher);
 
-      // 세션 토큰 가져오기
-      const token = sessionStorage.getItem('openViduToken');
-      if (!token) {
-        alert('토큰이 없습니다. 다시 시도해주세요.');
-        // 방 목록으로 이동
-        this.navigate('/rooms');
-        return;
-      }
-
-      // 세션 연결 (옵션: clientData에 닉네임 전달)
-      await session.connect(token, { clientData: randomNick });
-
-      // 미리보기 퍼블리셔를 세션에 publish
-      await session.publish(previewPublisher);
-
-      // 상태 갱신
+      // 3) 본인 스트림 = previewPublisher
       this.setState({
         session,
         publisher: previewPublisher,
         mainStreamManager: previewPublisher,
       });
-    } catch (err) {
-      console.error('세션 연결 오류:', err);
+    } catch (error) {
+      console.error('Error connecting to the session:', error);
     }
   };
 
   /**
-   * 세션에서 나가기 (연결 해제)
+   * 세션 떠나기
    */
   leaveSession = () => {
-    const { session } = this.state;
-    if (session) session.disconnect();
-    if (this.OV) this.OV = null;
+    if (this.state.session) {
+      this.state.session.disconnect();
+    }
+
+    this.OV = null;
     this.setState({
       session: undefined,
-      previewPublisher: undefined,
-      publisher: undefined,
-      mainStreamManager: undefined,
       subscribers: [],
+      mainStreamManager: undefined,
+      publisher: undefined,
+      previewPublisher: null,
+      isPreview: true,
     });
   };
 
   /**
-   * 방 목록(rooms)으로 돌아가기
-   * - 세션 연결 해제 후 페이지 이동
+   * Subscriber 제거
    */
-  leaveRoom = () => {
-    this.leaveSession();
-    this.navigate('/rooms');
+  deleteSubscriber = (streamManager) => {
+    this.setState({
+      subscribers: this.state.subscribers.filter(
+        (sub) => sub !== streamManager
+      ),
+    });
   };
 
+  // ----------------------
+  // 렌더링
+  // ----------------------
   render() {
     const {
-      session,
+      isPreview,
       previewPublisher,
+      mySessionId,
       mainStreamManager,
       subscribers,
-      randomNick,
     } = this.state;
 
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '2rem' }}>
-        {/* 세션에 아직 입장 전(미리보기 단계) */}
-        {session === undefined ? (
-          <div style={{ textAlign: 'center' }}>
-            {/* 미리보기를 시작하기 전 */}
-            {!previewPublisher && (
-              <button onClick={this.initPreview} style={{ marginBottom: '1rem' }}>
-                카메라 미리보기
-              </button>
-            )}
-
-            {/* 미리보기 중 */}
+    // 1) 미리보기 화면
+    if (isPreview) {
+      return (
+        <div className="preview-container">
+          <h1>다람쥐 월드 미리보기</h1>
+          <p>AI/AR 필터가 적용된 카메라 영상을 미리 확인하세요.</p>
+          <div className="preview-video">
             {previewPublisher && (
-              <>
-                <div style={{ width: '640px', height: '480px', margin: '0 auto', position: 'relative' }}>
-                  <UserVideoComponent streamManager={previewPublisher} />
-                  {/* 닉네임 표시 (영상 위에 겹치지 않도록 절대 위치) */}
-                  <div style={{
-                    position: 'absolute',
-                    bottom: '8px',
-                    left: '8px',
-                    backgroundColor: 'rgba(0,0,0,0.5)',
-                    color: '#fff',
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                    fontSize: '14px',
-                  }}>
-                    {randomNick}
-                  </div>
-                </div>
-                <button onClick={this.joinSession} style={{ marginTop: '1rem' }}>
-                  방 입장하기
-                </button>
-                {/* 나가기 버튼: 미리보기 하다가도 rooms로 돌아가고 싶다면 */}
-                <button onClick={this.leaveRoom} style={{ marginTop: '1rem', marginLeft: '1rem' }}>
-                  방 목록으로
-                </button>
-              </>
+              <UserVideoComponent streamManager={previewPublisher} />
             )}
           </div>
-        ) : (
-          // 세션에 입장한 후
-          <div style={{ textAlign: 'center' }}>
-            {/* 내 카메라 스트림 (메인 화면) */}
-            {mainStreamManager && (
-              <div style={{ width: '640px', height: '480px', margin: '0 auto', position: 'relative' }}>
-                <UserVideoComponent streamManager={mainStreamManager} />
-                {/* 내 닉네임 */}
-                <div style={{
-                  position: 'absolute',
-                  bottom: '8px',
-                  left: '8px',
-                  backgroundColor: 'rgba(0,0,0,0.5)',
-                  color: '#fff',
-                  padding: '4px 8px',
-                  borderRadius: '4px',
-                  fontSize: '14px',
-                }}>
-                  {randomNick}
-                </div>
-              </div>
-            )}
+          <button onClick={this.enterGame}>게임에 입장하기</button>
+        </div>
+      );
+    }
 
-            {/* 다른 참가자들 스트림 */}
-            {subscribers.map((sub, idx) => (
-              <div
-                key={idx}
-                style={{ width: '320px', height: '240px', margin: '1rem auto', position: 'relative' }}
-              >
-                <UserVideoComponent streamManager={sub} />
-                {/* 여기도 필요하다면 해당 참가자의 닉네임 표시 가능
-                  const data = sub.stream.connection.data; // "Participant_12345" 등
-                  <div style={{ position:'absolute', bottom:'8px', ... }}>{data}</div>
-                */}
-              </div>
-            ))}
+    // 2) 세션 화면
+    const allStreams = [];
+    if (mainStreamManager) allStreams.push(mainStreamManager);
+    allStreams.push(...subscribers);
 
-            {/* 나가기 버튼: 세션 해제 후 rooms로 이동 */}
-            <button onClick={this.leaveRoom} style={{ marginTop: '1rem' }}>
-              방 목록으로
-            </button>
-          </div>
-        )}
+    // 최대 6명 표시
+    const topStreams = allStreams.slice(0, 6);
+
+    return (
+      <div className="container">
+        <h1>다람쥐 월드: {mySessionId}</h1>
+        <button onClick={this.leaveSession}>Leave session</button>
+
+        <div className="video-grid">
+          {topStreams.map((stream, idx) => (
+            <UserVideoComponent key={idx} streamManager={stream} />
+          ))}
+        </div>
       </div>
     );
   }
 }
 
-/**
- * OpenViduPageWrapper
- * - useParams()로 roomId, useNavigate()로 페이지 이동 기능을 받아
- *   OpenViduPage 컴포넌트에 전달
- */
+// useParams로 roomId 받는 Wrapper (없어도 되지만, 질문 코드에 있으므로 유지)
 export default function OpenViduPageWrapper() {
   const { roomId } = useParams();
-  const navigate = useNavigate();
-  return <OpenViduPage roomId={roomId} navigate={navigate} />;
+  return <OpenViduPage roomId={roomId} />;
 }
