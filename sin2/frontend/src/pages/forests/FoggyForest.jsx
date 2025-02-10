@@ -19,15 +19,15 @@ const FoggyForest = () => {
  const [showMiniGame, setShowMiniGame] = useState(false);
  const [completedMissions, setCompletedMissions] = useState([]);
 
- // 입장 시 효과 적용
- useEffect(() => {
-   toggleFoggyEffects(true);
-   return () => toggleFoggyEffects(false);
- }, [toggleFoggyEffects]);
+//  // 입장 시 효과 적용
+//  useEffect(() => {
+//    toggleFoggyEffects(true);
+//    return () => toggleFoggyEffects(false);
+//  }, [toggleFoggyEffects]);
 
  const handleMissionClick = (missionId) => {
    if (completedMissions.includes(missionId)) return;
-   if (gameState.role === 'good' && gameState.fatigue < 1) return;
+   if (gameState.evilSquirrel === true && gameState.fatigue < 1) return;
    setShowMiniGame(true);
  };
 

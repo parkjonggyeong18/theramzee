@@ -10,14 +10,14 @@ const MissionButton = ({
  const { gameState } = useGame();
  const isDisabled = disabled || 
    completed || 
-   (gameState.role === 'good' && gameState.fatigue < 1);
+   (gameState.evilSquirrel === true && gameState.fatigue < 1);
 
  return (
    <StyledMissionButton
      onClick={onClick}
      disabled={isDisabled}
      $completed={completed}
-     $isKillable={gameState.role === 'bad' && gameState.fatigue >= 3}
+     $isKillable={gameState.evilSquirrel === true && gameState.fatigue >= 3}
    >
      ⭐
      {/* 추후 이미지로 변경 예정 
