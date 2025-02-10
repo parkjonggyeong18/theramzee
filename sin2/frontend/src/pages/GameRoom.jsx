@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../contexts/GameContext';
 import { backgroundImages, characterImages } from '../assets/images';
+import { connectSocket, disconnectSocket } from '../services/stomp';
 
 // 공통 레이아웃 import
 import GameLayout from '../components/game/common/GameLayout';
@@ -22,18 +23,21 @@ const GameRoom = () => {
     gameState, 
     startGame,   // startGame 함수 사용
     players,
+    setRoomId,
+    setIsConnected,
     setGameState,
-    setRoomId
   } = useGame();
   const { roomId } = useParams();  // roomId 가져오기
 
   useEffect(() => {
-    setRoomId(31);
-    setGameState(prev => ({
+    setRoomId(37);
+    setGameState((prev) => ({
       ...prev,
-      roomId
+      roomId: roomId,
     }));
-  }, [roomId, setRoomId, setGameState]);
+    connectSocket();
+    setIsConnected(true);
+  }, []);
 
   const clkStart = () => {
     startGame();
@@ -41,13 +45,14 @@ const GameRoom = () => {
   };
 
   const clkExit = () => {
+    disconnectSocket();
     navigate('/lobby');
   };
 
   // 커서 스타일 변경
   useEffect(() => {
-    if (gameState.isStarted && gameState.role) {
-      document.body.style.cursor = `url(${gameState.role === 'good' ? characterImages.goodSquirrel : characterImages.badSquirrel}), auto`;
+    if (gameState.isStarted && gameState.evilSquirrel) {
+      document.body.style.cursor = `url(${gameState.evilSquirrel === false ? characterImages.goodSquirrel : characterImages.badSquirrel}), auto`;
     } else {
       document.body.style.cursor = 'auto';
     }
@@ -55,7 +60,7 @@ const GameRoom = () => {
     return () => {
       document.body.style.cursor = 'auto';
     };
-  }, [gameState.isStarted, gameState.role]);
+  }, [gameState.isStarted, gameState.evilSquirrel]);
 
   // GameLayout에 전달할 컴포넌트들
   const gameLayoutProps = {

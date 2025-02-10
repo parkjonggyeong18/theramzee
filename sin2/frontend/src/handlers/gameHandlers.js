@@ -30,7 +30,7 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [roomId, gameState.userNum]
+    [roomId, gameState.userNum, setGameState]
   );
 
   // 비상 상황 응답 처리
@@ -57,15 +57,11 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [roomId]
+    [gameState.nickName, setGameState]
   );
 
-  const handleMoveResponse = useCallback((response) => {
-    console.log("Move Response:", response);
-  }, []);
-
-  // 도토리 저장 응답 처리
-  const handleSaveAcornsResponse = useCallback(
+  // 숲 이동 응답 처리
+  const handleMoveResponse = useCallback(
     (message) => {
       try {
         if (message.success && message.data['nickname'] === gameState.nickName) {
@@ -74,8 +70,7 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
 
           setGameState((prev) => ({
             ...prev,
-            totalAcorns: initializedData.newTotalAcorns,
-            heldAcorns: initializedData.userAcorns,
+            forestToken: initializedData.forestToken,
           }));
         } else {
           console.error("Game initialization failed:", message.errorCode);
@@ -84,7 +79,34 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [roomId, gameState.userNum]
+    [gameState.nickName, setGameState]
+  );
+
+  // 도토리 저장 응답 처리
+  const handleSaveAcornsResponse = useCallback(
+    (message) => {
+      try {
+        if (message.success) {
+          const initializedData = message.data;
+          console.log("Game initialized successfully:", initializedData);
+          setGameState((prev) => ({
+            ...prev,
+            totalAcorns: initializedData.newTotalAcorns,
+          }));
+          if (message.data['nickname'] === gameState.nickName) {
+            setGameState((prev) => ({
+              ...prev,
+              heldAcorns: initializedData.userAcorns,
+            }));
+          } 
+        } else {
+          console.error("Game initialization failed:", message.errorCode);
+        }
+      } catch (error) {
+        console.error("Error parsing game start response:", error);
+      }
+    },
+    [gameState.nickName, setGameState]
  );
 
   // 피로도 충전 응답 처리
@@ -106,16 +128,69 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [roomId, gameState.userNum]
+    [gameState.nickName, setGameState]
 );
 
-  const handleKillResponse = useCallback((response) => {
-    console.log("Kill Response:", response);
-  }, []);
+  // 킬 응답 처리
+  const handleKillResponse = useCallback(
+    (message) => {
+      try {
+        if (message.success) {
+          const initializedData = message.data;
+          console.log("Game initialized successfully:", initializedData);
+          setGameState((prev) => ({
+            ...prev,
+            killedPlayers: [...prev.killedPlayers, initializedData['victimNickname']]
+          }));
+          if (message.data['killerNickname'] === gameState.nickName) {
+            setGameState((prev) => ({
+              ...prev,
+              fatigue: initializedData['killerFatigue'],
+            }));
+          } else if (message.data['victimNickname'] === gameState.nickName) {
+            setGameState((prev) => ({
+              ...prev,
+              isDead: true,
+              isSpectating: true,
+            }));
+          }
+        } else {
+          console.error("Game initialization failed:", message.errorCode);
+        }
+      } catch (error) {
+        console.error("Error parsing game start response:", error);
+      }
+    },
+    [gameState.nickName, setGameState]
+  );
 
-  const handleCompleteMissionResponse = useCallback((response) => {
-    console.log("Complete Mission Response:", response);
-  }, []);
+  const handleCompleteMissionResponse = useCallback(
+    (message) => {
+      try {
+        if (message.success) {
+          const initializedData = message.data;
+          console.log("Game initialized successfully:", initializedData);
+          const missionKey = `${initializedData['forestNum']}_${initializedData['missionNum']}`;
+          setGameState((prev) => ({
+            ...prev,
+            missionKey: [true, prev[missionKey][1]],
+          }));
+          if (message.data['nickname'] === gameState.nickName) {
+            setGameState((prev) => ({
+              ...prev,
+              fatigue: prev.fatigue - 1,
+              heldAcorns: initializedData['userAcorns'],
+            }));
+          } 
+        } else {
+          console.error("Game initialization failed:", message.errorCode);
+        }
+      } catch (error) {
+        console.error("Error parsing game start response:", error);
+      }
+    },
+    [gameState.nickName, setGameState]
+  );
 
   return {
     handleGameInfo,
