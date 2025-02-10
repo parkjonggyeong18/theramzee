@@ -13,30 +13,34 @@ import StatePanel from '../components/StatePanel';
 import MiniMap from '../components/MiniMap';
 import MissionButton from '../components/MissionButton';
 import SnakeGame from '../components/missions/SnakeGame';
+import MatchingGame from '../components/missions/MatchingGame';
+
+
 
 const TwistedForest = () => {
   const { gameState, players, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [currentMission, setCurrentMission] = useState(null);
   const [completedMissions, setCompletedMissions] = useState([]);
-
+  const isMissionCompleted = (missionId) => {
+    const missionNum = missionId === 'snake' ? 1 : 
+                      missionId === 'matching' ? 2 : 3;
+    return gameState[`2_${missionNum}`][0]; // gameState에서 미션 완료 상태 확인
+  };
   const handleMissionClick = (missionId) => {
-    if (completedMissions.includes(missionId)) return;
-    if (gameState.evilSquirrel === true && gameState.fatigue < 1) return;
+    if (isMissionCompleted(missionId)) return;
+    if (gameState.fatigue < 1) return;
     setCurrentMission(missionId);
     setShowMiniGame(true);
   };
 
+
   const handleMissionComplete = async () => {
     try {
-      // 뒤틀린 숲은 forestNum이 2
-      // missionNum은 1, 2, 3 중 하나 (currentMission에 따라)
       const missionNum = currentMission === 'snake' ? 1 : 
-                        currentMission === 'color' ? 2 : 3;
+                        currentMission === 'matching' ? 2 : 3;
       
       await completeMission(2, missionNum);
-      
-      setCompletedMissions(prev => [...prev, currentMission]);
       setShowMiniGame(false);
       setCurrentMission(null);
     } catch (error) {
@@ -58,28 +62,37 @@ const TwistedForest = () => {
       <MissionButtons>
         <MissionButton 
           onClick={() => handleMissionClick('snake')}
-          completed={completedMissions.includes('snake')}
+          completed={isMissionCompleted('snake')}
         />
         <MissionButton 
-          onClick={() => handleMissionClick('color')}
-          completed={completedMissions.includes('color')}
+          onClick={() => handleMissionClick('matching')}
+          completed={isMissionCompleted('matching')}
         />
-        <MissionButton 
-          onClick={() => handleMissionClick('puzzle')}
-          completed={completedMissions.includes('puzzle')}
+        <MissionButton isDisabled
+    
         />
       </MissionButtons>
     ),
     
     // 미니게임 오버레이
     miniGameOverlay: showMiniGame && (
-      <SnakeGame
-        onComplete={handleMissionComplete}
-        onClose={() => {
-          setShowMiniGame(false);
-          setCurrentMission(null);
-        }}
-      />
+      currentMission === 'snake' ? (
+        <SnakeGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
+      ) : currentMission === 'matching' ? (
+        <MatchingGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
+      ) : null
     ),
     
     // 기타
