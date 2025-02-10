@@ -18,7 +18,7 @@ export const startGame = async (roomId, nicknames) => {
   }
 };
 
-export const handleEmergency = async (roomId) => {
+export const startEmergency = async (roomId) => {
     try {
       await sendMessage(`/app/game/${roomId}/emergency`, { roomId });
     } catch (error) {
@@ -36,29 +36,11 @@ export const handleEmergency = async (roomId) => {
     }
   };
 
-  export const getUserAcorns = async (roomId, userNum) => {
-    try {
-      await sendMessage(`/app/game/${roomId}/acorns`, { roomId, userNum });
-    } catch (error) {
-      console.error('Failed to get user acorns:', error);
-      throw error;
-    }
-  };
-
   export const saveUserAcorns = async (roomId, userNum) => {
     try {
       await sendMessage(`/app/game/${roomId}/save-acorns`, { roomId, userNum });
     } catch (error) {
       console.error('Failed to save user acorns:', error);
-      throw error;
-    }
-  };
-
-  export const getUserFatigue = async (roomId, userNum) => {
-    try {
-      await sendMessage(`/app/game/${roomId}/fatigue`, { roomId, userNum });
-    } catch (error) {
-      console.error('Failed to get user fatigue:', error);
       throw error;
     }
   };
@@ -81,15 +63,6 @@ export const handleEmergency = async (roomId) => {
     }
   };
 
-  export const getMissionStatus = async (roomId, forestNum) => {
-    try {
-      await sendMessage(`/app/game/${roomId}/mission`, { roomId, forestNum });
-    } catch (error) {
-      console.error('Failed to get mission status:', error);
-      throw error;
-    }
-  };
-
   export const completeMission = async (roomId, forestNum, missionNum, userNum) => {
     try {
       await sendMessage(`/app/game/${roomId}/complete-mission`, { roomId, forestNum, missionNum, userNum });
@@ -99,4 +72,3 @@ export const handleEmergency = async (roomId) => {
     }
   };
 
-// 필요한 다른 게임 관련 함수들도 여기에 추가
