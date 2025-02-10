@@ -46,21 +46,25 @@ export const GameProvider = ({ children }) => {
     miniMapEnabled: false,  // 미니맵 활성화 상태 (게임 시작 후 true)
 
     //미션 상태
-    2_1: [false, 1], // 2번 숲 1번 미션
-    2_2: [false, 2], // 2번 숲 2번 미션
-    2_3: [false, 3], // 2번 숲 3번 미션
-    3_1: [false, 1], // 3번 숲 1번 미션
-    3_2: [false, 2], // 3번 숲 2번 미션
-    3_3: [false, 3], // 3번 숲 3번 미션
-    4_1: [false, 1], // 4번 숲 1번 미션
-    4_2: [false, 2], // 4번 숲 2번 미션
-    4_3: [false, 3], // 4번 숲 3번 미션
-    5_1: [false, 1], // 5번 숲 1번 미션
-    5_2: [false, 2], // 5번 숲 2번 미션
-    5_3: [false, 3], // 5번 숲 3번 미션
-    6_1: [false, 1], // 6번 숲 1번 미션
-    6_2: [false, 2], // 6번 숲 2번 미션
-    6_3: [false, 3], // 6번 숲 3번 미션
+    
+    "2_1": [false, 1], // 2번 숲 1번 미션
+    "2_2": [false, 2], // 2번 숲 2번 미션
+    "2_3": [false, 3], // 2번 숲 3번 미션
+    "3_1": [false, 1], // 3번 숲 1번 미션
+    "3_2": [false, 2], // 3번 숲 2번 미션
+    "3_3": [false, 3], // 3번 숲 3번 미션
+    "4_1": [false, 1], // 4번 숲 1번 미션
+    "4_2": [false, 2], // 4번 숲 2번 미션
+    "4_3": [false, 3], // 4번 숲 3번 미션
+    "5_1": [false, 1], // 5번 숲 1번 미션
+    "5_2": [false, 2], // 5번 숲 2번 미션
+    "5_3": [false, 3], // 5번 숲 3번 미션
+    "6_1": [false, 1], // 6번 숲 1번 미션
+    "6_2": [false, 2], // 6번 숲 2번 미션
+    "6_3": [false, 3], // 6번 숲 3번 미션
+    "7_1": [false, 1], // 6번 숲 1번 미션
+    "7_2": [false, 2], // 6번 숲 2번 미션
+    "7_3": [false, 3], // 6번 숲 3번 미션
   });
 
   const [videoSettings, setVideoSettings] = useState({
@@ -276,17 +280,38 @@ export const GameProvider = ({ children }) => {
 
   // 미션 완료 처리
   const completeMission = useCallback(async (forestNum, missionNum) => {
+    console.log("completeMission called in GameContext:", { forestNum, missionNum });
+    
     if (isConnected && roomId) {
       try {
+        console.log("Sending mission completion to server");
         await gameService.completeMission(roomId, forestNum, missionNum, gameState.userNum);
+        
+        const missionKey = `${forestNum}_${missionNum}`;
+        console.log("Updating mission state:", {
+          missionKey,
+          before: gameState[missionKey],
+        });
+        
+        setGameState(prev => {
+          const newState = {
+            ...prev,
+            [missionKey]: [true, prev[missionKey][1]],
+            fatigue: Math.max(0, prev.fatigue - 1)
+          };
+          console.log("New game state:", newState);
+          return newState;
+        });
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
+        console.error('Failed to complete mission:', error);
       }
     } else {
-      console.error('WebSocket is not connected or required fields are empty');
+      console.error('WebSocket is not connected or required fields are empty:', {
+        isConnected,
+        roomId
+      });
     }
   }, [isConnected, roomId, gameState.userNum]);
-
   // 투표 종료
   const endVote = (result) => {
     setGameState(prev => ({

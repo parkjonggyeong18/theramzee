@@ -1,52 +1,17 @@
-// App.js
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import Lobby from './pages/Lobby';
-import GameRoom from './pages/GameRoom';
-import MainForest from './pages/forests/MainForest';
-import TwistedForest from './pages/forests/TwistedForest';
-import DryForest from './pages/forests/DryForest';
-import BreathingForest from './pages/forests/BreathingForest';
-import FoggyForest from './pages/forests/FoggyForest';
-import FairyForest from './pages/forests/FairyForest';
-import TimeForest from './pages/forests/TimeForest';
-import { GameProvider } from 'contexts/GameContext';
+import React from 'react';
+import { AuthProvider } from './contexts/AuthContext';
+import { UserProvider } from './contexts/UserContext';
+import { GameProvider } from './contexts/GameContext';
+import AppRoutes from './routes/AppRoutes';
 
-function App() {
-  return (
-    <GameProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/lobby" element={<Lobby />} />
-          <Route path="/game/:roomId" element={<GameRoom />} />
-          <Route path="/game/:roomId/main" element={<MainForest />} />
-          <Route path="/game/:roomId/forest/twisted" element={<TwistedForest />} />
-          <Route path="/game/:roomId/forest/dry" element={<DryForest />} />
-          <Route path="/game/:roomId/forest/breathing" element={<BreathingForest />} />
-          <Route path="/game/:roomId/forest/foggy" element={<FoggyForest />} />
-          <Route path="/game/:roomId/forest/fairy" element={<FairyForest />} />
-          <Route path="/game/:roomId/forest/time" element={<TimeForest />} />
-        </Routes>
-      </BrowserRouter>
-    </GameProvider>
-  );
-}
+const App = () => (
+  <AuthProvider>
+    <UserProvider>
+      <GameProvider>
+        <AppRoutes />
+      </GameProvider>
+    </UserProvider>
+  </AuthProvider>
+);
 
 export default App;
-
-// 각 컴포넌트의 background-image 부분:
-/*
-Login, Register, ForgotPassword: background-image: url('/forest-bg.gif')
-MainForest: background-image: url('/main-forest-bg.png')
-TwistedForest: background-image: url('/twisted-forest-bg.png')
-DryForest: background-image: url('/dry-forest-bg.png')
-BreathingForest: background-image: url('/breathing-forest-bg.png')
-FoggyForest: background-image: url('/foggy-forest-bg.png')
-FairyForest: background-image: url('/fairy-forest-bg.png')
-TimeForest: background-image: url('/time-forest-bg.png')
-*/
