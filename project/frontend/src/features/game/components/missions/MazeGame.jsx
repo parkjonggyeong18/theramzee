@@ -19,61 +19,51 @@ const MazeGame = ({ onComplete, onClose }) => {
     }
   }, []);
 
-  // 방향키 이벤트 처리
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (gameOver) return;
+  // 키보드 이동을 위한 이벤트 리스너 추가
+useEffect(() => {
+  const handleKeyDown = (e) => {
+    if (gameOver) return;
+    
+    switch(e.key) {
+      case 'ArrowUp':
+        handleMove(playerPos.x, playerPos.y - 1);  // y값을 감소시켜 위로 이동
+        break;
+      case 'ArrowDown':
+        handleMove(playerPos.x, playerPos.y + 1);  // y값을 증가시켜 아래로 이동
+        break;
+      case 'ArrowLeft':
+        handleMove(playerPos.x - 1, playerPos.y);  // x값을 감소시켜 왼쪽으로 이동
+        break;
+      case 'ArrowRight':
+        handleMove(playerPos.x + 1, playerPos.y);  // x값을 증가시켜 오른쪽으로 이동
+        break;
+      default:
+        break;
+    }
+  };
 
-      // 방향키 입력 시 브라우저의 기본 스크롤 동작 방지
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.key)) {
-        e.preventDefault();
-      }
-      
-      switch(e.key) {
-        case 'ArrowUp':
-          handleMove(playerPos.x, playerPos.y - 1);
-          break;
-        case 'ArrowDown':
-          handleMove(playerPos.x, playerPos.y + 1);
-          break;
-        case 'ArrowLeft':
-          handleMove(playerPos.x - 1, playerPos.y);
-          break;
-        case 'ArrowRight':
-          handleMove(playerPos.x + 1, playerPos.y);
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [playerPos, gameOver, maze]);
+  window.addEventListener('keydown', handleKeyDown);
+  
+  return () => {
+    window.removeEventListener('keydown', handleKeyDown);
+  };
+}, [playerPos, gameOver, maze]);
 
   const generateMaze = () => {
-    const newMaze = Array(5)
-      .fill(null)
-      .map(() =>
-        Array(5)
-          .fill(null)
-          .map(() => ({
-            isWall: Math.random() < 0.3,
-            isVisited: false,
-            isPath: false,
-            isTrap: false,
-            isTrapVisible: false,
-          }))
-      );
+    const newMaze = Array(5).fill(null).map(() =>
+      Array(5).fill(null).map(() => ({
+        isWall: Math.random() < 0.3,
+        isVisited: false,
+        isPath: false,
+        isTrap: false,
+        isTrapVisible: false
+      }))
+    );
 
-    // 시작 및 종료 셀 설정
     newMaze[0][0] = { isWall: false, isVisited: true, isPath: true, isStart: true, isTrap: false, isTrapVisible: false };
     newMaze[4][4] = { isWall: false, isVisited: false, isPath: false, isEnd: true, isTrap: false, isTrapVisible: false };
 
-    // 미로를 통과하는 경로 확보
-    const pathCells = [[0, 1], [1, 1], [1, 2], [2, 2], [2, 3], [3, 3], [3, 4], [4, 4]];
+    const pathCells = [[0,1], [1,1], [1,2], [2,2], [2,3], [3,3], [3,4], [4,4]];
     pathCells.forEach(([y, x]) => {
       newMaze[y][x].isWall = false;
     });
@@ -109,7 +99,7 @@ const MazeGame = ({ onComplete, onClose }) => {
       const newMaze = maze.map(row =>
         row.map(cell => ({
           ...cell,
-          isTrapVisible: cell.isTrap ? true : cell.isTrapVisible,
+          isTrapVisible: cell.isTrap ? true : cell.isTrapVisible
         }))
       );
       setMaze(newMaze);
@@ -130,7 +120,7 @@ const MazeGame = ({ onComplete, onClose }) => {
       if (gameState.role === 'good') {
         setGameState(prev => ({
           ...prev,
-          heldAcorns: prev.heldAcorns + 3,
+          heldAcorns: prev.heldAcorns + 3
         }));
       }
       setTimeout(() => onComplete(), 1500);
@@ -139,24 +129,29 @@ const MazeGame = ({ onComplete, onClose }) => {
 
   return (
     <GameOverlay onClick={onClose}>
-      <GameContent onClick={e => e.stopPropagation()} tabIndex={0} ref={gameRef}>
+      <GameContent onClick={e => e.stopPropagation()}>
         <GameTitle>🌿 살아있는 숲의 미로</GameTitle>
         <MazeContainer>
           <MazeGrid>
             {maze.map((row, y) => (
-              // MazeRow가 display: contents를 가지면, 자식들이 MazeGrid의 직접적인 그리드 아이템이 됩니다.
-              <MazeRow key={y}>
+              <div key={y} className="maze-row">
                 {row.map((cell, x) => (
-                  <MazeCell key={`${x}-${y}`} $isWall={cell.isWall} $isPath={cell.isPath}>
+                  <MazeCell
+                    key={`${x}-${y}`}
+                    $isWall={cell.isWall}
+                    $isPath={cell.isPath}
+                  >
                     {playerPos.x === x && playerPos.y === y && '🌰'}
                     {cell.isEnd && !cell.isPath && '🏠'}
                     {cell.isTrap && cell.isTrapVisible && '🕸️'}
                   </MazeCell>
                 ))}
-              </MazeRow>
+              </div>
             ))}
           </MazeGrid>
-          <Message $type={message?.includes('🌟') ? 'success' : 'info'}>{message}</Message>
+          <Message $type={message?.includes('🌟') ? 'success' : 'info'}>
+            {message}
+          </Message>
           <MovesCount>이동 횟수: {moves}</MovesCount>
         </MazeContainer>
       </GameContent>
@@ -182,7 +177,6 @@ const GameContent = styled.div`
   padding: 20px;
   border-radius: 8px;
   min-width: 300px;
-  outline: none;
 `;
 
 const GameTitle = styled.h2`
@@ -204,11 +198,6 @@ const MazeGrid = styled.div`
   gap: 2px;
   background: #2d3748;
   padding: 2px;
-`;
-
-// MazeRow는 display: contents를 사용해 DOM 구조상 존재는 하지만 레이아웃에 영향을 주지 않습니다.
-const MazeRow = styled.div`
-  display: contents;
 `;
 
 const MazeCell = styled.div`
