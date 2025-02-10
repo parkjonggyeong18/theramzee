@@ -41,14 +41,14 @@ public class GameApiController {
     @PostMapping("/game-emergency")
     @Operation(summary = "긴급 소집", description = "모든 유저 숲1로 이동 & 긴급 불가능으로 변경")
     public ResponseEntity<BaseResponse<EmergencyResponse>> emergency(@RequestBody GameEmergencyRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-        EmergencyResponse emergencyPossible = gameService.emergency(request.getRoomId());
+        EmergencyResponse emergencyPossible = gameService.emergency(request.getRoomId(), request.getNicknames());
         return ResponseEntity.ok(BaseResponse.success("긴급 소집 성공", emergencyPossible));
     }
 
     @PostMapping("/game-move")
     @Operation(summary = "숲 이동", description = "특정 숲으로 이동")
     public ResponseEntity<BaseResponse<MoveForestResponse>> move(@RequestBody GameMoveRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-        MoveForestResponse token = gameService.moveForest(request.getRoomId(), request.getUserNum(), request.getNewForest());
+        MoveForestResponse token = gameService.moveForest(request.getRoomId(), request.getNickname(), request.getNewForest());
         return ResponseEntity.ok(BaseResponse.success("숲 이동 성공", token));
     }
 
@@ -62,7 +62,7 @@ public class GameApiController {
     @PostMapping("/game-save")
     @Operation(summary = "도토리 저장", description = "공용 저장소에 도토리 저장 & 유저의 도토리 0으로 초기화")
     public ResponseEntity<BaseResponse<SaveUserAcornsResponse>> save(@RequestBody saveAcornsRequest request) {
-        SaveUserAcornsResponse totalAcorns = gameService.saveUserAcorns(request.getRoomId(), request.getUserNum());
+        SaveUserAcornsResponse totalAcorns = gameService.saveUserAcorns(request.getRoomId(), request.getNickname());
         return ResponseEntity.ok(BaseResponse.success("도토리 저장 성공", totalAcorns));
     }
 
@@ -76,14 +76,14 @@ public class GameApiController {
     @PostMapping("/game-charge")
     @Operation(summary = "피로도 충전", description = "특정 유저의 피로도 1 충전")
     public ResponseEntity<BaseResponse<IncrementUserFatigueResponse>> charge(@RequestBody chargeFatigueRequest request) {
-        IncrementUserFatigueResponse newFatigue = gameService.incrementUserFatigue(request.getRoomId(), request.getUserNum());
+        IncrementUserFatigueResponse newFatigue = gameService.incrementUserFatigue(request.getRoomId(), request.getNickname());
         return ResponseEntity.ok(BaseResponse.success("피로도 충전 성공", newFatigue));
     }
 
     @PostMapping("/game-kill")
     @Operation(summary = "킬", description = "플레이어 사망 처리 & 나의 피로도 0으로 초기화")
     public ResponseEntity<BaseResponse<KillResponse>> kill(@RequestBody killRequest request) {
-        KillResponse userAlive = gameService.Kill(request.getRoomId(), request.getUserNum(), request.getMyNum());
+        KillResponse userAlive = gameService.Kill(request.getRoomId(), request.getVictimNickname(), request.getKillerNickname());
         return ResponseEntity.ok(BaseResponse.success("유저 킬 성공", userAlive));
     }
 
@@ -97,7 +97,7 @@ public class GameApiController {
     @PostMapping("/game-mission")
     @Operation(summary = "미션 수행", description = "미션 상태 업데이트 & 보상 획득 & 피로도 1차감")
     public ResponseEntity<BaseResponse<CompleteMissionResponse>> mission(@RequestBody completeMissionRequest request) {
-        CompleteMissionResponse missionCompleted = gameService.completeMission(request.getRoomId(), request.getForestNum(), request.getMissionNum(), request.getUserNum());
+        CompleteMissionResponse missionCompleted = gameService.completeMission(request.getRoomId(), request.getForestNum(), request.getMissionNum(), request.getNickname());
         return ResponseEntity.ok(BaseResponse.success("미션 수행 성공", missionCompleted));
     }
 }

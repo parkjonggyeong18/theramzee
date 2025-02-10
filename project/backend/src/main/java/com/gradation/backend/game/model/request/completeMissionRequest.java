@@ -7,5 +7,5 @@ public class completeMissionRequest {
     private int roomId;
     private int forestNum;
     private int missionNum;
-    private int userNum;
+    private String nickname;
 }
