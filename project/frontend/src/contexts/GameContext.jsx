@@ -253,7 +253,7 @@ export const GameProvider = ({ children }) => {
           const newState = {
             ...prev,
             [missionKey]: [true, prev[missionKey][1]],
-            fatigue: Math.max(0, prev.fatigue - 1)
+            // 피로도 업데이트 제거
           };
           console.log("New game state:", newState);
           return newState;
