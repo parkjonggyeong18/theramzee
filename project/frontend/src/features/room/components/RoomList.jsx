@@ -10,7 +10,7 @@ const RoomList = ({ rooms }) => {
   return (
     <GridContainer>
       {rooms.map((room) => (
-        <RoomListItem key={room.id} room={room} />
+        <RoomListItem key={room.roomId} room={room} />
       ))}
     </GridContainer>
   );
