@@ -11,7 +11,7 @@ spring:
   data:
     redis:
       port: 6379
-      host: theramzee_theramzee-network
+      host: theramzee-redis
   mail:
     host: smtp.gmail.com
     port: 587
