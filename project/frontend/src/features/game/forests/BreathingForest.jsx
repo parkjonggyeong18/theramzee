@@ -1,8 +1,8 @@
 // pages/forests/BreathingForest.jsx
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
-import { backgroundImages } from '../../../assets/images';
+import { backgroundImages,characterImages } from '../../../assets/images';
 import GameLayout from '../components/common/GameLayout';
 
 // components import
@@ -46,7 +46,19 @@ const BreathingForest = () => {
       console.error('Failed to complete mission:', error);
     }
   };
+  useEffect(() => {
+    if (gameState.isStarted && gameState.evilSquirrel !== null) {
+      const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
+      document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;
+      console.log('✅ 커서 변경:', cursorImage);
+    } else {
+      document.body.style.cursor = 'auto';
+    }
 
+    return () => {
+      document.body.style.cursor = 'auto';
+    };
+  }, [gameState.isStarted, gameState.evilSquirrel]);
   const gameLayoutProps = {
     // 기본 레이아웃 요소
     leftVideoGrid: <VideoGrid players={players} gridPosition="left" />,

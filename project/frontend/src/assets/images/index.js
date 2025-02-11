@@ -11,7 +11,7 @@ import timeForestBg from './backgrounds/time-forest.png';
 
 // 캐릭터 이미지들
 import goodSquirrel from './characters/good-squirrel.png';
-import badSquirrel from './characters/bad-squirrel.png';
+import badSquirrel from './characters/evil-squirrel.png';
 
 // 애니메이션 이미지들
 import killAnimation from './animations/kill-animation.gif';

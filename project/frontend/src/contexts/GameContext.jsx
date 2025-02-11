@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback,useEffect } from 'react';
 import * as gameService from '../api/gameService';
 import { fetchRoomById } from '../api/room';
 
@@ -42,7 +42,11 @@ export const GameProvider = ({ children }) => {
     forceVideosOff: false,    // 안개 숲 캠 강제 OFF
     foggyVoiceEffect: false,  // 안개 숲 음성 변조
     miniMapEnabled: false,  // 미니맵 활성화 상태 (게임 시작 후 true)
-
+     // 종료 상태
+    isGameOver: false,           // 게임 종료 여부
+    gameOverReason: null,        // 'acorns' | 'emergency' | 'time'
+    winner: null,                // 'good' | 'bad'
+    lastKilledPlayer: null,      // 마지막으로 죽은 플레이어
     //미션 상태
     
     "2_1": [false, 1], // 2번 숲 1번 미션
@@ -210,7 +214,19 @@ export const GameProvider = ({ children }) => {
       console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
-
+  const checkGameOver = useCallback(() => {console.log("Checking game over condition - total acorns:", gameState.totalAcorns);
+    if (gameState.totalAcorns >= 1) {
+      console.log("Game should be over now");
+      setGameState(prev => ({
+        ...prev,
+        isGameOver: true,
+        gameOverReason: 'acorns',
+        winner: prev.evilSquirrel ? 'bad' : 'good',
+        timerRunning: false,
+        isStarted: false  // 추가
+      }));
+    }
+  }, [gameState.totalAcorns]);
   // 도토리 저장 처리
   const saveUserAcorns = useCallback(async () => {
     if (isConnected && roomId && nickname) {
@@ -223,6 +239,10 @@ export const GameProvider = ({ children }) => {
       console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
+
+  useEffect(() => {
+    checkGameOver();
+  }, [gameState.totalAcorns, checkGameOver]);
 
   // 숲 이동 처리
   const moveForest = useCallback(async (forestNum) => {
@@ -299,17 +319,30 @@ export const GameProvider = ({ children }) => {
 
   // 투표 종료
   const endVote = (result) => {
-    setGameState(prev => ({
-      ...prev,
-      isVoting: false,
-      isEmergencyVote: false,
-      timerRunning: !result.winner,  // 승자가 없으면 타이머 재개
-      // 결과에 따른 상태 업데이트
-      ...(result.winner && { winner: result.winner }),
-      ...(result.eliminatedPlayer && { 
-        killedPlayers: [...prev.killedPlayers, result.eliminatedPlayer] 
-      })
-    }));
+    if (result.winner) {
+      // 게임 종료 처리
+      setGameState(prev => ({
+        ...prev,
+        isVoting: false,
+        isEmergencyVote: false,
+        timerRunning: false,
+        isGameOver: true,
+        gameOverReason: prev.isEmergencyVote ? 'emergency' : 'time',
+        winner: result.winner,
+        lastKilledPlayer: result.eliminatedPlayer,
+        killedPlayers: result.eliminatedPlayer 
+          ? [...prev.killedPlayers, result.eliminatedPlayer]
+          : prev.killedPlayers
+      }));
+    } else {
+      // 투표 실패 처리 (게임 계속)
+      setGameState(prev => ({
+        ...prev,
+        isVoting: false,
+        isEmergencyVote: false,
+        timerRunning: true
+      }));
+    }
   };
 
   // 일반 투표 시작 함수
@@ -330,7 +363,32 @@ export const GameProvider = ({ children }) => {
       foggyVoiceEffect: isInFoggyForest   // openVidu 넣었을때, 실행되는 코드 구현 필요
     }));
   };
-
+  const resetGame = useCallback(() => {
+    setGameState(prev => ({
+      ...prev,
+      isStarted: false,
+      timer: 420,
+      timerRunning: false,
+      evilSquirrel: null,
+      forestToken: null,
+      totalAcorns: 0,
+      heldAcorns: 0,
+      fatigue: 0,
+      isVoting: false,
+      isEmergencyVote: false,
+      hasUsedEmergency: false,
+      voteTimer: 180,
+      isPaused: false,
+      killedPlayers: [],
+      isSpectating: false,
+      isDead: false,
+      killingAnimation: false,
+      isGameOver: false,
+      gameOverReason: null,
+      winner: null,
+      lastKilledPlayer: null
+    }));
+  }, []);
   const value = {
     gameState,         // 게임 전체 상태
     setGameState,      // 게임 상태 변경

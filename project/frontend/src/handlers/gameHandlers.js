@@ -95,16 +95,33 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         if (message.success) {
           const initializedData = message.data;
           console.log("도토리 저장 성공:", initializedData);
-          setGameState((prev) => ({
-            ...prev,
-            totalAcorns: initializedData.newTotalAcorns,
-          }));
-          if (message.data['nickname'] === nickName) {
+          
+          // 도토리가 3개 이상이면 게임 종료
+          if (initializedData.newTotalAcorns >= 1) {
+            navigate(`/game/${roomId}/main`);
             setGameState((prev) => ({
               ...prev,
+              totalAcorns: initializedData.newTotalAcorns,
+              heldAcorns: 0,
+              isGameOver: true,
+              gameOverReason: 'acorns',
+              winner: prev.evilSquirrel ? 'bad' : 'good',
+              timerRunning: false,
+              isStarted: false
+            }));setTimeout(() => {
+              setGameState(prev => ({
+                ...prev,
+                currentScreen: 'gameOver'
+              }));
+            }, 500);
+          } else {
+            // 게임 진행 중
+            setGameState((prev) => ({
+              ...prev,
+              totalAcorns: initializedData.newTotalAcorns,
               heldAcorns: 0,
             }));
-          } 
+          }
         } else {
           console.error("Game initialization failed:", message.errorCode);
         }
@@ -112,8 +129,8 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [setGameState, nickName]
- );
+    [setGameState, nickName, navigate, roomId]
+  );
 
   // 피로도 충전 응답 처리
   const handleChargeFatigueResponse = useCallback(
