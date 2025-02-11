@@ -2,6 +2,9 @@ package com.gradation.backend.user.service.impl;
 
 import com.gradation.backend.common.utill.JwtTokenUtil;
 import com.gradation.backend.common.utill.RedisUtil;
+import com.gradation.backend.friends.model.entitiy.FriendStatus;
+import com.gradation.backend.friends.model.response.FriendResponse;
+import com.gradation.backend.friends.repository.FriendsRepository;
 import com.gradation.backend.user.exception.UserNotFoundException;
 import com.gradation.backend.user.model.entity.CustomUserDetails;
 import com.gradation.backend.user.model.entity.User;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,7 +28,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * UserServiceImpl는 UserService 인터페이스의 구현체로,
@@ -47,15 +53,18 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenUtil jwtTokenUtil;
     private final RedisUtil redisUtil;
     private final AuthenticationManager authenticationManager;
-
+    private final FriendsRepository friendsRepository;
+    private final SimpMessagingTemplate messagingTemplate;
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, @Qualifier("redisTemplate1")RedisTemplate<String, String> redisTemplate1, RedisUtil redisUtil, JwtTokenUtil jwtTokenUtil, AuthenticationManager authenticationManager) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, @Qualifier("redisTemplate1")RedisTemplate<String, String> redisTemplate1, RedisUtil redisUtil, JwtTokenUtil jwtTokenUtil, AuthenticationManager authenticationManager, FriendsRepository friendsRepository, SimpMessagingTemplate messagingTemplate) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.redisTemplate1 = redisTemplate1;
         this.jwtTokenUtil = jwtTokenUtil;
         this.authenticationManager = authenticationManager;
         this.redisUtil = redisUtil;
+        this.friendsRepository = friendsRepository;
+        this.messagingTemplate = messagingTemplate;
     }
 
     /**
@@ -137,6 +146,17 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
         existingUser.setUserStatus(true); // 상태 업데이트
         userRepository.save(existingUser);
+
+        List<User> friends = friendsRepository.findFriendsByUser(existingUser, FriendStatus.ACCEPTED);
+        List<FriendResponse> updatedFriends = friends.stream()
+                .map(friend -> new FriendResponse(friend.getNickname(), "오프라인"))
+                .collect(Collectors.toList());
+
+        // 친구들에게 상태 변경 알림 전송
+        for(User friend : friends) {
+            messagingTemplate.convertAndSend("/topic/friends/" + friend.getUsername(), updatedFriends);
+        }
+
         return new TokenResponse(accessToken, existingUser.getNickname());
     }
 
@@ -154,6 +174,16 @@ public class UserServiceImpl implements UserService {
         User existingUser = userRepository.findByUsername(username).orElseThrow(() -> new UserNotFoundException("User not found"));
         existingUser.setUserStatus(false); // 상태 업데이트
         userRepository.save(existingUser);
+
+        List<User> friends = friendsRepository.findFriendsByUser(existingUser, FriendStatus.ACCEPTED);
+        List<FriendResponse> updatedFriends = friends.stream()
+                .map(friend -> new FriendResponse(friend.getNickname(), "오프라인"))
+                .collect(Collectors.toList());
+
+        // 친구들에게 상태 변경 알림 전송
+        for(User friend : friends) {
+            messagingTemplate.convertAndSend("/topic/friends/" + friend.getUsername(), updatedFriends);
+        }
         return null;
     }
 
