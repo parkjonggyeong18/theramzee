@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 
 export const useGameHandlers = (roomId, gameState, setGameState) => {
+  
 
   const nickName = sessionStorage.getItem('nickName');
   const navigate = useNavigate();
@@ -206,26 +207,36 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         if (message.success) {
           const initializedData = message.data;
           console.log("미션 완료 성공:", initializedData);
-          const missionKey = `${initializedData['forestNum']}_${initializedData['missionNum']}`;
-          setGameState((prev) => ({
+          
+          // initializedData에서 미션 정보 추출
+          const forestNum = initializedData.forestNum;
+          const missionNum = initializedData.missionNum;
+          const missionKey = `${forestNum}_${missionNum}`;
+
+          // 모든 플레이어가 미션 완료 상태 업데이트
+          setGameState(prev => ({
             ...prev,
-            missionKey: [true, prev[missionKey][1]],
+            [missionKey]: [true, prev[missionKey][1]],
           }));
-          if (message.data['nickname'] === nickName) {
-            setGameState((prev) => ({
+
+          // 미션을 완료한 플레이어인 경우에만 추가 상태 업데이트
+          if (initializedData.nickname === nickName) {
+            setGameState(prev => ({
               ...prev,
-              fatigue: prev.fatigue - 1,
-              heldAcorns: initializedData['userAcorns'],
+              fatigue: Math.max(prev.fatigue - 1, 0),
+              heldAcorns: initializedData.userAcorns
             }));
-          } 
+          }
+
+          console.log(`Mission ${missionKey} completed by ${initializedData.nickname}`);
         } else {
-          console.error("Game initialization failed:", message.errorCode);
+          console.error("미션 완료 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
+        console.error("미션 완료 응답 처리 중 에러:", error);
       }
     },
-    [setGameState, nickName]
+    [nickName, setGameState]
   );
 
   return {
