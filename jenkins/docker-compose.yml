@@ -40,7 +40,7 @@ services:
       - redis
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://theramzee-mysql-1:3306/gradation_db # 컨테이너 이름 사용 (더 명확)
-      SPRING_REDIS_HOST: theramzee-redis # 컨테이너 이름 사용 (더 명확)
+      SPRING_REDIS_HOST: theramzee-redis-1 # 컨테이너 이름 사용 (더 명확)
     restart: unless-stopped
     networks:
       - theramzee-network # theramzee-network 네트워크에 연결
