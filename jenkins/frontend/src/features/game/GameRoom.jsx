@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../../contexts/GameContext';
 import { backgroundImages, characterImages } from '../../assets/images';
 import { connectSocket, disconnectSocket } from '../../api/stomp';
+import { useGameHandlers } from '../../handlers/gameHandlers';
+import { subscribeToTopic } from '../../api/stomp';
 
 // 공통 레이아웃 import
 import GameLayout from './components/common/GameLayout';
@@ -18,25 +20,58 @@ import MiniMap from './components/MiniMap';
 
 const GameRoom = () => {
   const navigate = useNavigate();
+  
   const { 
     gameState, 
-    startGame,   // startGame 함수 사용
+    startGame, 
     players,
     setRoomId,
     setIsConnected,
     setGameState,
   } = useGame();
+
   const { roomId } = useParams();  // roomId 가져오기
+  const handlers = useGameHandlers(roomId, gameState, setGameState);
+  const isSubscribed = useRef(false); // 중복 실행 방지 플래그
 
   useEffect(() => {
     setRoomId(roomId);
+    if (!roomId) {
+      console.error("⚠️ roomId is missing.");
+      return;
+    }
+
     setGameState((prev) => ({
       ...prev,
       roomId: roomId,
     }));
-    connectSocket();
-    setIsConnected(true);
-  }, []);
+
+    const connectAndSubscribe = async () => {
+      try {
+        if (isSubscribed.current) return; // 이미 구독된 경우 실행하지 않음
+        isSubscribed.current = true; // 구독 상태 설정
+
+        await connectSocket();
+        setIsConnected(true);
+
+        setTimeout(() => {
+          console.log("📌 Subscribing to game topics...");
+          subscribeToTopic(`/user/queue/game/${roomId}/info`, handlers.handleGameInfo);
+          subscribeToTopic(`/topic/game/${roomId}/start`, handlers.handleGameStartResponse);
+          subscribeToTopic(`/topic/game/${roomId}/emergency`, handlers.handleEmergencyResponse);
+          subscribeToTopic(`/topic/game/${roomId}/move`, handlers.handleMoveResponse);
+          subscribeToTopic(`/topic/game/${roomId}/save-acorns`, handlers.handleSaveAcornsResponse);
+          subscribeToTopic(`/topic/game/${roomId}/charge-fatigue`, handlers.handleChargeFatigueResponse);
+          subscribeToTopic(`/topic/game/${roomId}/kill`, handlers.handleKillResponse);
+          subscribeToTopic(`/topic/game/${roomId}/complete-mission`, handlers.handleCompleteMissionResponse);
+        }, 100);
+      } catch (error) {
+        console.error("⚠️ Failed to connect or subscribe:", error);
+      }
+    };
+
+    connectAndSubscribe();
+  }, [roomId]);
 
   const clkStart = () => {
     startGame();

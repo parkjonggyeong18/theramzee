@@ -1,7 +1,6 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import * as gameService from '../api/gameService';
-import { useGameHandlers } from '../handlers/gameHandlers';
-import { subscribeToTopic } from '../api/stomp';
+import { fetchRoomById } from '../api/room';
 
 const GameContext = createContext();
 
@@ -9,8 +8,8 @@ export const GameProvider = ({ children }) => {
   // 게임의 전체 상태 관리
   const [gameState, setGameState] = useState({
     // 유저 정보
-    userNum: 3,
-    nickName: 'Player 3',
+    userNum: null,
+    nickName: null,
 
     // 게임 진행 상태
     isStarted: false, // 게임 시작 여부
@@ -45,21 +44,25 @@ export const GameProvider = ({ children }) => {
     miniMapEnabled: false,  // 미니맵 활성화 상태 (게임 시작 후 true)
 
     //미션 상태
-    2_1: [false, 1], // 2번 숲 1번 미션
-    2_2: [false, 2], // 2번 숲 2번 미션
-    2_3: [false, 3], // 2번 숲 3번 미션
-    3_1: [false, 1], // 3번 숲 1번 미션
-    3_2: [false, 2], // 3번 숲 2번 미션
-    3_3: [false, 3], // 3번 숲 3번 미션
-    4_1: [false, 1], // 4번 숲 1번 미션
-    4_2: [false, 2], // 4번 숲 2번 미션
-    4_3: [false, 3], // 4번 숲 3번 미션
-    5_1: [false, 1], // 5번 숲 1번 미션
-    5_2: [false, 2], // 5번 숲 2번 미션
-    5_3: [false, 3], // 5번 숲 3번 미션
-    6_1: [false, 1], // 6번 숲 1번 미션
-    6_2: [false, 2], // 6번 숲 2번 미션
-    6_3: [false, 3], // 6번 숲 3번 미션
+    
+    "2_1": [false, 1], // 2번 숲 1번 미션
+    "2_2": [false, 2], // 2번 숲 2번 미션
+    "2_3": [false, 3], // 2번 숲 3번 미션
+    "3_1": [false, 1], // 3번 숲 1번 미션
+    "3_2": [false, 2], // 3번 숲 2번 미션
+    "3_3": [false, 3], // 3번 숲 3번 미션
+    "4_1": [false, 1], // 4번 숲 1번 미션
+    "4_2": [false, 2], // 4번 숲 2번 미션
+    "4_3": [false, 3], // 4번 숲 3번 미션
+    "5_1": [false, 1], // 5번 숲 1번 미션
+    "5_2": [false, 2], // 5번 숲 2번 미션
+    "5_3": [false, 3], // 5번 숲 3번 미션
+    "6_1": [false, 1], // 6번 숲 1번 미션
+    "6_2": [false, 2], // 6번 숲 2번 미션
+    "6_3": [false, 3], // 6번 숲 3번 미션
+    "7_1": [false, 1], // 6번 숲 1번 미션
+    "7_2": [false, 2], // 6번 숲 2번 미션
+    "7_3": [false, 3], // 6번 숲 3번 미션
   });
 
   const [videoSettings, setVideoSettings] = useState({
@@ -67,23 +70,22 @@ export const GameProvider = ({ children }) => {
     audioEnabled: true
   });
 
-  const [players] = useState([
-    // 테스트용 더미 데이터
-    // { id: 1, name: '테스트 플레이어', isMe: true }
-    // 추후 6인용
-    { id: 1, nickName: 'Player 1', isMe: true },
-    { id: 2, nickName: 'Player 2', isMe: false },
-    { id: 3, nickName: 'Player 3', isMe: false },
-    { id: 4, nickName: 'Player 4', isMe: false },
-    { id: 5, nickName: 'Player 5', isMe: false },
-    { id: 6, nickName: 'Player 6', isMe: false }
-  ]);
+  // const [players] = useState([
+  //   // 테스트용 더미 데이터
+  //   // { id: 1, name: '테스트 플레이어', isMe: true }
+  //   // 추후 6인용
+  //   { id: 1, nickName: 'Player 1', isMe: true },
+  //   { id: 2, nickName: 'Player 2', isMe: false },
+  //   { id: 3, nickName: 'Player 3', isMe: false },
+  //   { id: 4, nickName: 'Player 4', isMe: false },
+  //   { id: 5, nickName: 'Player 5', isMe: false },
+  //   { id: 6, nickName: 'Player 6', isMe: false }
+  // ]);
   
   const [roomId, setRoomId] = useState(null);
-  const [nicknames, setNicknames] = useState('');
-  // ✅ 게임 핸들러 (GameRoom이랑 공유됨)
-  const handlers = useGameHandlers(roomId, gameState, setGameState);
+  const [players, setPlayers] = useState(['a', 'b', 'c', 'd']);
   const [isConnected, setIsConnected] = useState(false);
+  const nickname = sessionStorage.getItem('nickName');
 
     // // 🔹 WebSocket 연결 설정
     // useEffect(() => {
@@ -130,118 +132,170 @@ export const GameProvider = ({ children }) => {
 ////////////////////////////////////이벤트 함수////////////////////////////////////////////////////////////
 
   // 구독 함수 (startGame을 누를 때 실행됨)
-  const subscribeToGameTopics = useCallback(() => {
-    if (!isConnected || !roomId) {
-      console.error("⚠️ Cannot subscribe: WebSocket is not connected or roomId is missing.");
-      return;
-    }
+  // const subscribeToGameTopics = useCallback(() => {
+  //   if (!isConnected || !roomId) {
+  //     console.error("⚠️ Cannot subscribe: WebSocket is not connected or roomId is missing.");
+  //     return;
+  //   }
 
-    console.log("📌 Subscribing to game topics...");
-    subscribeToTopic(`/user/queue/game/${roomId}/info`, handlers.handleGameInfo);
-    subscribeToTopic(`/topic/game/${roomId}/start`, handlers.handleGameStartResponse);
-    subscribeToTopic(`/topic/game/${roomId}/emergency`, handlers.handleEmergencyResponse);
-    subscribeToTopic(`/topic/game/${roomId}/move`, handlers.handleMoveResponse);
-    subscribeToTopic(`/topic/game/${roomId}/save-acorns`, handlers.handleSaveAcornsResponse);
-    subscribeToTopic(`/topic/game/${roomId}/charge-fatigue`, handlers.handleChargeFatigueResponse);
-    subscribeToTopic(`/topic/game/${roomId}/kill`, handlers.handleKillResponse);
-    subscribeToTopic(`/topic/game/${roomId}/complete-mission`, handlers.handleCompleteMissionResponse);
-  }, [isConnected, roomId]);
+  //   console.log("📌 Subscribing to game topics...");
+  //   subscribeToTopic(`/user/queue/game/${roomId}/info`, handlers.handleGameInfo);
+  //   subscribeToTopic(`/topic/game/${roomId}/start`, handlers.handleGameStartResponse);
+  //   subscribeToTopic(`/topic/game/${roomId}/emergency`, handlers.handleEmergencyResponse);
+  //   subscribeToTopic(`/topic/game/${roomId}/move`, handlers.handleMoveResponse);
+  //   subscribeToTopic(`/topic/game/${roomId}/save-acorns`, handlers.handleSaveAcornsResponse);
+  //   subscribeToTopic(`/topic/game/${roomId}/charge-fatigue`, handlers.handleChargeFatigueResponse);
+  //   subscribeToTopic(`/topic/game/${roomId}/kill`, handlers.handleKillResponse);
+  //   subscribeToTopic(`/topic/game/${roomId}/complete-mission`, handlers.handleCompleteMissionResponse);
+  // }, [isConnected, roomId]);
+
+  // 최신 닉네임 리스트 가져오기 (startGame을 누를 때 실행됨)
+  const getPlayers = useCallback(async () => {
+    if (isConnected && roomId) {
+      try {
+        const response = await fetchRoomById(roomId);
+        
+        // 최신 닉네임 리스트 생성
+        const updatedPlayers = [...players, ...response.data['nicknames']]
+          .map((nick, index) => ({
+            id: index + 1, // ✅ 1부터 시작하는 id 부여
+            nickName: nick,
+            isMe: nick === nickname // 현재 사용자 닉네임과 비교하여 isMe 설정
+          }));
+
+        // 상태 업데이트
+        setPlayers(updatedPlayers);
+
+        // 최신 값 반환
+        return updatedPlayers;
+      } catch (error) {
+        console.error('Failed to get member nicknames:', error);
+        return players; // 에러 발생 시 기존 nicknames 반환
+      }
+    } else {
+      console.error('WebSocket is not connected or required fields are empty');
+      return players;
+    }
+  }, [isConnected, roomId, players, nickname]);
 
   // 게임 시작 처리
   const startGame = useCallback(async () => {
-    console.log('Attempting to start game:', roomId, players.map(p => p.nickName));
-    
     if (isConnected && roomId) {
       try {
-        // ✅ 게임 시작 전에 WebSocket 구독 실행
-        await subscribeToGameTopics();
-        await gameService.startGame(roomId, players.map(p => p.nickName));
-        console.log('Game start request sent successfully');
+        // ✅ 최신 nicknames 값을 받아오기
+        const updatedNicknames = await getPlayers();
+
+        // ✅ nickName 값만 추출하여 배열 형태로 변환
+        const nicknameList = updatedNicknames.map(player => player.nickName);
+
+        // ✅ 게임 시작 요청
+        gameService.startGame(roomId, nicknameList);
       } catch (error) {
         console.error('Failed to start game:', error);
       }
     } else {
       console.error('Socket connection not initialized');
     }
-  }, [isConnected, roomId, players, subscribeToGameTopics]);
+  }, [isConnected, roomId, getPlayers]);
 
   // 피로도 충전 처리
   const chargeFatigue = useCallback(async () => {
-    if (isConnected && roomId && gameState.userNum) {
+    if (isConnected && roomId && nickname) {
       try {
-        await gameService.chargeFatigue(roomId, gameState.userNum);
+        await gameService.chargeFatigue(roomId, nickname);
       } catch (error) {
         console.error('Failed to get user fatigue:', error);
       }
     } else {
       console.error('WebSocket is not connected or required fields are empty');
     }
-  }, [isConnected, roomId, gameState.userNum]);
+  }, [isConnected, roomId, nickname]);
 
   // 도토리 저장 처리
   const saveUserAcorns = useCallback(async () => {
-    if (isConnected && roomId && gameState.userNum) {
+    if (isConnected && roomId && nickname) {
       try {
-        await gameService.saveUserAcorns(roomId, gameState.userNum);
+        await gameService.saveUserAcorns(roomId, nickname);
       } catch (error) {
         console.error('Failed to get user fatigue:', error);
       }
     } else {
       console.error('WebSocket is not connected or required fields are empty');
     }
-  }, [isConnected, roomId, gameState.userNum]);
+  }, [isConnected, roomId, nickname]);
 
   // 숲 이동 처리
   const moveForest = useCallback(async (forestNum) => {
-    if (isConnected && roomId && gameState.userNum && forestNum) {
+    if (isConnected && roomId && nickname && forestNum) {
       try {
-        await gameService.moveForest(roomId, gameState.userNum, forestNum);
+        await gameService.moveForest(roomId, nickname, forestNum);
       } catch (error) {
         console.error('Failed to get user fatigue:', error);
       }
     } else {
       console.error('WebSocket is not connected or required fields are empty');
     }
-  }, [isConnected, roomId, gameState.userNum]);
+  }, [isConnected, roomId, nickname]);
 
   // 플레이어 사망 처리
-  const killUser = useCallback(async (killedNum) => {
-    if (isConnected && roomId && gameState.userNum && killedNum) {
+  const killUser = useCallback(async (vitimNickname) => {
+    if (isConnected && roomId && nickname && vitimNickname) {
       try {
-        await gameService.killUser(roomId, killedNum, gameState.userNum);
+        await gameService.killUser(roomId, vitimNickname, nickname);
       } catch (error) {
         console.error('Failed to get user fatigue:', error);
       }
     } else {
       console.error('WebSocket is not connected or required fields are empty');
     }
-  }, [isConnected, roomId, gameState.userNum]);
+  }, [isConnected, roomId, nickname]);
 
   // 긴급 투표 시작 처리
   const startEmergency = useCallback(async () => {
     if (isConnected && roomId) {
       try {
-        await gameService.startEmergency(roomId);
+        const nicknameList = players.map(player => player.nickName);
+        await gameService.startEmergency(roomId, nicknameList);
       } catch (error) {
         console.error('Failed to get user fatigue:', error);
       }
     } else {
       console.error('WebSocket is not connected or required fields are empty');
     }
-  }, [isConnected, roomId]);
+  }, [isConnected, roomId, players]);
 
   // 미션 완료 처리
   const completeMission = useCallback(async (forestNum, missionNum) => {
     if (isConnected && roomId) {
       try {
-        await gameService.completeMission(roomId, forestNum, missionNum, gameState.userNum);
+        console.log("Sending mission completion to server");
+        await gameService.completeMission(roomId, forestNum, missionNum, nickname);
+        
+        const missionKey = `${forestNum}_${missionNum}`;
+        console.log("Updating mission state:", {
+          missionKey,
+          before: gameState[missionKey],
+        });
+        
+        setGameState(prev => {
+          const newState = {
+            ...prev,
+            [missionKey]: [true, prev[missionKey][1]],
+            // 피로도 업데이트 제거
+          };
+          console.log("New game state:", newState);
+          return newState;
+        });
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
+        console.error('Failed to complete mission:', error);
       }
     } else {
-      console.error('WebSocket is not connected or required fields are empty');
+      console.error('WebSocket is not connected or required fields are empty:', {
+        isConnected,
+        roomId
+      });
     }
-  }, [isConnected, roomId, gameState.userNum]);
+  }, [isConnected, roomId, nickname, gameState]);
 
   // 투표 종료
   const endVote = (result) => {
@@ -280,7 +334,6 @@ export const GameProvider = ({ children }) => {
   const value = {
     gameState,         // 게임 전체 상태
     setGameState,      // 게임 상태 변경
-    players,          // 플레이어 정보
     startGame,        // 게임 시작
     chargeFatigue,       // 피로도 충전
     saveUserAcorns,       // 도토리 저장
@@ -297,7 +350,7 @@ export const GameProvider = ({ children }) => {
     setRoomId,
     roomId,
     setIsConnected,
-    // setNicknames,  // nicknames를 설정할 수 있는 함수 추가
+    players,
   };
 
   return (

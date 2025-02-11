@@ -12,70 +12,101 @@ import GameTimer from '../components/GameTimer';
 import StatePanel from '../components/StatePanel';
 import MiniMap from '../components/MiniMap';
 import MissionButton from '../components/MissionButton';
-import EmptyMissionOverlay from '../components/missions/EmptyMissionOverlay';
+import FlowerGame from '../components/missions/FlowerGame';
+import FishingGame from '../components/missions/FishingGame';
+
 
 const FairyForest = () => {
- const { gameState, players } = useGame();
- const [showMiniGame, setShowMiniGame] = useState(false);
- const [completedMissions, setCompletedMissions] = useState([]);
+  const { gameState, players, completeMission } = useGame();
+  const [showMiniGame, setShowMiniGame] = useState(false);
+  const [currentMission, setCurrentMission] = useState(null);
+  const [completedMissions, setCompletedMissions] = useState([]);
+  const isMissionCompleted = (missionId) => {
+    const missionNum = missionId === 'flower' ? 1 : 
+                      missionId === 'fishing' ? 2 : 3;
+    return gameState[`4_${missionNum}`][0]; // gameState에서 미션 완료 상태 확인
+  };
+  const handleMissionClick = (missionId) => {
+    if (isMissionCompleted(missionId)) return;
+    if (gameState.fatigue < 1) return;
+    setCurrentMission(missionId);
+    setShowMiniGame(true);
+  };
 
- const handleMissionClick = (missionId) => {
-   if (completedMissions.includes(missionId)) return;
-   if (gameState.evilSquirrel === true && gameState.fatigue < 1) return;
-   setShowMiniGame(true);
- };
 
- const handleMissionComplete = () => {
-   setShowMiniGame(false);
- };
+  const handleMissionComplete = async () => {
+    try {
+      const missionNum = currentMission === 'flower' ? 1 : 
+                        currentMission === 'fishing' ? 2 : 3;
+      
+      await completeMission(4, missionNum);
+      setShowMiniGame(false);
+      setCurrentMission(null);
+    } catch (error) {
+      console.error('Failed to complete mission:', error);
+    }
+  };
 
- const gameLayoutProps = {
-   // 기본 레이아웃 요소
-   leftVideoGrid: <VideoGrid players={players} gridPosition="left" />,
-   rightVideoGrid: <VideoGrid players={players} gridPosition="right" />,
-   gameTimer: <GameTimer />,
-   statePanel: <StatePanel />,
-   myVideo: <MyVideo />,
-   miniMap: <MiniMap />,
-   
-   // 미션 관련
-   missionButtons: (
-     <MissionButtons>
-       <MissionButton 
-         onClick={() => handleMissionClick('flowerConnect')}
-         completed={completedMissions.includes('flowerConnect')}
-       />
-       <MissionButton 
-         onClick={() => handleMissionClick('fishingTiming')}
-         completed={completedMissions.includes('fishingTiming')}
-       />
-       <MissionButton 
-         onClick={() => handleMissionClick('beaverHouse')}
-         completed={completedMissions.includes('beaverHouse')}
-       />
-     </MissionButtons>
-   ),
-   
-   // 미니게임 오버레이
-   miniGameOverlay: showMiniGame && (
-     <EmptyMissionOverlay 
-       onClose={() => setShowMiniGame(false)}
-     />
-   ),
-   
-   // 기타
-   isGameStarted: gameState.isStarted,
-   background: backgroundImages.fairyForest,
-   mainForestButtons: null,
-   voteScreen: null
- };
+  const gameLayoutProps = {
+    // 기본 레이아웃 요소
+    leftVideoGrid: <VideoGrid players={players} gridPosition="left" />,
+    rightVideoGrid: <VideoGrid players={players} gridPosition="right" />,
+    gameTimer: <GameTimer />,
+    statePanel: <StatePanel />,
+    myVideo: <MyVideo />,
+    miniMap: <MiniMap />,
+    
+    // 미션 관련
+    missionButtons: (
+      <MissionButtons>
+        <MissionButton 
+          onClick={() => handleMissionClick('flower')}
+          completed={isMissionCompleted('flower')}
+        />
+        <MissionButton 
+          onClick={() => handleMissionClick('fishing')}
+          completed={isMissionCompleted('fishing')}
+        />
+        <MissionButton isDisabled
+    
+        />
+      </MissionButtons>
+    ),
+    
+    // 미니게임 오버레이
+    miniGameOverlay: showMiniGame && (
+      currentMission === 'flower' ? (
+        <FlowerGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
+      ) : currentMission === 'fishing' ? (
+        <FishingGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
+      ) : null
+    ),
+    
+    // 기타
+    isGameStarted: gameState.isStarted,
+    background: backgroundImages.fairyForest,
+    mainForestButtons: null,
+    voteScreen: null
+  };
 
- return <GameLayout {...gameLayoutProps} />;
+  return <GameLayout {...gameLayoutProps} />;
 };
 
 const MissionButtons = styled.div`
- display: flex;
- gap: 50px;
+  display: flex;
+  gap: 50px;
 `;
 
 export default FairyForest;

@@ -5,5 +5,5 @@ import lombok.Data;
 @Data
 public class saveAcornsRequest {
     private int roomId;
-    private int userNum;
+    private String nickname;
 }

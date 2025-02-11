@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class GameMoveRequest {
     private int roomId;
-    private int userNum;
+    private String nickname;
     private int newForest;
 }
