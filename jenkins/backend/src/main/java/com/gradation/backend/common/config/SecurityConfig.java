@@ -108,7 +108,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("*")); // 허용할 Origin
+        config.setAllowedOrigins(List.of("https://ramzee.online")); // 허용할 Origin
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE")); // 허용할 HTTP 메서드
         config.setAllowedHeaders(List.of("*")); // 모든 요청 헤더 허용
         config.setAllowCredentials(true); // 인증 정보 포함 허용 (쿠키, Authorization 헤더 등)
