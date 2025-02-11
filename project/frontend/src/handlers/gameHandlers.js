@@ -161,30 +161,42 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         if (message.success) {
           const initializedData = message.data;
           console.log("킬 성공:", initializedData);
-          setGameState((prev) => ({
-            ...prev,
-            killedPlayers: [...prev.killedPlayers, initializedData['victimNickname']]
-          }));
-          if (message.data['killerNickname'] === nickName) {
-            setGameState((prev) => ({
+          
+          setGameState((prev) => {
+            const newKilledPlayers = [...prev.killedPlayers, initializedData['victimNickname']];
+            
+            // 기본 업데이트 객체
+            const updates = {
               ...prev,
-              fatigue: initializedData['killerFatigue'],
-            }));
-          } else if (message.data['victimNickname'] === nickName) {
-            setGameState((prev) => ({
-              ...prev,
-              isDead: true,
-              isSpectating: true,
-            }));
-          }
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
+              killedPlayers: newKilledPlayers
+            };
+  
+            // 킬러/희생자 관련 업데이트
+            if (message.data['killerNickname'] === nickName) {
+              updates.fatigue = initializedData['killerFatigue'];
+            } else if (message.data['victimNickname'] === nickName) {
+              updates.isDead = true;
+              updates.isSpectating = true;
+            }
+  
+            // 나쁜 다람쥐 승리 조건 체크 (4명 사망)
+            if (newKilledPlayers.length >= 4) {
+              navigate(`/game/${roomId}/main`);
+              updates.isGameOver = true;
+              updates.gameOverReason = 'kill';
+              updates.winner = 'bad';
+              updates.timerRunning = false;
+              updates.isStarted = false;
+            }
+  
+            return updates;
+          });
         }
       } catch (error) {
         console.error("Error parsing game start response:", error);
       }
     },
-    [setGameState, nickName]
+    [setGameState, nickName, navigate, roomId]
   );
 
   // 미션 완료 응답 처리

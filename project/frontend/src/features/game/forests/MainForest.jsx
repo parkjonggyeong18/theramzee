@@ -19,7 +19,9 @@ const MainForest = () => {
   const { gameState, players, startEmergencyVote, endVote,resetGame } = useGame();
   const navigate = useNavigate();
 
-  
+  useEffect(() => {
+    console.log("✅ 킬된 플레이어 목록 업데이트됨:", gameState.killedPlayers);
+  }, [gameState.killedPlayers]);
  
   useEffect(() => {
     if (gameState.isGameOver) {

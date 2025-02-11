@@ -35,19 +35,23 @@ const GameOverScreen = () => {
         ? "도토리를 모두 모으지 못했습니다!\n나쁜 다람쥐 승리!" 
         : "도토리를 모두 모았습니다!\n착한 다람쥐 승리!";
     }
-
+  
     if (gameState.gameOverReason === 'emergency') {
       return gameState.lastKilledPlayer === gameState.evilSquirrel
         ? "나쁜 다람쥐를 찾아냈습니다!\n착한 다람쥐 승리!"
         : "착한 다람쥐를 죽였습니다!\n나쁜 다람쥐 승리!";
     }
-
+  
     if (gameState.gameOverReason === 'time') {
       return gameState.lastKilledPlayer === gameState.evilSquirrel
         ? "시간 종료! 나쁜 다람쥐를 찾아냈습니다!\n착한 다람쥐 승리!"
         : "시간 종료! 나쁜 다람쥐를 찾지 못했습니다!\n나쁜 다람쥐 승리!";
     }
-
+  
+    if (gameState.gameOverReason === 'kill') {
+      return "4명의 다람쥐를 처치했습니다!\n나쁜 다람쥐 승리!";
+    }
+  
     return "게임 종료!";
   };
 
