@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { OpenVidu } from 'openvidu-browser';
 
 // Filter.js에서 createFaceLandmarkerStream  함수를 가져옴
@@ -88,6 +88,8 @@ class OpenViduPage extends Component {
   enterGame = async () => {
     await this.joinSession();
     this.setState({ isPreview: false });
+    // navigate 함수를 props에서 가져와 사용합니다.
+    this.props.navigate(`/room/${this.props.roomId}/game`);
   };
 
   /**
@@ -219,5 +221,6 @@ class OpenViduPage extends Component {
 // useParams로 roomId 받는 Wrapper (없어도 되지만, 질문 코드에 있으므로 유지)
 export default function OpenViduPageWrapper() {
   const { roomId } = useParams();
-  return <OpenViduPage roomId={roomId} />;
+  const navigate = useNavigate();
+  return <OpenViduPage roomId={roomId} navigate={navigate}/>;
 }
