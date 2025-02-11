@@ -1,7 +1,7 @@
 import { apiRequest } from './apiService';
 
 export const login = async (username, password) => {
-  return await apiRequest('/api/v1/auth/login', 'POST', { username, password });
+  return await apiRequest('/api/v1/auth/login', 'POST', { username, password }, false);
 };
 
 export const register = async (userData) => {

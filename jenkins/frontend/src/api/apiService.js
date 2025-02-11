@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // API 기본 URL
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://ramzee.online';
 
 // 토큰 갱신 함수
 export const refreshToken = async () => {
@@ -28,28 +28,62 @@ export const refreshToken = async () => {
 };
 
 // API 요청 함수
-export const apiRequest = async (url, method, data = null) => {
-  try {
-    const token = sessionStorage.getItem('accessToken');
-    console.log("Token check:", token); // 토큰 존재 여부 확인
+export const apiRequest = async (url, method, data = null, requiresAuth = true) => {
 
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }), // Bearer 접두어 확인
-    };
+    try {
+        // 로그인 등 토큰이 필요하지 않은 요청 처리
+        let accessToken = null;
+        if (requiresAuth) {
+          accessToken = sessionStorage.getItem('accessToken');
+        }
 
-    console.log("Request headers:", headers); // 헤더 확인
+        console.log('API 요청 시작:', { url, method, data });
 
-    const response = await axios({
-      url: `${BASE_URL}${url}`,
-      method,
-      data: data ? JSON.stringify(data) : "{}",
-      headers
-    });
+        // 요청 수행
+        const response = await axios({
+            url: `${BASE_URL}${url}`,
+            method,
+            data,
+            headers: {
+                'Content-Type': 'application/json',
+                ...(accessToken && { Authorization: `Bearer ${accessToken}` }), // 토큰이 있으면 헤더에 추가
+            },
+        });
+        
 
-    return response.data;
-  } catch (error) {
-    console.error("API Error:", error.response?.data || error.message);
-    throw error;
-  }
+        console.log('API 요청 성공:', response.data);
+        return response.data;
+    } catch (error) {
+        console.error('API 요청 실패:', error.response.data);
+        
+
+        // 401 Unauthorized 처리
+        if (requiresAuth && error.response?.data === "Unauthorized: Authentication failed") {
+            console.warn('401 Unauthorized: 토큰 갱신 시도');
+
+            try {
+                // 토큰 갱신
+                const accessToken  = await refreshToken();
+                console.log("새 토큰 발급 성공2:", accessToken);
+                // 요청 재시도
+                const retryResponse = await axios({
+                    url: `${BASE_URL}${url}`,
+                    method,
+                    data,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${accessToken}`, // 새 토큰 전달
+                    },
+                });
+
+                return retryResponse.data;
+            } catch (refreshError) {
+                console.error('토큰 갱신 후 요청 실패:', refreshError);
+                throw refreshError;
+            }
+        }
+        
+        throw error;
+    }
+    
 };

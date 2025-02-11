@@ -97,7 +97,7 @@ public class FriendsController {
     })
 //    @PostMapping("/request")
 //    @Transactional
-//    public ResponseEntity<BaseResponse<FriendRequestResponse>> sendFriendRequest(@RequestHeader("Authorization") String token, @RequestBody FriendRequest friendRequest) {
+//    public ResponseEntity<BaseResponse<FriendRequestResponse>> sendFrie'dRequest(@RequestHeader("Authorization") String token, @RequestBody FriendRequest friendRequest) {
 //        System.out.println(token);
 //        String username = jwtTokenUtil.extractUsername(token.substring(7));
 //        User user = userService.getUserByUserName(username);

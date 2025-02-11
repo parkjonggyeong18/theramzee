@@ -97,7 +97,7 @@ const GameRoom = () => {
       <ButtonContainer>
         <StartButton onClick={clkStart}>GAME START</StartButton>
         <ExitButton onClick={clkExit}>나가기</ExitButton>
-      </ButtonContainer>
+      </ButtonContainer>  
     ),
     myVideo: <MyVideo />,
     mainForestButtons: <MainForestButtons />,
