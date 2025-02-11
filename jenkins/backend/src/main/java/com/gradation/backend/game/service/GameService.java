@@ -112,21 +112,21 @@ public class GameService {
 
         // 2. Users 데이터 추가
         Random random = new Random();
-        int evilSquirrelIndex = random.nextInt(6); // 0부터 5 사이의 무작위 숫자 생성
+        String evilSquirrelNickname = nicknames.get(random.nextInt(nicknames.size()));
 
-        for (int userNum = 1; userNum <= 6; userNum++) {
-            String userKey = roomKey + ":USER:" + userNum;
+        for (String nickname : nicknames) {
+            String userKey = roomKey + ":USER:" + nickname;
             UserResponse userData = new UserResponse();
 
             //토큰 재발급
-            String token = openViduService.generateToken(roomId+ "-1", nicknames.get(userNum -1));
+            String token = openViduService.generateToken(roomId+ "-1", nickname);
 
-            userData.setNickname(nicknames.get(userNum - 1));
+            userData.setNickname(nickname);
             userData.setAlive(true);
             userData.setAcorns(0);
             userData.setFatigue(0);
             userData.setForestToken(token);
-            userData.setEvilSquirrel(userNum - 1 == evilSquirrelIndex);
+            userData.setEvilSquirrel(nickname.equals(evilSquirrelNickname));
 
             // Redis Hash로 저장
             Map<String, Object> userDataMap = convertToMap(userData);
@@ -194,18 +194,15 @@ public class GameService {
      * @param roomId: 해당 방의 Id
      * @return 모든 사용자의 닉네임과 새로운 토큰 값
      */
-    public EmergencyResponse emergency(int roomId) throws OpenViduJavaClientException, OpenViduHttpException {
+    public EmergencyResponse emergency(int roomId, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException {
         String roomKey = "ROOM:" + roomId;
         String forestKey = roomKey + ":FOREST:1";
 
         String sessionId = roomId + "-1";
         Map<String, String> userTokens = new HashMap<>();
 
-        for (int userNum = 1; userNum <= 6; userNum++) {
-            String userKey = roomKey + ":USER:" + userNum;
-
-            // 사용자 데이터 가져오기
-            String nickname = (String) redisUtil.hget(userKey, "nickname");
+        for (String nickname : nicknames) {
+            String userKey = roomKey + ":USER:" + nickname;
 
             if (nickname != null) {
                 //forestToken을 roomId-1세션으로 설정
@@ -232,16 +229,13 @@ public class GameService {
      * 각 숲으로 참가하기 위한 토큰 발급
      *
      * @param roomId: 해당 방의 Id
-     * @param userNum: 유저 번호 (1-6)
+     * @param nickname: 유저 닉네임
      * @param newForest: 새로운 forestToken 값
      * @return MoveForestResponse 객체 (유저 닉네임, 새로운 forestToken)
      */
-    public MoveForestResponse moveForest(int roomId, int userNum, int newForest) throws OpenViduJavaClientException, OpenViduHttpException {
+    public MoveForestResponse moveForest(int roomId, String nickname, int newForest) throws OpenViduJavaClientException, OpenViduHttpException {
         String roomKey = "ROOM:" + roomId;
-        String userKey = roomKey + ":USER:" + userNum;
-
-        // 사용자 데이터 가져오기
-        String nickname = (String) redisUtil.hget(userKey, "nickname");
+        String userKey = roomKey + ":USER:" + nickname;
 
         // 새로운 숲 토큰 생성
         String token = openViduService.generateToken(roomId + "-" + newForest, nickname);
@@ -276,16 +270,13 @@ public class GameService {
      * 특정 유저의 acorns값 0으로 초기화
      *
      * @param roomId: 해당 방의 Id
-     * @param userNum: 유저 번호 (1-6)
+     * @param nickname: 유저 닉네임
      * @return SaveUserAcornsResponse 객체 (유저 닉네임, 새로운 totalAcorns 값, 유저가 저장한 acorns 값)
      */
-    public SaveUserAcornsResponse saveUserAcorns(int roomId, int userNum) {
+    public SaveUserAcornsResponse saveUserAcorns(int roomId, String nickname) {
         String roomKey = "ROOM:" + roomId;
-        String userKey = roomKey + ":USER:" + userNum;
+        String userKey = roomKey + ":USER:" + nickname;
         String forestKey = roomKey + ":FOREST:1";
-
-        // 유저의 닉네임 가져오기
-        String nickname = (String) redisUtil.hget(userKey, "nickname");
 
         // 유저의 현재 acorns 값 가져오기
         Integer currentAcorns = (Integer) redisUtil.hget(userKey, "acorns");
@@ -324,15 +315,12 @@ public class GameService {
      * 특정 유저의 fatigue 값을 1충전
      *
      * @param roomId: 해당 방의 Id
-     * @param userNum: 유저 번호 (1-6)
+     * @param nickname: 유저 닉네임
      * @return IncrementUserFatigueResponse 객체 (유저 닉네임, 증가된 fatigue 값)
      */
-    public IncrementUserFatigueResponse incrementUserFatigue(int roomId, int userNum) {
+    public IncrementUserFatigueResponse incrementUserFatigue(int roomId, String nickname) {
         String roomKey = "ROOM:" + roomId;
-        String userKey = roomKey + ":USER:" + userNum;
-
-        // 사용자의 닉네임 가져오기
-        String nickname = (String) redisUtil.hget(userKey, "nickname");
+        String userKey = roomKey + ":USER:" + nickname;
 
         // 사용자의 현재 fatigue 값 가져오기
         Object fatigueObj = redisUtil.hget(userKey, "fatigue");
@@ -353,19 +341,14 @@ public class GameService {
      * 나의 피로도 3 차감
      *
      * @param roomId: 해당 방의 Id
-     * @param userNum: 유저 번호 (1-6)
+     * @param victimNickname: 살해자 닉네임
+     * @param killerNickname: 살인자 닉네임
      * @return KillResponse 객체 (살해자 닉네임, 살해자의 새로운 피로도, 살해당한 유저의 닉네임)
      */
-    public KillResponse Kill(int roomId, int userNum, int myNum) {
+    public KillResponse Kill(int roomId, String victimNickname, String killerNickname) {
         String roomKey = "ROOM:" + roomId;
-        String userKey = roomKey + ":USER:" + userNum;
-        String myKey = roomKey + ":USER:" + myNum;
-
-        // 살해당한 유저의 닉네임 가져오기
-        String victimNickname = (String) redisUtil.hget(userKey, "nickname");
-
-        // 살해자의 닉네임 가져오기
-        String killerNickname = (String) redisUtil.hget(myKey, "nickname");
+        String userKey = roomKey + ":USER:" + victimNickname;
+        String myKey = roomKey + ":USER:" + killerNickname;
 
         // alive 상태를 false로 설정
         redisUtil.hset(userKey, "alive", false);
@@ -418,17 +401,14 @@ public class GameService {
      * @param roomId: 해당 방의 Id
      * @param forestNum: forest 번호 (2-7)
      * @param missionNum: mission 번호 (1-3)
-     * @param userNum: 보상을 받을 유저 번호 (1-6)
+     * @param nickname: 보상을 받을 유저 닉네임(1-6)
      * @return CompleteMissionResponse 객체
      */
-    public CompleteMissionResponse completeMission(int roomId, int forestNum, int missionNum, int userNum) {
+    public CompleteMissionResponse completeMission(int roomId, int forestNum, int missionNum, String nickname) {
         String roomKey = "ROOM:" + roomId;
         String forestKey = roomKey + ":FOREST:" + forestNum;
-        String userKey = roomKey + ":USER:" + userNum;
+        String userKey = roomKey + ":USER:" + nickname;
         String missionKey = "mission" + missionNum;
-
-        // 유저의 닉네임 가져오기
-        String nickname = (String) redisUtil.hget(userKey, "nickname");
 
         // 1. 미션 데이터 조회
         MissionData missionData = (MissionData) redisUtil.hget(forestKey, missionKey);

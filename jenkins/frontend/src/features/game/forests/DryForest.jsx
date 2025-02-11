@@ -12,21 +12,38 @@ import GameTimer from '../components/GameTimer';
 import StatePanel from '../components/StatePanel';
 import MiniMap from '../components/MiniMap';
 import MissionButton from '../components/MissionButton';
-import EmptyMissionOverlay from '../components/missions/EmptyMissionOverlay';
+import FireGame from '../components/missions/FireGame';
+import ArrowPuzzleGame from '../components/missions/ArrowPuzzleGame';
 
 const DryForest = () => {
-  const { gameState, players } = useGame();
+  const { gameState, players, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
+  const [currentMission, setCurrentMission] = useState(null);
   const [completedMissions, setCompletedMissions] = useState([]);
-
+  const isMissionCompleted = (missionId) => {
+    const missionNum = missionId === 'fire' ? 1 : 
+                      missionId === 'arrow' ? 2 : 3;
+    return gameState[`3_${missionNum}`][0]; // gameState에서 미션 완료 상태 확인
+  };
   const handleMissionClick = (missionId) => {
-    if (completedMissions.includes(missionId)) return;
-    if (gameState.evilSquirrel === true && gameState.fatigue < 1) return;
+    if (isMissionCompleted(missionId)) return;
+    if (gameState.fatigue < 1) return;
+    setCurrentMission(missionId);
     setShowMiniGame(true);
   };
 
-  const handleMissionComplete = () => {
-    setShowMiniGame(false);
+
+  const handleMissionComplete = async () => {
+    try {
+      const missionNum = currentMission === 'fire' ? 1 : 
+                        currentMission === 'arrow' ? 2 : 3;
+      
+      await completeMission(3, missionNum);
+      setShowMiniGame(false);
+      setCurrentMission(null);
+    } catch (error) {
+      console.error('Failed to complete mission:', error);
+    }
   };
 
   const gameLayoutProps = {
@@ -42,25 +59,38 @@ const DryForest = () => {
     missionButtons: (
       <MissionButtons>
         <MissionButton 
-          onClick={() => handleMissionClick('fireOff')}
-          completed={completedMissions.includes('fireOff')}
+          onClick={() => handleMissionClick('fire')}
+          completed={isMissionCompleted('fire')}
         />
         <MissionButton 
-          onClick={() => handleMissionClick('shadowArrow')}
-          completed={completedMissions.includes('shadowArrow')}
+          onClick={() => handleMissionClick('arrow')}
+          completed={isMissionCompleted('arrow')}
         />
-        <MissionButton 
-          onClick={() => handleMissionClick('findAcorn')}
-          completed={completedMissions.includes('findAcorn')}
+        <MissionButton isDisabled
+    
         />
       </MissionButtons>
     ),
     
     // 미니게임 오버레이
     miniGameOverlay: showMiniGame && (
-      <EmptyMissionOverlay 
-        onClose={() => setShowMiniGame(false)}
-      />
+      currentMission === 'fire' ? (
+        <FireGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
+      ) : currentMission === 'arrow' ? (
+        <ArrowPuzzleGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
+      ) : null
     ),
     
     // 기타
@@ -77,5 +107,4 @@ const MissionButtons = styled.div`
   display: flex;
   gap: 50px;
 `;
-
 export default DryForest;

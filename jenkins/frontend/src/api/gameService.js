@@ -18,54 +18,54 @@ export const startGame = async (roomId, nicknames) => {
   }
 };
 
-export const startEmergency = async (roomId) => {
+export const startEmergency = async (roomId, nicknames) => {
     try {
-      await sendMessage(`/app/game/${roomId}/emergency`, { roomId });
+      await sendMessage(`/app/game/${roomId}/emergency`, { roomId, nicknames });
     } catch (error) {
       console.error('Failed to handle emergency:', error);
       throw error;
     }
   };
 
-  export const moveForest = async (roomId, userNum, newForest) => {
+  export const moveForest = async (roomId, nickname, newForest) => {
     try {
-      await sendMessage(`/app/game/${roomId}/move`, { roomId, userNum, newForest });
+      await sendMessage(`/app/game/${roomId}/move`, { roomId, nickname, newForest });
     } catch (error) {
       console.error('Failed to move forest:', error);
       throw error;
     }
   };
 
-  export const saveUserAcorns = async (roomId, userNum) => {
+  export const saveUserAcorns = async (roomId, nickname) => {
     try {
-      await sendMessage(`/app/game/${roomId}/save-acorns`, { roomId, userNum });
+      await sendMessage(`/app/game/${roomId}/save-acorns`, { roomId, nickname });
     } catch (error) {
       console.error('Failed to save user acorns:', error);
       throw error;
     }
   };
 
-  export const chargeFatigue = async (roomId, userNum) => {
+  export const chargeFatigue = async (roomId, nickname) => {
     try {
-      await sendMessage(`/app/game/${roomId}/charge-fatigue`, { roomId, userNum });
+      await sendMessage(`/app/game/${roomId}/charge-fatigue`, { roomId, nickname });
     } catch (error) {
       console.error('Failed to charge user fatigue:', error);
       throw error;
     }
   };
 
-  export const killUser = async (roomId, userNum, myNum) => {
+  export const killUser = async (roomId, victimNickname, killerNickname) => {
     try {
-      await sendMessage(`/app/game/${roomId}/kill`, { roomId, userNum, myNum });
+      await sendMessage(`/app/game/${roomId}/kill`, { roomId, victimNickname, killerNickname });
     } catch (error) {
       console.error('Failed to kill user:', error);
       throw error;
     }
   };
 
-  export const completeMission = async (roomId, forestNum, missionNum, userNum) => {
+  export const completeMission = async (roomId, forestNum, missionNum, nickname) => {
     try {
-      await sendMessage(`/app/game/${roomId}/complete-mission`, { roomId, forestNum, missionNum, userNum });
+      await sendMessage(`/app/game/${roomId}/complete-mission`, { roomId, forestNum, missionNum, nickname });
     } catch (error) {
       console.error('Failed to complete mission:', error);
       throw error;

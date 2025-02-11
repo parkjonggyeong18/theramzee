@@ -49,7 +49,6 @@ const MiniMap = () => {
 
  const clkForest = (forestId, forestNum) => {
    // 죽었을 때도 관전은 가능하도록 함
-   console.log('왜 안돼돼', gameState.isStarted, gameState.isDead, gameState.roomId);
    if (!gameState.isStarted && gameState.isDead) return;
    if (!gameState.roomId) return;
    moveForest(forestNum);
