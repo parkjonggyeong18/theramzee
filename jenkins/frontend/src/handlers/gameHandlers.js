@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 
 export const useGameHandlers = (roomId, gameState, setGameState) => {
+  
 
   const nickName = sessionStorage.getItem('nickName');
   const navigate = useNavigate();
@@ -95,16 +96,33 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         if (message.success) {
           const initializedData = message.data;
           console.log("도토리 저장 성공:", initializedData);
-          setGameState((prev) => ({
-            ...prev,
-            totalAcorns: initializedData.newTotalAcorns,
-          }));
-          if (message.data['nickname'] === nickName) {
+          
+          // 도토리가 3개 이상이면 게임 종료
+          if (initializedData.newTotalAcorns >= 1) {
+            navigate(`/game/${roomId}/main`);
             setGameState((prev) => ({
               ...prev,
+              totalAcorns: initializedData.newTotalAcorns,
+              heldAcorns: 0,
+              isGameOver: true,
+              gameOverReason: 'acorns',
+              winner: prev.evilSquirrel ? 'bad' : 'good',
+              timerRunning: false,
+              isStarted: false
+            }));setTimeout(() => {
+              setGameState(prev => ({
+                ...prev,
+                currentScreen: 'gameOver'
+              }));
+            }, 500);
+          } else {
+            // 게임 진행 중
+            setGameState((prev) => ({
+              ...prev,
+              totalAcorns: initializedData.newTotalAcorns,
               heldAcorns: 0,
             }));
-          } 
+          }
         } else {
           console.error("Game initialization failed:", message.errorCode);
         }
@@ -112,8 +130,8 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [setGameState, nickName]
- );
+    [setGameState, nickName, navigate, roomId]
+  );
 
   // 피로도 충전 응답 처리
   const handleChargeFatigueResponse = useCallback(
@@ -144,30 +162,42 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         if (message.success) {
           const initializedData = message.data;
           console.log("킬 성공:", initializedData);
-          setGameState((prev) => ({
-            ...prev,
-            killedPlayers: [...prev.killedPlayers, initializedData['victimNickname']]
-          }));
-          if (message.data['killerNickname'] === nickName) {
-            setGameState((prev) => ({
+          
+          setGameState((prev) => {
+            const newKilledPlayers = [...prev.killedPlayers, initializedData['victimNickname']];
+            
+            // 기본 업데이트 객체
+            const updates = {
               ...prev,
-              fatigue: initializedData['killerFatigue'],
-            }));
-          } else if (message.data['victimNickname'] === nickName) {
-            setGameState((prev) => ({
-              ...prev,
-              isDead: true,
-              isSpectating: true,
-            }));
-          }
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
+              killedPlayers: newKilledPlayers
+            };
+  
+            // 킬러/희생자 관련 업데이트
+            if (message.data['killerNickname'] === nickName) {
+              updates.fatigue = initializedData['killerFatigue'];
+            } else if (message.data['victimNickname'] === nickName) {
+              updates.isDead = true;
+              updates.isSpectating = true;
+            }
+  
+            // 나쁜 다람쥐 승리 조건 체크 (4명 사망)
+            if (newKilledPlayers.length >= 4) {
+              navigate(`/game/${roomId}/main`);
+              updates.isGameOver = true;
+              updates.gameOverReason = 'kill';
+              updates.winner = 'bad';
+              updates.timerRunning = false;
+              updates.isStarted = false;
+            }
+  
+            return updates;
+          });
         }
       } catch (error) {
         console.error("Error parsing game start response:", error);
       }
     },
-    [setGameState, nickName]
+    [setGameState, nickName, navigate, roomId]
   );
 
   // 미션 완료 응답 처리
@@ -177,26 +207,36 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         if (message.success) {
           const initializedData = message.data;
           console.log("미션 완료 성공:", initializedData);
-          const missionKey = `${initializedData['forestNum']}_${initializedData['missionNum']}`;
-          setGameState((prev) => ({
+          
+          // initializedData에서 미션 정보 추출
+          const forestNum = initializedData.forestNum;
+          const missionNum = initializedData.missionNum;
+          const missionKey = `${forestNum}_${missionNum}`;
+
+          // 모든 플레이어가 미션 완료 상태 업데이트
+          setGameState(prev => ({
             ...prev,
-            missionKey: [true, prev[missionKey][1]],
+            [missionKey]: [true, prev[missionKey][1]],
           }));
-          if (message.data['nickname'] === nickName) {
-            setGameState((prev) => ({
+
+          // 미션을 완료한 플레이어인 경우에만 추가 상태 업데이트
+          if (initializedData.nickname === nickName) {
+            setGameState(prev => ({
               ...prev,
-              fatigue: prev.fatigue - 1,
-              heldAcorns: initializedData['userAcorns'],
+              fatigue: Math.max(prev.fatigue - 1, 0),
+              heldAcorns: initializedData.userAcorns
             }));
-          } 
+          }
+
+          console.log(`Mission ${missionKey} completed by ${initializedData.nickname}`);
         } else {
-          console.error("Game initialization failed:", message.errorCode);
+          console.error("미션 완료 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
+        console.error("미션 완료 응답 처리 중 에러:", error);
       }
     },
-    [setGameState, nickName]
+    [nickName, setGameState]
   );
 
   return {

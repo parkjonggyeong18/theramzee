@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../../contexts/GameContext';
@@ -9,6 +9,7 @@ import { subscribeToTopic } from '../../api/stomp';
 
 // 공통 레이아웃 import
 import GameLayout from './components/common/GameLayout';
+import RoleReveal from './components/RoleReveal';
 
 // components import
 import VideoGrid from './components/VideoGrid';
@@ -20,7 +21,8 @@ import MiniMap from './components/MiniMap';
 
 const GameRoom = () => {
   const navigate = useNavigate();
-  
+  const [showRoleReveal, setShowRoleReveal] = useState(false);
+
   const { 
     gameState, 
     startGame, 
@@ -40,7 +42,7 @@ const GameRoom = () => {
       console.error("⚠️ roomId is missing.");
       return;
     }
-
+    
     setGameState((prev) => ({
       ...prev,
       roomId: roomId,
@@ -57,7 +59,10 @@ const GameRoom = () => {
         setTimeout(() => {
           console.log("📌 Subscribing to game topics...");
           subscribeToTopic(`/user/queue/game/${roomId}/info`, handlers.handleGameInfo);
-          subscribeToTopic(`/topic/game/${roomId}/start`, handlers.handleGameStartResponse);
+          subscribeToTopic(`/topic/game/${roomId}/start`, (response) => {
+            handlers.handleGameStartResponse(response);
+            setShowRoleReveal(true); // 역할 공개 화면 활성화
+          });
           subscribeToTopic(`/topic/game/${roomId}/emergency`, handlers.handleEmergencyResponse);
           subscribeToTopic(`/topic/game/${roomId}/move`, handlers.handleMoveResponse);
           subscribeToTopic(`/topic/game/${roomId}/save-acorns`, handlers.handleSaveAcornsResponse);
@@ -75,26 +80,12 @@ const GameRoom = () => {
 
   const clkStart = () => {
     startGame();
-    navigate(`/game/${roomId}/main`);
   };
 
   const clkExit = () => {
     disconnectSocket();
     navigate('/lobby');
   };
-
-  // 커서 스타일 변경
-  useEffect(() => {
-    if (gameState.isStarted && gameState.evilSquirrel) {
-      document.body.style.cursor = `url(${gameState.evilSquirrel === false ? characterImages.goodSquirrel : characterImages.badSquirrel}), auto`;
-    } else {
-      document.body.style.cursor = 'auto';
-    }
-
-    return () => {
-      document.body.style.cursor = 'auto';
-    };
-  }, [gameState.isStarted, gameState.evilSquirrel]);
 
   // GameLayout에 전달할 컴포넌트들
   const gameLayoutProps = {
@@ -117,7 +108,12 @@ const GameRoom = () => {
     voteScreen: null        // GameRoom에서는 투표 화면 없음
   };
 
-  return <GameLayout {...gameLayoutProps} />;
+  return (
+    <>
+      <GameLayout {...gameLayoutProps} />
+      {showRoleReveal && <RoleReveal roomId={roomId} />}
+    </>
+  );
 };
 
 const ButtonContainer = styled.div`
