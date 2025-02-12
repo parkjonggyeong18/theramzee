@@ -15,6 +15,7 @@ public class RoomResponse {
     private String hostNickName; // 방 생성자
     private int currentParticipantCount; // 현재 참여자 수
     private List<String> nicknames; // 현재 참여자 목록
+    private Integer password;
 
     // 엔티티 -> DTO
     public RoomResponse(Room room) {
@@ -22,6 +23,7 @@ public class RoomResponse {
         this.title = room.getTitle();
         this.gameStatus = room.getGameStatus();
         this.hostNickName = room.getHost().getNickname();
+        this.password = room.getPassword();
 
         List<User> users = room.getUsers();  // Fetch Join으로 이미 로딩됨
         this.currentParticipantCount = users.size(); // 조회된 참여자 list size
