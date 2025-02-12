@@ -18,10 +18,10 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
-    @Value("${spring.data.redis.host}") // application.yml에서 가져옴
+    @Value("${spring.data.redis.host}")
     private String host;
 
-    @Value("${spring.data.redis.port}") // application.yml에서 가져옴
+    @Value("${spring.data.redis.port}")
     private int port;
 
     @Bean(name = "redisConnectionFactory")
@@ -36,7 +36,7 @@ public class RedisConfig {
      *
      * @return {@link RedisTemplate} 객체로, Redis와의 데이터 작업을 수행할 수 있습니다.
      */
-    @Bean(name = "stringRedisTemplate")
+    @Bean(name = "redisTemplate")
     public RedisTemplate<String, Object> redisTemplate(@Qualifier("redisConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
         // RedisTemplate 생성 및 설정
         RedisTemplate<String, Object> template = new RedisTemplate<>();
@@ -58,7 +58,7 @@ public class RedisConfig {
         return factory;
     }
 
-    @Bean(name = "stringRedisTemplate1")
+    @Bean(name = "redisTemplate1")
     public RedisTemplate<String, String> redisTemplate1(@Qualifier("redisConnectionFactory1") RedisConnectionFactory redisConnectionFactory1) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory1);
