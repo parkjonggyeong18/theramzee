@@ -63,7 +63,7 @@ const TimeForest = () => {
   const gameLayoutProps = {
     // 기본 레이아웃 요소
     leftVideoGrid: <VideoGrid players={players} gridPosition="left" />,
-    rightVideoGrid: <VideoGrid players={players} gridPosition="right" />,
+    // rightVideoGrid: <VideoGrid players={players} gridPosition="right" />,
     gameTimer: <GameTimer />,
     statePanel: <StatePanel />,
     myVideo: <MyVideo />,

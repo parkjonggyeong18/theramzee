@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 
-export const useGameHandlers = (roomId, gameState, setGameState) => {
+export const useGameHandlers = (roomId, gameState, setGameState, joinSession, leaveSession) => {
   
 
   const nickName = sessionStorage.getItem('nickName');
@@ -68,12 +68,14 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
 
   // 숲 이동 응답 처리
   const handleMoveResponse = useCallback(
-    (message) => {
+    async (message) => {
       try {
         console.log(nickName);
         if (message.success && message.data['nickname'] === nickName) {
           const initializedData = message.data;
           console.log("숲 이동 성공:", initializedData);
+          await leaveSession();
+          await joinSession(initializedData['forestToken'], nickName)
 
           setGameState((prev) => ({
             ...prev,
