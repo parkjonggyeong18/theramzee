@@ -19,6 +19,7 @@ services:
       - theramzee-network # theramzee-network 네트워크에 연결
 
   redis:
+    command: redis-server --bind 0.0.0.0
     image: redis:latest
     container_name: theramzee-redis-1 # 컨테이너 이름 명시적으로 지정 (선택 사항, 권장)
     ports:
