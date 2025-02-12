@@ -28,7 +28,6 @@ const OpenViduPage = () => {
    * "게임에 입장하기" 버튼 클릭
    */
   const enterGame = async () => {
-    await leaveSession();
     await joinSession(token, nickname);
     setIsPreview(false);
     navigate(`/room/${roomId}/game`);

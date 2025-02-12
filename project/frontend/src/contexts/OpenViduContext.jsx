@@ -52,6 +52,12 @@ export const OpenViduProvider = ({ children }) => {
    * 게임 세션 접속
    */
   const joinSession = async (token, userName) => {
+
+    if (session) {
+      console.warn("⚠️ Already connected to a session. Leaving current session first...");
+      await leaveSession(); // 기존 세션 정리 후 다시 연결
+    }
+
     const newSession = OV.initSession();
 
     newSession.on('streamCreated', (event) => {
@@ -95,9 +101,9 @@ export const OpenViduProvider = ({ children }) => {
   /**
    * 세션 떠나기
    */
-  const leaveSession = () => {
+  const leaveSession = async () => {
     if (session) {
-      session.disconnect();
+      await session.disconnect();
     }
 
     setSession(undefined);

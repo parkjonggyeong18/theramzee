@@ -35,12 +35,11 @@ const GameRoom = () => {
 
   const {
     joinSession,
-    leaveSession,
   } = useOpenVidu();
 
 
   const { roomId } = useParams();  // roomId 가져오기
-  const handlers = useGameHandlers(roomId, gameState, setGameState, joinSession, leaveSession);
+  const handlers = useGameHandlers(roomId, gameState, setGameState, joinSession);
   const isSubscribed = useRef(false); // 중복 실행 방지 플래그
 
   useEffect(() => {
