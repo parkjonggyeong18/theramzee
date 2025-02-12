@@ -6,12 +6,14 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
-      ddl-auto: create
-      dialect: org.hibernate.dialect.MySQLDialect
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
   data:
     redis:
       port: 6379
-      host: theramzee-redis-1
+      host: redis
   mail:
     host: smtp.gmail.com
     port: 587

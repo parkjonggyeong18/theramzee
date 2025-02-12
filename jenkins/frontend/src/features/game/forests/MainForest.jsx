@@ -1,9 +1,10 @@
-// pages/forests/MainForest.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
-import { backgroundImages } from '../../../assets/images';
+import { backgroundImages, characterImages } from '../../../assets/images';
 import GameLayout from '../components/common/GameLayout';
+import { useNavigate } from 'react-router-dom';
+import GameOverScreen from '../components/GameOverScreen'
 
 // components import
 import VideoGrid from '../components/VideoGrid';
@@ -15,12 +16,40 @@ import MiniMap from '../components/MiniMap';
 import VoteScreen from '../components/vote/VoteScreen';
 
 const MainForest = () => {
-  const { 
-    gameState, 
-    players, 
-    startEmergencyVote, 
-    endVote 
-  } = useGame();
+  const { gameState, players, startEmergencyVote, endVote,resetGame } = useGame();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log("✅ 킬된 플레이어 목록 업데이트됨:", gameState.killedPlayers);
+  }, [gameState.killedPlayers]);
+ 
+  useEffect(() => {
+    if (gameState.isGameOver) {
+      console.log("Game Over detected - showing overlay");
+    }
+  }, [gameState.isGameOver]);
+
+  const handleExitGame = () => {
+    resetGame();
+    navigate('/rooms'); 
+ 
+  };
+  // 🌟 커서 스타일을 useEffect를 사용해 변경
+  useEffect(() => {
+    if (gameState.isStarted && gameState.evilSquirrel !== null) {
+      const cursorImage = gameState.evilSquirrel
+        ? characterImages.badSquirrel
+        : characterImages.goodSquirrel;
+
+      document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;
+    } else {
+      document.body.style.cursor = 'auto';
+    }
+
+    return () => {
+      document.body.style.cursor = 'auto';
+    };
+  }, [gameState.isStarted, gameState.evilSquirrel]);
 
   const handleVoteEnd = (result) => {
     endVote(result);
@@ -34,7 +63,7 @@ const MainForest = () => {
     statePanel: <StatePanel />,
     myVideo: <MyVideo />,
     miniMap: <MiniMap />,
-    
+
     // 메인 숲 특화 요소
     mainForestButtons: (
       <MainForestButtons 
@@ -42,7 +71,7 @@ const MainForest = () => {
         emergencyDisabled={gameState.hasUsedEmergency}
       />
     ),
-    
+
     // 오버레이
     voteScreen: gameState.isVoting && (
       <VoteScreen 
@@ -50,6 +79,9 @@ const MainForest = () => {
         isEmergency={gameState.isEmergencyVote}
       />
     ),
+    gameOverScreen: gameState.isGameOver ? (
+      <GameOverScreen onExit={handleExitGame} />
+    ) : null,
     
     // 기타
     isGameStarted: gameState.isStarted,
@@ -57,56 +89,19 @@ const MainForest = () => {
     missionButtons: null,    // 메인 숲은 미션 버튼 없음
     miniGameOverlay: null    // 메인 숲은 미니게임 없음
   };
+  
 
-  return <GameLayout {...gameLayoutProps} />;
+
+  return (
+    <>
+      {/* ✅ 게임이 끝나면 GameOverScreen을 독립적인 화면으로 렌더링 */}
+      {gameState.isGameOver ? (
+        <GameOverScreen onExit={handleExitGame} />
+      ) : (
+        <GameLayout {...gameLayoutProps} />
+      )}
+    </>
+  );
 };
-
-// const ForestContainer = styled.div`
-//  width: 100vw;
-//  height: 100vh;
-//  position: relative;
-//  overflow: hidden;
-// `;
-
-// const BackgroundImage = styled.div`
-//  position: absolute;
-//  top: 0;
-//  left: 0;
-//  width: 100%;
-//  height: 100%;
-//  background-image: url(${backgroundImages.mainForest});
-//  background-size: cover;
-//  background-position: center;
-//  z-index: -1;
-// `;
-
-// const TopSection = styled.div`
-//  position: absolute;
-//  top: 20px;
-//  left: 50%;
-//  transform: translateX(-50%);
-//  z-index: 1;
-// `;
-
-// const ContentSection = styled.div`
-//  height: 100%;
-//  display: flex;
-//  flex-direction: column;
-//  justify-content: space-between;
-//  padding: 80px 20px 20px;
-// `;
-
-// const VideoSection = styled.div`
-//  display: flex;
-//  justify-content: space-between;
-//  align-items: flex-start;
-// `;
-
-// const BottomSection = styled.div`
-//  display: flex;
-//  justify-content: flex-end;
-//  align-items: flex-end;
-//  gap: 20px;
-// `;
 
 export default MainForest;
