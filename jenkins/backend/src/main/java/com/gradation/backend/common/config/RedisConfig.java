@@ -18,15 +18,15 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 @Configuration
 public class RedisConfig {
 
-    @Value("redis")
+    @Value("${spring.data.redis.host}")
     private String host;
 
-    @Value("$6379")
+    @Value("${spring.data.redis.port}")
     private int port;
 
     @Bean(name = "redisConnectionFactory")
     public RedisConnectionFactory redisConnectionFactory() {
-        LettuceConnectionFactory factory = new LettuceConnectionFactory();
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(host,port);
         factory.setDatabase(0);
         return factory;
     }
@@ -53,7 +53,7 @@ public class RedisConfig {
 
     @Bean(name = "redisConnectionFactory1")
     public RedisConnectionFactory redisConnectionFactory1() {
-        LettuceConnectionFactory factory = new LettuceConnectionFactory();
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(host,port);
         factory.setDatabase(1); // 1번 데이터베이스 설정
         return factory;
     }
@@ -73,7 +73,7 @@ public class RedisConfig {
 
     @Bean(name = "redisConnectionFactory2")
     public RedisConnectionFactory redisConnectionFactory2() {
-        LettuceConnectionFactory factory = new LettuceConnectionFactory();
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(host,port);
         factory.setDatabase(2);
         return factory;
     }
