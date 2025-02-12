@@ -4,8 +4,7 @@ COPY package.json package-lock.json ./
 RUN npm install --save-dev @babel/plugin-proposal-private-property-in-object
 RUN npm install
 COPY . .
-RUN npm run build
-RUN ls -al /app/build
+RUN npm run build && ls -al /app/build
 
 FROM nginx:alpine
 RUN mkdir -p /usr/share/nginx/html
