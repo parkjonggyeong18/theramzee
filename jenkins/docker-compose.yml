@@ -52,8 +52,8 @@ services:
     container_name: theramzee-frontend-1 # 컨테이너 이름 명시적으로 지정 (선택 사항, 권장)
     ports:
       - "3000:80"
-    #volumes:
-    # - ./build:/usr/share/nginx/html
+    volumes:
+      - ./build:/usr/share/nginx/html
     depends_on:
       - backend
     restart: unless-stopped
