@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -26,7 +27,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenUtil jwtTokenUtil;
     private final CustomUserDetailsServiceImpl userDetailsService;
-
+    private final AntPathMatcher antPathMatcher = new AntPathMatcher();
     /**
      * JwtAuthenticationFilter 생성자.
      *
@@ -38,7 +39,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtTokenUtil = jwtTokenUtil;
         this.userDetailsService = userDetailsService;
     }
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
 
+        // Use AntPathMatcher for more flexible path matching (wildcards, etc.)
+        return antPathMatcher.match("/api-docs/**", path) ||
+                antPathMatcher.match("/swagger-ui/**", path) ||
+                antPathMatcher.match("/v3/api-docs/**", path) ||
+                path.equals("/") || path.equals("/index.html") ||
+                antPathMatcher.match("/static/**", path) ||
+                antPathMatcher.match("/assets/**", path) ||
+                antPathMatcher.match("/game-socket/**", path) || // Add any other permitAll paths if needed
+                antPathMatcher.match("/ws/**", path) ||
+                antPathMatcher.match("/user/**", path) ||
+                antPathMatcher.match("/api/v1/**", path);
+    }
     /**
      * HTTP 요청을 처리하여 JWT 토큰을 검증하고, 유효한 경우 사용자 인증 정보를 설정합니다.
      *
