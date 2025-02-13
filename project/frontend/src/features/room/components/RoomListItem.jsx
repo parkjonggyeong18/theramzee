@@ -29,7 +29,7 @@ const RoomListItem = ({ room }) => {
       
       const openViduToken = response.data.token;
       sessionStorage.setItem('openViduToken', openViduToken);
-      navigate(`/room/${room.roomId}/game`);
+      navigate(`/room/${room.roomId}`);
     } catch (error) {
       console.error('Join room error:', error.response?.data || error);
       const errorMessage = error.response?.data?.message || '방 참가에 실패했습니다';

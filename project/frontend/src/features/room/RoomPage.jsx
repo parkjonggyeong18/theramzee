@@ -46,7 +46,7 @@ const RoomPage = () => {
       const roomId = response.data.roomId;
       const openViduToken = response.data.token;
       sessionStorage.setItem('openViduToken', openViduToken);
-      navigate(`/room/${roomId}/game`);
+      navigate(`/room/${roomId}`);
     } catch (error) {
       setError('방 생성에 실패했습니다');
     }
