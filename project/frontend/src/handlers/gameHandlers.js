@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 
-export const useGameHandlers = (roomId, gameState, setGameState) => {
+export const useGameHandlers = (roomId, gameState, setGameState, joinSession) => {
   
 
   const nickName = sessionStorage.getItem('nickName');
@@ -40,12 +40,14 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
 
   // 비상 상황 응답 처리
   const handleEmergencyResponse = useCallback(
-    (message) => {
+    async (message) => {
       try {
         navigate(`/game/${gameState.roomId}/main`);
         if (message.success) {
           const initializedData = message.data.userTokens;
           console.log("긴급 요청 성공:", initializedData);
+
+          // await joinSession(initializedData[nickName], nickName);
 
           setGameState((prev) => ({
             ...prev,
@@ -68,12 +70,14 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
 
   // 숲 이동 응답 처리
   const handleMoveResponse = useCallback(
-    (message) => {
+    async (message) => {
       try {
         console.log(nickName);
         if (message.success && message.data['nickname'] === nickName) {
           const initializedData = message.data;
           console.log("숲 이동 성공:", initializedData);
+
+          await joinSession(initializedData['forestToken'], nickName)
 
           setGameState((prev) => ({
             ...prev,
@@ -86,7 +90,7 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
         console.error("Error parsing game start response:", error);
       }
     },
-    [setGameState, nickName]
+    []
   );
 
   // 도토리 저장 응답 처리
@@ -239,6 +243,23 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
     [nickName, setGameState]
   );
 
+  const handleOutResponse = useCallback(
+    (message) => {
+      try {
+        if (message.status) {
+          const initializedData = message.data;
+          console.log("퇴장 성공:", initializedData);
+          navigate("/rooms");
+        } else {
+          console.error("퇴장 실패:", message.errorCode);
+        }
+      } catch (error) {
+        console.error("퇴장 응답 처리 중 에러:", error);
+      }
+    },
+    [setGameState]
+  );
+
   return {
     handleGameInfo,
     handleGameStartResponse,
@@ -248,5 +269,6 @@ export const useGameHandlers = (roomId, gameState, setGameState) => {
     handleChargeFatigueResponse,
     handleKillResponse,
     handleCompleteMissionResponse,
+    handleOutResponse,
   };
 };

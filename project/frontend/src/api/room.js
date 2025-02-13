@@ -4,8 +4,8 @@ export const fetchRooms = async () => {
   return await apiRequest('/api/v1/rooms', 'GET');
 };
 
-export const createRoom = async (rommTitle) => {
-  return await apiRequest('/api/v1/rooms', 'POST', {title: rommTitle});
+export const createRoom = async (rommTitle, password) => {
+  return await apiRequest('/api/v1/rooms', 'POST', {title: rommTitle, password: password});
 };
 
 export const leaveRoom = async (roomId) => {

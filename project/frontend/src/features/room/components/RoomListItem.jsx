@@ -13,7 +13,7 @@ const RoomListItem = ({ room }) => {
   // 안전한 방식으로 nickname 접근
   const hostNickname = room?.host?.nickname || '알 수 없음';
   const userCount = room?.users?.length || 0;
-
+  const passwordEnabled = room?.password ? true : false;
   const handleJoinRoom = async (inputPassword = null) => {
     if (isJoining) return;
     
@@ -29,7 +29,7 @@ const RoomListItem = ({ room }) => {
       
       const openViduToken = response.data.token;
       sessionStorage.setItem('openViduToken', openViduToken);
-      navigate(`/room/${room.roomId}`);
+      navigate(`/room/${room.roomId}/game`);
     } catch (error) {
       console.error('Join room error:', error.response?.data || error);
       const errorMessage = error.response?.data?.message || '방 참가에 실패했습니다';
@@ -61,7 +61,7 @@ const RoomListItem = ({ room }) => {
     <RoomCard>
       <RoomHeader>
         <RoomTitle>{room.title || '제목 없음'}</RoomTitle>
-        {room.password ? '🔒' : '🔓'}
+        {passwordEnabled ? '🔒' : '🔓'}
       </RoomHeader>
       <RoomInfo>
         <RoomDetails>
@@ -175,11 +175,7 @@ const RoomHeader = styled.div`
 
 const ModalOverlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: transparent;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -188,9 +184,9 @@ const ModalOverlay = styled.div`
 
 const ModalContent = styled.div`
   background-color: rgba(139, 69, 19, 0.95);
-  padding: 2rem;
+  padding: 1rem;
   border-radius: 10px;
-  width: 300px;
+  width: 180px;
 
   h3 {
     color: white;
@@ -206,6 +202,7 @@ const PasswordInput = styled.input`
   border: none;
   border-radius: 5px;
   background-color: white;
+  width: 155px;
 `;
 
 const ModalButtonGroup = styled.div`

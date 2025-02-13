@@ -95,9 +95,19 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // URL 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/static/**", "/assets/**").permitAll()
-                        .requestMatchers("/api/v1/**", "/swagger-ui/**", "/v3/api-docs/**","/api-docs/**","/ws/**", "/user/**","/swagger-ui.html","/game-socket").permitAll() // 인증 없이 접근 가능 경로
-                        .anyRequest().authenticated() // 나머지 요청은 인증 필요
+                        .requestMatchers(
+                                "/api-docs",          // 명시적으로 /api-docs 경로 추가
+                                "/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**",
+                                "/game-socket",
+                                "/ws/**",
+                                "/user/**",
+                                "/api/v1/**",
+                                "/", "/index.html", "/static/**", "/assets/**" // 나머지 permitAll 경로들을 뒤로 이동
+                        ).permitAll()
+                        .anyRequest().authenticated()
                 )
                 // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
