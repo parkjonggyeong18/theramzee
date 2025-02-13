@@ -95,6 +95,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // URL 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/index.html", "/static/**", "/assets/**").permitAll()
                         .requestMatchers("/api/v1/**", "/swagger-ui/**", "/v3/api-docs/**","/api-docs/**","/ws/**", "/user/**","/swagger-ui.html","/game-socket").permitAll() // 인증 없이 접근 가능 경로
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
@@ -108,7 +109,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:3000","http://localhost:8080", "http://localhost:5173", "http://localhost:4443")); // 허용할 Origin
+        config.setAllowedOrigins(List.of("https://ramzee.online")); // 허용할 Origin
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE")); // 허용할 HTTP 메서드
         config.setAllowedHeaders(List.of("*")); // 모든 요청 헤더 허용
         config.setAllowCredentials(true); // 인증 정보 포함 허용 (쿠키, Authorization 헤더 등)
