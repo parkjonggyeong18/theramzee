@@ -45,9 +45,3 @@ springdoc:
 openvidu:
   url: ${OPENVIDU_URL:https://ramzee.online:8443/}
   secret: ${OPENVIDU_SECRET:dleogus1}
-
-logging:
-  level:
-    root: DEBUG                     # 루트 로거의 로그 레벨을 DEBUG로 설정
-    com.gradation.backend: TRACE      # 특정 패키지 (com.gradation.backend) 의 로그 레벨을 TRACE로 설정
-    org.springframework.security: DEBUG # Spring Security 관련 로그 레벨을 DEBUG로 설정

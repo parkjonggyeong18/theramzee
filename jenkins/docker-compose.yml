@@ -34,8 +34,8 @@ services:
     build: ./backend
     image: murhyun2/theramzee-backend:latest # Docker Hub 이미지 사용 (Dockerfile 빌드 대신)
     container_name: theramzee-backend-1 # 컨테이너 이름 명시적으로 지정 (선택 사항, 권장)
-    ports:
-      - "8080:8080"
+    #ports:
+    #  - "8080:8080"
     depends_on:
       - mysql
       - redis
@@ -50,8 +50,8 @@ services:
     build: ./frontend
     image: murhyun2/theramzee-frontend:latest # Docker Hub 이미지 사용 (Dockerfile 빌드 대신)
     container_name: theramzee-frontend-1 # 컨테이너 이름 명시적으로 지정 (선택 사항, 권장)
-    ports:
-      - "3000:80"
+    #ports:
+    #  - "3000:80"
     #volumes:
     #  - ./build:/usr/share/nginx/html
     depends_on:

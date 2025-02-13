@@ -29,7 +29,7 @@ const RoomListItem = ({ room }) => {
       
       const openViduToken = response.data.token;
       sessionStorage.setItem('openViduToken', openViduToken);
-      navigate(`/room/${room.roomId}/game`);
+      navigate(`/room/${room.roomId}`);
     } catch (error) {
       console.error('Join room error:', error.response?.data || error);
       const errorMessage = error.response?.data?.message || '방 참가에 실패했습니다';
@@ -186,7 +186,7 @@ const ModalContent = styled.div`
   background-color: rgba(139, 69, 19, 0.95);
   padding: 1rem;
   border-radius: 10px;
-  width: 180px;
+  width: 192px;
 
   h3 {
     color: white;
@@ -202,7 +202,7 @@ const PasswordInput = styled.input`
   border: none;
   border-radius: 5px;
   background-color: white;
-  width: 155px;
+  width: 166px;
 `;
 
 const ModalButtonGroup = styled.div`

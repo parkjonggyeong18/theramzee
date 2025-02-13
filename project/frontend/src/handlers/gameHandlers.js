@@ -77,7 +77,7 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
           const initializedData = message.data;
           console.log("숲 이동 성공:", initializedData);
 
-          await joinSession(initializedData['forestToken'], nickName)
+          // await joinSession(initializedData['forestToken'], nickName)
 
           setGameState((prev) => ({
             ...prev,
