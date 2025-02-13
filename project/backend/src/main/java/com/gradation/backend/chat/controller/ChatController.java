@@ -15,6 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.security.Principal;
 import java.util.List;
 
+/**
+ * 1:1 채팅 관리를 담당하는 컨트롤러 클래스.
+ * 이 클래스는 채팅 메시지 전송 및 채팅 내역 조회와 관련된 API를 제공합니다.
+ */
 @Controller
 @Tag(name = "1:1 채팅 관리", description = "채팅 관리 API")
 public class ChatController {
@@ -29,7 +33,15 @@ public class ChatController {
         this.userService = userService;
     }
 
-    // 기존 메시지 조회
+    /**
+     * 사용자의 채팅 내역을 조회합니다.
+     *
+     * 이 메서드는 Redis에서 발신자와 수신자 간의 이전 대화 내역을 조회하고,
+     * 해당 내역을 발신자에게 WebSocket을 통해 전송합니다.
+     *
+     * @param receiver  채팅 내역을 조회할 상대방(수신자)의 사용자 이름
+     * @param principal 현재 인증된 사용자의 정보 (발신자)
+     */
     @Operation(
             summary = "채팅 내역 조회",
             description = "사용자가 요청한 채팅 내역을 조회하여 반환합니다.",
@@ -43,6 +55,7 @@ public class ChatController {
     public void loadChatHistory(String receiver, Principal principal) {
         String sender = principal.getName(); // 발신자 정보
         System.out.println("Chat history 요청 - Sender: " + sender + ", Receiver: " + receiver);
+
         // Redis에서 이전 대화 내역 조회
         List<String> chatHistory = chatMessageService.getMessages(sender, receiver);
 
@@ -54,23 +67,13 @@ public class ChatController {
         System.out.println("Chat history 전송 완료.");
     }
 
-//    @MessageMapping("/chat.history")
-//    @Transactional
-//    public void loadChatHistory(String receiver, Principal principal) {
-//        String sender = principal.getName(); // 발신자 정보
-//        System.out.println("Chat history 요청 - Sender: " + sender + ", Receiver: " + receiver);
-//        User user = userService.getUserByUserNickname(receiver);
-//        // Redis에서 이전 대화 내역 조회
-//        List<String> chatHistory = chatMessageService.getMessages(sender, user.getUsername());
-//
-//        // 조회된 내역을 발신자에게 전송
-//        messagingTemplate.convertAndSendToUser(
-//                sender, "/queue/chat-history", chatHistory
-//        );
-//
-//        System.out.println("Chat history 전송 완료.");
-//    }
-
+    /**
+     * 새로운 채팅 메시지를 상대방에게 전송합니다.
+     * 이 메서드는 메시지를 Redis에 저장하고, 읽지 않은 메시지 개수를 계산하여 상대방에게 알림과 메시지를 실시간으로 전송합니다.
+     *
+     * @param chatMessage 전송할 {@link ChatMessage} 객체 (발신자, 수신자, 내용 포함)
+     * @param principal   현재 인증된 사용자의 정보 (발신자)
+     */
     @Operation(
             summary = "메시지 전송",
             description = "새로운 채팅 메시지를 보내고, 상대방에게 실시간으로 전송합니다.",
@@ -79,66 +82,34 @@ public class ChatController {
                     @ApiResponse(responseCode = "400", description = "잘못된 요청")
             }
     )
-//    @MessageMapping("/chat.send")
-//    @Transactional
-//    public void sendMessage(ChatMessage chatMessage, Principal principal) {
-//        // 현재 WebSocket 세션의 사용자 이름
-//        String sender = principal.getName();
-//
-//        String receiver = chatMessage.getReceiver();
-//
-//        System.out.println("Sender: " + sender);
-//        System.out.println("Receiver: " + receiver);
-//        chatMessageService.saveMessage(sender, receiver, chatMessage.getContent());
-//        // 메시지를 개인 큐로 전송
-//        messagingTemplate.convertAndSendToUser(
-//                receiver, "/queue/messages", chatMessage
-//        );
-//    }
-//    @MessageMapping("/chat.send")
-//    @Transactional
-//    public void sendMessage(ChatMessage chatMessage, Principal principal) {
-//        // 현재 WebSocket 세션의 사용자 이름
-//        String sender = principal.getName();
-//        User user = userService.getUserByUserNickname(chatMessage.getReceiver());
-//        String receiver = user.getUsername();
-//
-//        System.out.println("Sender: " + sender);
-//        System.out.println("Receiver: " + receiver);
-//        chatMessageService.saveMessage(sender, receiver, chatMessage.getContent());
-//        // 메시지를 개인 큐로 전송
-//        messagingTemplate.convertAndSendToUser(
-//                receiver, "/queue/messages", chatMessage
-//        );
-//    }
     @MessageMapping("/chat.send")
     @Transactional
-    @Tag(name = "친구 관리", description = "친구 관리 API")
     public void sendMessage(ChatMessage chatMessage, Principal principal) {
         String sender = chatMessage.getSender();
         System.out.println("Sender: " + sender);
+
+        // 발신자와 수신자의 사용자 정보를 가져옴
         User users = userService.getUserByUserName(sender);
         User user = userService.getUserByUserNickname(chatMessage.getReceiver());
         String receiver = user.getUsername();
-//        String receiver = chatMessage.getReceiver();
 
         System.out.println("Sender: " + sender + ", Receiver: " + receiver);
         System.out.println("Sender : " + chatMessage.getSender() + ", Receiver: " + chatMessage.getReceiver());
 
-//        chatMessageService.saveMessage(chatMessage.getSender(), chatMessage.getReceiver(), chatMessage.getContent());
-//        Long unreadCount = chatMessageService.getUnreadCount(chatMessage.getSender(), chatMessage.getReceiver());
-
+        // 메시지를 저장하고 읽지 않은 메시지 개수를 계산
         chatMessageService.saveMessage(users.getNickname(), chatMessage.getReceiver(), chatMessage.getContent());
         Long unreadCount = chatMessageService.getUnreadCount(users.getNickname(), chatMessage.getReceiver());
         System.out.println("Unread count: " + unreadCount);
 
+        // 읽지 않은 메시지가 있는 경우 알림 전송
         if (unreadCount > 0) {
             messagingTemplate.convertAndSend(
                     "/topic/notifications" + receiver,
                     "새로운 메시지가 있습니다 (" + unreadCount + "개)"
             );
         }
-        System.out.println("ㅎㅇ");
+
+        // 메시지를 상대방에게 실시간으로 전송
         messagingTemplate.convertAndSend(
                 "/topic/messages/" + receiver,
                 chatMessage

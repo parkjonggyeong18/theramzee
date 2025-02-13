@@ -36,8 +36,7 @@ public class ChatNotificationController {
     /**
      * 읽지 않은 메시지 개수를 조회합니다.
      *
-     * @param sender   메시지 송신자의 ID 또는 닉네임
-     * @param receiver 메시지 수신자의 ID 또는 닉네임
+     * @param receiver 메시지 닉네임
      * @return 읽지 않은 메시지의 개수
      */
     @Operation(summary = "읽지 않은 메시지 수 조회",
@@ -49,9 +48,6 @@ public class ChatNotificationController {
     })
     @GetMapping("/unread-count")
     public ResponseEntity<BaseResponse<List<UnreadMessageResponse>>> getUnreadCount(@RequestParam String receiver) {
-        // 특정 수신자(receiver)에 대한 모든 sender별 읽지 않은 메시지 수 조회
-//        User user = userService.getUserByUserNickname(receiver);
-//        String receiverName = user.getUsername();
         List<UnreadMessageResponse> unreadCounts = chatMessageService.getUnreadCountsForReceiver(receiver);
 
         // 응답 반환
@@ -61,8 +57,7 @@ public class ChatNotificationController {
     /**
      * 메시지를 읽음 상태로 업데이트합니다.
      *
-     * @param sender   메시지 송신자의 ID 또는 닉네임
-     * @param receiver 메시지 수신자의 ID 또는 닉네임
+     * @param chatUserRequest   메시지 송신자의  닉네임, 수신자의 닉네임
      * @return HTTP 상태 코드 204(No Content) - 성공적으로 처리됨을 나타냅니다.
      */
     @Operation(summary = "메시지를 읽음 처리",
@@ -74,10 +69,6 @@ public class ChatNotificationController {
     })
     @PutMapping("/mark-as-read")
     public ResponseEntity<Void> markAsRead(@RequestBody ChatUserRequest chatUserRequest) {
-//        User userR = userService.getUserByUserNickname(chatUserRequest.getReceiver());
-//        String receiverName = userR.getUsername();
-//        User userS = userService.getUserByUserNickname(chatUserRequest.getSender());
-//        String senderName = userS.getUsername();
         chatMessageService.markMessagesAsRead(chatUserRequest.getSender(), chatUserRequest.getReceiver());
         return ResponseEntity.noContent().build();
     }
