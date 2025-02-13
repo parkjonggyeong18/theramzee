@@ -8,7 +8,7 @@ USE gradation_db;
 -- User 테이블
 CREATE TABLE IF NOT EXISTS user (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    username VARCHAR(20) NOT NULL,
+    username VARCHAR(20) NOT NULL UNIQUE,
     name VARCHAR(255) NOT NULL,
     nickname VARCHAR(10) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
