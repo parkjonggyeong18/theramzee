@@ -1,140 +1,51 @@
 package com.gradation.backend.room.service;
 
 import com.gradation.backend.room.model.entity.Room;
-import com.gradation.backend.room.repository.RoomRepository;
-import com.gradation.backend.user.model.entity.User;
-import com.gradation.backend.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
-@Service
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
-public class RoomService {
-
-    private final RoomRepository roomRepository;
-    private final UserRepository userRepository;
-    private final SimpMessagingTemplate messagingTemplate;
+public interface RoomService {
 
     /**
      * 방 생성
      *
-     * @param title
-     * @param password
-     * @param nickname
-     * @return
+     * @param title    방 제목
+     * @param password 방 비밀번호
+     * @param nickname 생성자 닉네임
+     * @return 생성된 Room 객체
      */
-    @Transactional
-    public Room createRoom(String title, Integer password, String nickname) {
-
-        // 생성자 닉네임을 받아서 생성자로 가져옴
-        User host = userRepository.findByNickname(nickname)
-                .orElseThrow(() -> new RuntimeException("생성자 닉네임이 필요합니다."));
-
-        // 2) 방 엔티티 생성 & DB 저장
-        Room room = Room.createRoom(title, password, host);
-        roomRepository.save(room);
-
-        // Fetch Join을 사용하여 fakeUsers를 강제로 로드
-        return roomRepository.findByIdWithUsers(room.getId())
-                .orElseThrow(() -> new RuntimeException("Room not found after creation"));
-
-    }
+    Room createRoom(String title, Integer password, String nickname);
 
     /**
      * 방 참가
      *
-     * @param roomId
-     * @param nickname
-     * @param password
-     * @return room
+     * @param roomId   방 ID
+     * @param nickname 참가자 닉네임
+     * @param password 방 비밀번호
+     * @return 참가한 Room 객체
      */
-    @Transactional
-    public Room joinRoom(Long roomId, String nickname, Integer password) {
-        // 참여자 유저 조회
-        User user = userRepository.findByNickname(nickname)
-                .orElseThrow(() -> new RuntimeException("참여자를 찾을 수 없습니다."));
-
-        // 방 조회 (fetch join)
-        Room room = roomRepository.findByIdWithUsers(roomId)
-                .orElseThrow(() -> new RuntimeException("참여하려는 방을 찾을 수 없습니다."));
-
-        //비번방일 경우 비밀번호 검증
-        if (room.getPassword() != null && !password.equals(room.getPassword())) {
-            throw new IllegalArgumentException("비밀번호 오류!");
-        }
-
-        // 방 인원이 이미 6명일 경우 참가 불가
-        if (room.getUsers().size() == 6) {
-            throw new RuntimeException("방 인원이 다 찼습니다!");
-        }
-
-        // 참여자 추가
-        room.addUser(user);
-
-        return room;
-    }
+    Room joinRoom(Long roomId, String nickname, Integer password);
 
     /**
      * 방 나가기
      *
-     * @param roomId
-     * @param nickname
+     * @param roomId   방 ID
+     * @param nickname 나가는 유저 닉네임
      */
-    @Transactional
-    public void leaveRoom(Long roomId, String nickname) {
-        // 참여자 유저 조회
-        User user = userRepository.findByNickname(nickname)
-                .orElseThrow(() -> new RuntimeException("참여자를 찾을 수 없습니다."));
-
-        // 방 조회 (fetch join)
-        Room room = roomRepository.findByIdWithUsers(roomId)
-                .orElseThrow(() -> new RuntimeException("참여하려는 방을 찾을 수 없습니다."));
-
-        // 참여자 검증
-        if (user.equals(room.getHost())) {
-            List<User> users = room.getUsers();
-            for (User participant : users) {
-                participant.setRoom(null);
-            }
-            Map<String, Object> message = new HashMap<>();
-            message.put("status", "success");
-            message.put("message", "방장이 방을 나갔습니다.");
-            messagingTemplate.convertAndSend("/topic/game/" + roomId + "/out", message);
-            System.out.println("방장이 방을 나갔습니다.");
-            roomRepository.delete(room);
-
-        }
-        room.removeUser(user);
-    }
+    void leaveRoom(Long roomId, String nickname);
 
     /**
      * 방 목록 조회
      *
-     * @return 방 목록
+     * @return 모든 방의 목록
      */
-    @Transactional(readOnly = true)
-    public List<Room> getRooms() {
-        return roomRepository.findAllWithUsers();
-    }
+    List<Room> getRooms();
 
     /**
      * 방 단건 조회
      *
-     * @param roomId
-     * @return 방 하나
+     * @param roomId 조회할 방 ID
+     * @return 조회된 Room 객체
      */
-    @Transactional(readOnly = true)
-    public Room getRoom(Long roomId) {
-        return roomRepository.findByIdWithUsers(roomId)
-                .orElseThrow(() -> new RuntimeException("Room not found. id=" + roomId));
-
-    }
+    Room getRoom(Long roomId);
 }
