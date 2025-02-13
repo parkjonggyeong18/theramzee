@@ -7,7 +7,7 @@ import { backgroundImages, characterImages } from '../../assets/images';
 import { connectSocket, disconnectSocket } from '../../api/stomp';
 import { useGameHandlers } from '../../handlers/gameHandlers';
 import { subscribeToTopic } from '../../api/stomp';
-
+import { leaveRoom } from '../../api/room';
 // 공통 레이아웃 import
 import GameLayout from './components/common/GameLayout';
 import RoleReveal from './components/RoleReveal';
@@ -90,7 +90,8 @@ const GameRoom = () => {
 
   const clkExit = () => {
     disconnectSocket();
-    navigate('/lobby');
+    leaveRoom(roomId);
+    navigate('/rooms');
   };
 
   // GameLayout에 전달할 컴포넌트들
