@@ -73,8 +73,6 @@ export const OpenViduProvider = ({ children }) => {
       console.warn(exception);
     });
 
-    // const token = sessionStorage.getItem('openViduToken');
-
     try {
       await newSession.connect(token, { clientData: userName });
 

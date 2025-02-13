@@ -40,14 +40,14 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
 
   // 비상 상황 응답 처리
   const handleEmergencyResponse = useCallback(
-    (message) => {
+    async (message) => {
       try {
         navigate(`/game/${gameState.roomId}/main`);
         if (message.success) {
           const initializedData = message.data.userTokens;
           console.log("긴급 요청 성공:", initializedData);
 
-          // joinSession(initializedData[nickName], nickName);
+          await joinSession(initializedData[nickName], nickName);
 
           setGameState((prev) => ({
             ...prev,
@@ -70,14 +70,14 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
 
   // 숲 이동 응답 처리
   const handleMoveResponse = useCallback(
-    (message) => {
+    async (message) => {
       try {
         console.log(nickName);
         if (message.success && message.data['nickname'] === nickName) {
           const initializedData = message.data;
           console.log("숲 이동 성공:", initializedData);
 
-          // joinSession(initializedData['forestToken'], nickName)
+          await joinSession(initializedData['forestToken'], nickName)
 
           setGameState((prev) => ({
             ...prev,
