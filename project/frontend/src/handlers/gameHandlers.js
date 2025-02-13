@@ -47,7 +47,7 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
           const initializedData = message.data.userTokens;
           console.log("긴급 요청 성공:", initializedData);
 
-          await joinSession(initializedData[nickName], nickName);
+          // await joinSession(initializedData[nickName], nickName);
 
           setGameState((prev) => ({
             ...prev,
@@ -90,7 +90,7 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
         console.error("Error parsing game start response:", error);
       }
     },
-    [setGameState, nickName]
+    []
   );
 
   // 도토리 저장 응답 처리
