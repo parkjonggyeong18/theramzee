@@ -243,6 +243,23 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
     [nickName, setGameState]
   );
 
+  const handleOutResponse = useCallback(
+    (message) => {
+      try {
+        if (message.status) {
+          const initializedData = message.data;
+          console.log("퇴장 성공:", initializedData);
+          navigate("/rooms");
+        } else {
+          console.error("퇴장 실패:", message.errorCode);
+        }
+      } catch (error) {
+        console.error("퇴장 응답 처리 중 에러:", error);
+      }
+    },
+    [setGameState]
+  );
+
   return {
     handleGameInfo,
     handleGameStartResponse,
@@ -252,5 +269,6 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
     handleChargeFatigueResponse,
     handleKillResponse,
     handleCompleteMissionResponse,
+    handleOutResponse,
   };
 };
