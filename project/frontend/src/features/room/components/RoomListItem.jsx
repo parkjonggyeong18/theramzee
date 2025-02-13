@@ -186,7 +186,7 @@ const ModalContent = styled.div`
   background-color: rgba(139, 69, 19, 0.95);
   padding: 1rem;
   border-radius: 10px;
-  width: 180px;
+  width: 192px;
 
   h3 {
     color: white;
@@ -202,7 +202,7 @@ const PasswordInput = styled.input`
   border: none;
   border-radius: 5px;
   background-color: white;
-  width: 155px;
+  width: 166px;
 `;
 
 const ModalButtonGroup = styled.div`
