@@ -96,7 +96,7 @@ public class SecurityConfig {
                 // URL 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index.html", "/static/**", "/assets/**").permitAll()
-                        .requestMatchers("/api/v1/**", "/swagger-ui/**", "/v3/api-docs/**","/api-docs/**","/ws/**", "/user/**","/swagger-ui.html","/game-socket").permitAll() // 인증 없이 접근 가능 경로
+                        .requestMatchers("/api-docs", "/api-docs/**", "/swagger-ui/**", "/v3/api-docs/**","/ws/**", "/user/**","/swagger-ui.html","/game-socket", "/api/v1/**").permitAll()
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
                 // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
