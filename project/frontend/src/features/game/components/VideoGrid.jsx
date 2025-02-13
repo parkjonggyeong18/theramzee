@@ -4,26 +4,30 @@ import { useOpenVidu } from '../../../contexts/OpenViduContext';
 
 const VideoGrid = () => {
   const { subscribers } = useOpenVidu();
-  const videoRefs = useRef({}); // ✅ 비디오 요소 저장을 위한 useRef()
+  const videoRefs = useRef({}); // ✅ 비디오 요소 저장
+  const prevSubscribers = useRef(new Map()); // ✅ connectionId 기반 중복 체크
 
   useEffect(() => {
-    // ✅ 새로운 subscriber가 추가될 때만 videoRefs 초기화
     subscribers.forEach((sub) => {
-      if (!videoRefs.current[sub.stream.connection.connectionId]) {
-        videoRefs.current[sub.stream.connection.connectionId] = React.createRef();
+      const connectionId = sub.stream.connection.connectionId;
+      
+      // ✅ 새로운 subscriber인 경우만 videoRefs 초기화
+      if (!videoRefs.current[connectionId]) {
+        videoRefs.current[connectionId] = React.createRef();
+      }
+
+      // ✅ 중복 등록 방지
+      if (!prevSubscribers.current.has(connectionId)) {
+        const videoElement = videoRefs.current[connectionId]?.current;
+        if (videoElement) {
+          console.log("📌 Assigning video element for", connectionId);
+          sub.addVideoElement(videoElement);
+          prevSubscribers.current.set(connectionId, sub); // ✅ 등록된 subscriber 저장
+        }
       }
     });
 
-    // ✅ 중복 실행 방지를 위해 videoRefs.current의 존재 여부를 먼저 체크
-    subscribers.forEach((sub) => {
-      const videoElement = videoRefs.current[sub.stream.connection.connectionId]?.current;
-      if (videoElement && !videoElement.dataset.assigned) {
-        console.log("📌 Assigning video element for", sub.stream.connection.connectionId);
-        sub.addVideoElement(videoElement);
-        videoElement.dataset.assigned = "true"; // ✅ 한 번만 실행되도록 설정
-      }
-    });
-  }, [subscribers]);
+  }, [subscribers]); // ✅ subscribers가 변경될 때만 실행
 
   return (
     <GridContainer>
@@ -31,13 +35,9 @@ const VideoGrid = () => {
         <VideoContainer key={sub.stream.connection.connectionId}>
           <StyledVideo
             ref={(el) => {
+              const connectionId = sub.stream.connection.connectionId;
               if (el) {
-                // ✅ videoRefs에 connectionId가 존재하지 않는 경우 안전하게 초기화
-                if (!videoRefs.current[sub.stream.connection.connectionId]) {
-                  videoRefs.current[sub.stream.connection.connectionId] = { current: el };
-                } else {
-                  videoRefs.current[sub.stream.connection.connectionId].current = el;
-                }
+                videoRefs.current[connectionId] = { current: el };
               }
             }}
             autoPlay
@@ -73,7 +73,7 @@ const StyledVideo = styled.video`
   height: 100%;
   object-fit: contain; /* 🔥 화면이 잘리지 않도록 설정 */
   transform: scaleX(-1); /* 🔥 좌우 반전 유지 */
-  max-width: 200px; /* 🔥 너무 커지지 않도록 제한 */
+  max-width: 200px;
   max-height: 150px;
 `;
 
