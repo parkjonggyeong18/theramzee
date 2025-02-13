@@ -5,10 +5,14 @@ import com.gradation.backend.room.repository.RoomRepository;
 import com.gradation.backend.user.model.entity.User;
 import com.gradation.backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +21,7 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate messagingTemplate;
 
     /**
      * 방 생성
@@ -62,12 +67,12 @@ public class RoomService {
                 .orElseThrow(() -> new RuntimeException("참여하려는 방을 찾을 수 없습니다."));
 
         //비번방일 경우 비밀번호 검증
-        if(room.getPassword() != null && !password.equals(room.getPassword())){
+        if (room.getPassword() != null && !password.equals(room.getPassword())) {
             throw new IllegalArgumentException("비밀번호 오류!");
         }
 
         // 방 인원이 이미 6명일 경우 참가 불가
-        if(room.getUsers().size() == 6){
+        if (room.getUsers().size() == 6) {
             throw new RuntimeException("방 인원이 다 찼습니다!");
         }
 
@@ -94,13 +99,18 @@ public class RoomService {
                 .orElseThrow(() -> new RuntimeException("참여하려는 방을 찾을 수 없습니다."));
 
         // 참여자 검증
-        if(user.equals(room.getHost())){
-            // 방에 참여한 모든 FakeUser의 room 필드를 null로 설정
+        if (user.equals(room.getHost())) {
             List<User> users = room.getUsers();
             for (User participant : users) {
                 participant.setRoom(null);
             }
+            Map<String, Object> message = new HashMap<>();
+            message.put("status", "success");
+            message.put("message", "방장이 방을 나갔습니다.");
+            messagingTemplate.convertAndSend("/topic/game/" + roomId + "/out", message);
+            System.out.println("방장이 방을 나갔습니다.");
             roomRepository.delete(room);
+
         }
         room.removeUser(user);
     }
@@ -111,7 +121,7 @@ public class RoomService {
      * @return 방 목록
      */
     @Transactional(readOnly = true)
-    public List<Room> getRooms(){
+    public List<Room> getRooms() {
         return roomRepository.findAllWithUsers();
     }
 
@@ -122,7 +132,7 @@ public class RoomService {
      * @return 방 하나
      */
     @Transactional(readOnly = true)
-    public Room getRoom(Long roomId){
+    public Room getRoom(Long roomId) {
         return roomRepository.findByIdWithUsers(roomId)
                 .orElseThrow(() -> new RuntimeException("Room not found. id=" + roomId));
 
