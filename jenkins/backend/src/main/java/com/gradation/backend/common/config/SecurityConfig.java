@@ -99,7 +99,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // URL 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/email/**").permitAll()
+                        .requestMatchers("/api/v1/email/**","/api/v1/**").permitAll()
                         .requestMatchers("http://ramzee.online/api/v1/**","/api/v1/**", "/swagger-ui/**", "/v3/api-docs/**","/api-docs/**","/ws/**", "/user/**","/swagger-ui.html","/game-socket","/wss/**").permitAll() // 인증 없이 접근 가능 경로
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
