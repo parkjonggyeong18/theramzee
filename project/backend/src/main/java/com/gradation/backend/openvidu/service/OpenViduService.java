@@ -25,31 +25,6 @@ public interface OpenViduService {
      * @throws OpenViduJavaClientException OpenVidu 클라이언트 예외
      * @throws OpenViduHttpException       OpenVidu HTTP 예외
      */
-<<<<<<< HEAD
-    public String generateToken(String sessionId, String nickname) throws OpenViduJavaClientException, OpenViduHttpException {
-        Session session = openVidu.getActiveSession(sessionId);
 
-        if (session == null) {
-            throw new IllegalArgumentException("세션을 찾을 수 없습니다. 세션 ID: " + sessionId);
-        }
-
-        ConnectionProperties connectionProperties = new ConnectionProperties.Builder()
-                .type(ConnectionType.WEBRTC)
-                .role(OpenViduRole.PUBLISHER) // 동영상 전송과 스트림
-                .data(nickname)
-                .kurentoOptions(
-                        new KurentoOptions.Builder()
-                                .allowedFilters(new String[]{"GStreamerFilter", "FaceOverlayFilter"})
-                                .build())
-                .build();
-
-        Connection connection = session.createConnection(connectionProperties);
-        String token = connection.getToken();
-        System.out.println("generated token:" + token);
-
-        return token;
-    }
-=======
     String generateToken(String sessionId, String nickname) throws OpenViduJavaClientException, OpenViduHttpException;
->>>>>>> develop
 }
