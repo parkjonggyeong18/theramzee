@@ -55,7 +55,6 @@ export const apiRequest = async (url, method, data = null, requiresAuth = true) 
         return response.data;
     } catch (error) {
         console.error('API 요청 실패:', error.response.data);
-        console.log(error);
 
         // 401 Unauthorized 처리
         if (requiresAuth && error.response?.data === "Unauthorized: Authentication failed") {
