@@ -34,6 +34,8 @@ services:
     build: ./backend
     image: ${BACKEND_IMAGE}
     container_name: theramzee-backend-1
+    env_file:
+      - .env
     depends_on:
       - mysql
       - redis
