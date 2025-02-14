@@ -47,7 +47,7 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
           const initializedData = message.data.userTokens;
           console.log("긴급 요청 성공:", initializedData);
 
-          await joinSession(initializedData[nickName], nickName);
+          // await joinSession(initializedData[nickName], nickName);
 
           setGameState((prev) => ({
             ...prev,
@@ -72,16 +72,21 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
   const handleMoveResponse = useCallback(
     async (message) => {
       try {
-        console.log(nickName);
+        console.log("숲 이동 응답:", message);
+
+        
         if (message.success && message.data['nickname'] === nickName) {
           const initializedData = message.data;
           console.log("숲 이동 성공:", initializedData);
 
-          await joinSession(initializedData['forestToken'], nickName)
+          // await joinSession(initializedData['forestToken'], nickName)
 
           setGameState((prev) => ({
             ...prev,
             forestToken: initializedData.forestToken,
+            foresetNum: initializedData.forestNum,
+            forestUsers: initializedData.forestUsers,
+
           }));
         } else {
           console.error("Game initialization failed:", message.errorCode);

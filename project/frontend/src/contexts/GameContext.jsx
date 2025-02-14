@@ -5,11 +5,15 @@ import { fetchRoomById } from '../api/room';
 const GameContext = createContext();
 
 export const GameProvider = ({ children }) => {
+  
   // 게임의 전체 상태 관리
   const [gameState, setGameState] = useState({
     // 유저 정보
     userNum: null,
     nickName: null,
+
+    // 숲 별 유저 정보
+    forestUsers: {},
 
     // 게임 진행 상태
     isStarted: false, // 게임 시작 여부
@@ -17,6 +21,7 @@ export const GameProvider = ({ children }) => {
     timerRunning: false,    // 타이머 실행 상태
     evilSquirrel: null, // true | false
     forestToken: null,  // 숲 토큰
+    currentForestNum: 1, // 현재 숲 번호 (초기는 메인 숲숲)
 
     // 게임 리소스
     totalAcorns: 0, // 저장된 도토리
@@ -87,7 +92,7 @@ export const GameProvider = ({ children }) => {
   // ]);
   
   const [roomId, setRoomId] = useState(null);
-  const [players, setPlayers] = useState(['a', 'b', 'c', 'd', 'w']);
+  const [players, setPlayers] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
   const nickname = sessionStorage.getItem('nickName');
 
@@ -246,9 +251,11 @@ export const GameProvider = ({ children }) => {
 
   // 숲 이동 처리
   const moveForest = useCallback(async (forestNum) => {
-    if (isConnected && roomId && nickname && forestNum) {
+    const nicknameList = players.map(player => player.nickName);
+    if (isConnected && roomId && nickname && forestNum && nicknameList) {
       try {
-        await gameService.moveForest(roomId, nickname, forestNum);
+        await gameService.moveForest(roomId, nickname, forestNum, nicknameList);
+        setGameState.currentForestNum = forestNum;
       } catch (error) {
         console.error('Failed to get user fatigue:', error);
       }
@@ -276,6 +283,7 @@ export const GameProvider = ({ children }) => {
       try {
         const nicknameList = players.map(player => player.nickName);
         await gameService.startEmergency(roomId, nicknameList);
+        setGameState.forestNum = 1;
       } catch (error) {
         console.error('Failed to get user fatigue:', error);
       }
@@ -409,6 +417,8 @@ export const GameProvider = ({ children }) => {
     roomId,
     setIsConnected,
     players,
+    
+    
   };
 
   return (

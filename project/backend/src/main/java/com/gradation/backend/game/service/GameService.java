@@ -9,13 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,12 +22,6 @@ public class GameService {
     private final RedisUtil redisUtil;
     private final OpenViduService openViduService;
 
-    /**
-     * 방 정보 조회 (테스트용)
-     *
-     * @param roomId: 조회할 방의 Id
-     * @return 방의 전체 정보를 담은 Map
-     */
     /**
      * 방 정보 조회
      *
@@ -54,6 +46,7 @@ public class GameService {
                 user.setAcorns((Integer) userData.get("acorns"));
                 user.setFatigue((Integer) userData.get("fatigue"));
                 user.setForestToken((String) userData.get("forestToken"));
+                user.setForestNum((Integer) userData.get("forestNum"));
                 user.setEvilSquirrel((Boolean) userData.get("isEvilSquirrel"));
                 users.put(userKey, user);
             }
@@ -92,6 +85,32 @@ public class GameService {
         return roomInfo;
     }
 
+    /**
+     * 방의 숲별 유저 정보를 조회하여 반환
+     */
+    public Map<Integer, List<String>> getForestUserMap(int roomId, List<String> nicknames) {
+        String roomKey = "ROOM:" + roomId;
+        Map<Integer, List<String>> forestUsers = new HashMap<>();
+
+        for (int forestNum = 1; forestNum <= 7; forestNum++) {
+            List<String> userList = new ArrayList<>();
+
+            for (String nickname: nicknames){
+                String userKey = roomKey + ":USER:" + nickname;
+                Integer userForestNum = (Integer) redisUtil.hget(userKey, "forestNum");
+
+
+                if (userForestNum != null && userForestNum == forestNum) {
+                    if (nickname != null) {
+                        userList.add(nickname);
+                    }
+                }
+            }
+            forestUsers.put(forestNum, userList);
+        }
+        return forestUsers;
+    }
+
 
     /**
      * 시작하기 클릭 시 방 초기화
@@ -104,13 +123,14 @@ public class GameService {
     public RoomInitializationResponse initializeRoomStructure(int roomId, List<String> nicknames)
             throws OpenViduJavaClientException, OpenViduHttpException {
         RoomInitializationResponse responseDto = new RoomInitializationResponse();
+
         Map<String, UserResponse> usersData = new HashMap<>();
         Map<String, ForestResponse> forestsData = new HashMap<>();
 
         // 1. Room 기본 정보 저장
         String roomKey = "ROOM:" + roomId;
 
-        // 2. Users 데이터 추가
+        // 2. Users 데이터 추가 + 각 유저가 현재 위치한 숲 정보 표시( 지금은 로비라서 1)
         Random random = new Random();
         String evilSquirrelNickname = nicknames.get(random.nextInt(nicknames.size()));
 
@@ -126,6 +146,7 @@ public class GameService {
             userData.setAcorns(0);
             userData.setFatigue(0);
             userData.setForestToken(token);
+            userData.setForestNum(1);
             userData.setEvilSquirrel(nickname.equals(evilSquirrelNickname));
 
             // Redis Hash로 저장
@@ -158,6 +179,9 @@ public class GameService {
             forestsData.put(forestKey, forestData);
         }
         responseDto.setForests(forestsData);
+
+        Map<Integer, List<String>> forestUsers = getForestUserMap(roomId, nicknames);
+        responseDto.setForestUsers(forestUsers);
 
         return responseDto;
     }
@@ -208,6 +232,7 @@ public class GameService {
                 //forestToken을 roomId-1세션으로 설정
                 String token = openViduService.generateToken(sessionId, nickname);
                 redisUtil.hset(userKey, "forestToken", token);
+                redisUtil.hset(userKey, "forestNum", 1);
 
                 // 닉네임과 토큰을 맵에 저장
                 userTokens.put(nickname, token);
@@ -220,6 +245,10 @@ public class GameService {
         // EmergencyResponse 객체 생성 및 반환
         EmergencyResponse response = new EmergencyResponse();
         response.setUserTokens(userTokens);
+
+        Map<Integer, List<String>> forestUsers = getForestUserMap(roomId, nicknames);
+        response.setForestUsers(forestUsers);
+
         return response;
     }
 
@@ -233,18 +262,23 @@ public class GameService {
      * @param newForest: 새로운 forestToken 값
      * @return MoveForestResponse 객체 (유저 닉네임, 새로운 forestToken)
      */
-    public MoveForestResponse moveForest(int roomId, String nickname, int newForest) throws OpenViduJavaClientException, OpenViduHttpException {
+    public MoveForestResponse moveForest(int roomId, String nickname, int newForest, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException {
         String roomKey = "ROOM:" + roomId;
         String userKey = roomKey + ":USER:" + nickname;
+        int forestNum = newForest;
 
         // 새로운 숲 토큰 생성
         String token = openViduService.generateToken(roomId + "-" + newForest, nickname);
 
         // forestToken newForest값으로 변경
         redisUtil.hset(userKey, "forestToken", token);
+        redisUtil.hset(userKey, "forestNum", forestNum);
+
+        // 최신 숲별 유저 정보 조회
+        Map<Integer, List<String>> forestUsers = getForestUserMap(roomId, nicknames);
 
         // MoveForestResponse 객체 생성 및 반환
-        return new MoveForestResponse(nickname, token);
+        return new MoveForestResponse(nickname, token, forestNum, forestUsers);
     }
 
 //    /**
@@ -434,3 +468,5 @@ public class GameService {
         return new CompleteMissionResponse(nickname, forestNum, missionNum, reward, newAcorns);
     }
 }
+
+

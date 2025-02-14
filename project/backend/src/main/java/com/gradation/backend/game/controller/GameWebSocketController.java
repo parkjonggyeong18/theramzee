@@ -67,7 +67,7 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/move")
     @SendTo("/topic/game/{roomId}/move")
     public BaseResponse<MoveForestResponse> handleGameMove(@Payload GameMoveRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-        MoveForestResponse token = gameService.moveForest(request.getRoomId(), request.getNickname(), request.getNewForest());
+        MoveForestResponse token = gameService.moveForest(request.getRoomId(), request.getNickname(), request.getNewForest(), request.getNicknames());
         return BaseResponse.success("사용자 이동", token);
     }
 
@@ -148,3 +148,5 @@ public class GameWebSocketController {
         return BaseResponse.success("미션 완료", result);
     }
 }
+
+//    public forestUserResponse getForestUserMap()

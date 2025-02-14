@@ -61,7 +61,9 @@ export const OpenViduProvider = ({ children }) => {
     const newSession = OV.initSession();
 
     newSession.on('streamCreated', (event) => {
+      console.log('New stream created:', event.stream);
       const subscriber = newSession.subscribe(event.stream, undefined);
+      console.log('New stream created:', subscriber);
       setSubscribers((prev) => [...prev, subscriber]);
     });
 

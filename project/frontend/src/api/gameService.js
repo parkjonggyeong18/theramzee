@@ -27,9 +27,9 @@ export const startEmergency = async (roomId, nicknames) => {
     }
   };
 
-  export const moveForest = async (roomId, nickname, newForest) => {
+  export const moveForest = async (roomId, nickname, newForest, nicknames) => {
     try {
-      await sendMessage(`/app/game/${roomId}/move`, { roomId, nickname, newForest });
+      await sendMessage(`/app/game/${roomId}/move`, { roomId, nickname, newForest, nicknames });
     } catch (error) {
       console.error('Failed to move forest:', error);
       throw error;

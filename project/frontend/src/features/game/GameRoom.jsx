@@ -35,6 +35,7 @@ const GameRoom = () => {
 
   const {
     joinSession,
+    subscribers,
   } = useOpenVidu();
 
 
@@ -93,10 +94,18 @@ const GameRoom = () => {
     navigate('/lobby');
   };
 
+  const leftCam = subscribers.slice(0, 3);
+  console.log("leftPlayers:", leftCam);
+  const rightCam = subscribers.slice(3, 7);
+  console.log("rightPlayers:", rightCam);
+
+
   // GameLayout에 전달할 컴포넌트들
   const gameLayoutProps = {
-    leftVideoGrid: <VideoGrid players={players} gridPosition="left" />,
-    // rightVideoGrid: <VideoGrid players={players} gridPosition="right" />,
+      
+    leftVideoGrid: <VideoGrid players={leftCam} totalSlots={3} gridPosition="left" />,
+    rightVideoGrid: <VideoGrid players={rightCam} totalSlots={2} gridPosition="right" />,
+
     gameTimer: <GameTimer />,
     statePanel: <StatePanel />,
     buttonContainer: (

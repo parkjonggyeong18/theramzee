@@ -20,6 +20,15 @@ const DryForest = () => {
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [currentMission, setCurrentMission] = useState(null);
   const [completedMissions, setCompletedMissions] = useState([]);
+
+  // 현재 사용자가 위치한 숲 번호 가져오기
+  const currentForestNum = gameState.currentForestNum;
+
+  // 현재 숲에 있는 플레이어들 필터링
+  const playersInCurrentForest = players.filter(player => 
+    gameState.forestUsers?.[currentForestNum]?.includes(player.nickName)
+  );
+
   const isMissionCompleted = (missionId) => {
     const missionNum = missionId === 'fire' ? 1 : 
                       missionId === 'arrow' ? 2 : 3;
@@ -60,7 +69,7 @@ const DryForest = () => {
   }, [gameState.isStarted, gameState.evilSquirrel]);
   const gameLayoutProps = {
     // 기본 레이아웃 요소
-    leftVideoGrid: <VideoGrid players={players} gridPosition="left" />,
+    leftVideoGrid: <VideoGrid players={playersInCurrentForest} gridPosition="left" />,
     // rightVideoGrid: <VideoGrid players={players} gridPosition="right" />,
     gameTimer: <GameTimer />,
     statePanel: <StatePanel />,

@@ -6,7 +6,7 @@ import { backgroundImages } from '../../../assets/images';
 
 const MiniMap = () => {
  const navigate = useNavigate();
- const { gameState, moveForest } = useGame();
+ const { gameState, moveForest, players } = useGame();
 
  const forests = [
    { 

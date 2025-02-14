@@ -21,11 +21,21 @@ const BreathingForest = () => {
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [currentMission, setCurrentMission] = useState(null);
   const [completedMissions, setCompletedMissions] = useState([]);
+ 
+  // 현재 사용자가 위치한 숲 번호 가져오기
+  const currentForestNum = gameState.currentForestNum;
+
+  // 현재 숲에 있는 플레이어들 필터링
+  const playersInCurrentForest = players.filter(player => 
+    gameState.forestUsers?.[currentForestNum]?.includes(player.nickName)
+  );
+    
   const isMissionCompleted = (missionId) => {
     const missionNum = missionId === 'maze' ? 1 : 
                       missionId === 'vine' ? 2 : 3;
     return gameState[`7_${missionNum}`][0]; // gameState에서 미션 완료 상태 확인
   };
+
   const handleMissionClick = (missionId) => {
     if (isMissionCompleted(missionId)) return;
     if (gameState.fatigue < 1) return;
@@ -61,7 +71,7 @@ const BreathingForest = () => {
   }, [gameState.isStarted, gameState.evilSquirrel]);
   const gameLayoutProps = {
     // 기본 레이아웃 요소
-    leftVideoGrid: <VideoGrid players={players} gridPosition="left" />,
+    leftVideoGrid: <VideoGrid players={playersInCurrentForest} gridPosition="left" />,
     // rightVideoGrid: <VideoGrid players={players} gridPosition="right" />,
     gameTimer: <GameTimer />,
     statePanel: <StatePanel />,
