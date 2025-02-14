@@ -7,7 +7,7 @@ const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://ramzee.online';
 export const refreshToken = async () => {
     try {
         const expiredAccessToken = sessionStorage.getItem('accessToken'); // 만료된 Access Token
-        const response = await axios.post(`${BASE_URL}/api/v1/auth/refresh-token`, 'POST', {
+        const response = await axios.post(`${BASE_URL}/api/v1/auth/refresh-token`, null, {
             headers: {
                 Authorization: `Bearer ${expiredAccessToken}`, // 만료된 토큰 전달
             },
