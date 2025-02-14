@@ -46,6 +46,11 @@ export const OpenViduProvider = ({ children }) => {
     } catch (error) {
       console.error('Preview init error:', error);
     }
+
+    if (previewPublisher) {
+      previewPublisher.stream.disposeWebRtcPeer();
+      previewPublisher.stream.disposeMediaStream();
+    }
   };
 
   /**
@@ -138,6 +143,7 @@ export const OpenViduProvider = ({ children }) => {
         joinSession,
         leaveSession,
         setIsPreview,
+        initPreview
       }}
     >
       {children}
