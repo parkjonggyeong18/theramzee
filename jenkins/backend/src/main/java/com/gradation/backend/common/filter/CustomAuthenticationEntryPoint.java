@@ -20,9 +20,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
             response.setStatus(HttpServletResponse.SC_OK); // 인증 없이 처리하려면 OK 응답으로 설정
             return;
         }
-
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getWriter().write("Unauthorized: Authentication failed");
     }
-
 }
