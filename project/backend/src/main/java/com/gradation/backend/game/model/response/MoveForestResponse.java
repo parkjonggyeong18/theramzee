@@ -12,7 +12,7 @@ import java.util.Map;
 @AllArgsConstructor
 public class MoveForestResponse {
     private String nickname;
-    private String forestToken;
+//    private String forestToken;
     private int forestNum;
     private Map<Integer, List<String>> forestUsers;
 }

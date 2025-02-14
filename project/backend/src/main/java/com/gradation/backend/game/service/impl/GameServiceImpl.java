@@ -143,7 +143,7 @@ public class GameServiceImpl implements GameService {
                 forestData.setMission3(new MissionData(false, 1));
 
                 //각 Forest에 해당하는 openvidu 세션 생성
-                openViduService.createSession(roomId + "-" + forestNum);
+//                openViduService.createSession(roomId + "-" + forestNum);
             }
 
             // Redis Hash로 저장
@@ -240,10 +240,10 @@ public class GameServiceImpl implements GameService {
         int forestNum = newForest;
 
         // 새로운 숲 토큰 생성
-        String token = openViduService.generateToken(roomId + "-" + newForest, nickname);
+//        String token = openViduService.generateToken(roomId + "-" + newForest, nickname);
 
         // forestToken newForest값으로 변경
-        redisUtil.hset(userKey, "forestToken", token);
+//        redisUtil.hset(userKey, "forestToken", token);
         redisUtil.hset(userKey, "forestNum", forestNum);
 
         // 최신 숲별 유저 정보 조회
@@ -252,7 +252,7 @@ public class GameServiceImpl implements GameService {
         System.out.println("Updated forestNum: " + forestUsers);
 
         // MoveForestResponse 객체 생성 및 반환
-        return new MoveForestResponse(nickname, token, forestNum, forestUsers);
+        return new MoveForestResponse(nickname, forestNum, forestUsers);
     }
 
     /**

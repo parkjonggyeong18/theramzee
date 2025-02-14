@@ -45,6 +45,7 @@ public class GameWebSocketController {
     @SendTo("/topic/game/{roomId}/start")
     public BaseResponse<RoomInitializationResponse> handleGameStart(@Payload GameStartRequest request)
             throws OpenViduJavaClientException, OpenViduHttpException {
+        System.out.println("게임시작 요청은 백에서 옴🙌🙌🙌");
         RoomInitializationResponse initializedData = gameService.initializeRoomStructure(request.getRoomId(), request.getNicknames());
         return BaseResponse.success("게임 시작 성공", initializedData);
     }
