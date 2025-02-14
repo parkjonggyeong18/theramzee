@@ -3,7 +3,6 @@ package com.gradation.backend.game.service;
 import com.gradation.backend.game.model.response.*;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
-<<<<<<< HEAD
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,26 +12,18 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.*;
-=======
-
-import java.util.List;
->>>>>>> develop
 
 public interface GameService {
 
-<<<<<<< HEAD
     private final RedisUtil redisUtil;
     private final OpenViduService openViduService;
 
-=======
->>>>>>> develop
     /**
      * 방 정보 조회
      *
      * @param roomId 조회할 방의 Id
      * @return 방의 전체 정보를 담은 RoomInfoResponseDto
      */
-<<<<<<< HEAD
     public RoomInfoResponse getRoomInformation(int roomId) {
         RoomInfoResponse roomInfo = new RoomInfoResponse();
         String roomKey = "ROOM:" + roomId;
@@ -116,9 +107,6 @@ public interface GameService {
         return forestUsers;
     }
 
-=======
-    RoomInfoResponse getRoomInformation(int roomId);
->>>>>>> develop
 
     /**
      * 방 초기화 (시작하기 클릭 시)
@@ -127,7 +115,6 @@ public interface GameService {
      * @param nicknames 모든 참가자의 닉네임
      * @return 방의 전체 정보를 담은 RoomInitializationResponse 객체
      */
-<<<<<<< HEAD
     public RoomInitializationResponse initializeRoomStructure(int roomId, List<String> nicknames)
             throws OpenViduJavaClientException, OpenViduHttpException {
         RoomInitializationResponse responseDto = new RoomInitializationResponse();
@@ -207,10 +194,6 @@ public interface GameService {
         }
         return map;
     }
-=======
-    RoomInitializationResponse initializeRoomStructure(int roomId, List<String> nicknames)
-            throws OpenViduJavaClientException, OpenViduHttpException;
->>>>>>> develop
 
     /**
      * 긴급 상황 처리
@@ -219,7 +202,6 @@ public interface GameService {
      * @param nicknames 모든 참가자의 닉네임
      * @return 모든 사용자의 닉네임과 새로운 토큰 값을 담은 EmergencyResponse 객체
      */
-<<<<<<< HEAD
     public EmergencyResponse emergency(int roomId, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException {
         String roomKey = "ROOM:" + roomId;
         String forestKey = roomKey + ":FOREST:1";
@@ -254,10 +236,6 @@ public interface GameService {
         return response;
     }
 
-=======
-    EmergencyResponse emergency(int roomId, List<String> nicknames)
-            throws OpenViduJavaClientException, OpenViduHttpException;
->>>>>>> develop
 
     /**
      * 특정 유저가 특정 숲으로 이동
@@ -267,7 +245,6 @@ public interface GameService {
      * @param newForest 새로운 forestToken 값
      * @return MoveForestResponse 객체 (유저 닉네임과 새로운 forestToken)
      */
-<<<<<<< HEAD
     public MoveForestResponse moveForest(int roomId, String nickname, int newForest, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException {
         String roomKey = "ROOM:" + roomId;
         String userKey = roomKey + ":USER:" + nickname;
@@ -304,10 +281,6 @@ public interface GameService {
 //        // acorns 값을 정수로 변환하여 반환
 //        return (Integer) acornsObj;
 //    }
-=======
-    MoveForestResponse moveForest(int roomId, String nickname, int newForest)
-            throws OpenViduJavaClientException, OpenViduHttpException;
->>>>>>> develop
 
     /**
      * 특정 유저의 도토리를 공용 저장소에 저장하고 초기화
