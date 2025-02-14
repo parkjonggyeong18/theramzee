@@ -28,33 +28,37 @@ export const refreshToken = async () => {
 };
 
 // API 요청 함수
+// API 요청 함수에서 requiresAuth=false일 경우 Authorization 헤더를 포함시키지 않도록 수정
 export const apiRequest = async (url, method, data = null, requiresAuth = true) => {
-
     try {
         // 로그인 등 토큰이 필요하지 않은 요청 처리
         let accessToken = null;
         if (requiresAuth) {
-          accessToken = sessionStorage.getItem('accessToken');
+            accessToken = sessionStorage.getItem('accessToken');
         }
 
         console.log('API 요청 시작:', { url, method, data });
+
+        const headers = {
+            'Content-Type': 'application/json',
+        };
+
+        if (requiresAuth && accessToken) {
+            headers['Authorization'] = `Bearer ${accessToken}`;
+        }
 
         // 요청 수행
         const response = await axios({
             url: `${BASE_URL}${url}`,
             method,
             data,
-            headers: {
-                'Content-Type': 'application/json',
-                ...(accessToken && { Authorization: `Bearer ${accessToken}` }), // 토큰이 있으면 헤더에 추가
-            },
+            headers,
         });
-        
 
         console.log('API 요청 성공:', response.data);
         return response.data;
     } catch (error) {
-        console.error('API 요청 실패:', error.response.data);
+        console.error('API 요청 실패:', error.response?.data);
 
         // 401 Unauthorized 처리
         if (requiresAuth && error.response?.data === "Unauthorized: Authentication failed") {
@@ -62,8 +66,8 @@ export const apiRequest = async (url, method, data = null, requiresAuth = true) 
 
             try {
                 // 토큰 갱신
-                const accessToken  = await refreshToken();
-                console.log("새 토큰 발급 성공2:", accessToken);
+                const newAccessToken = await refreshToken();
+                console.log("새 토큰 발급 성공:", newAccessToken);
                 // 요청 재시도
                 const retryResponse = await axios({
                     url: `${BASE_URL}${url}`,
@@ -71,7 +75,7 @@ export const apiRequest = async (url, method, data = null, requiresAuth = true) 
                     data,
                     headers: {
                         'Content-Type': 'application/json',
-                        Authorization: `Bearer ${accessToken}`, // 새 토큰 전달
+                        Authorization: `Bearer ${newAccessToken}`, // 새 토큰 전달
                     },
                 });
 
@@ -81,9 +85,7 @@ export const apiRequest = async (url, method, data = null, requiresAuth = true) 
                 throw refreshError;
             }
         }
-        
+
         throw error;
     }
-
-
 };
