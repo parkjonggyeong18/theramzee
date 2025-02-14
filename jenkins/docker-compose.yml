@@ -44,11 +44,14 @@ services:
       - theramzee-network
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        - REACT_APP_VERSION=${BUILD_NUMBER:-dev}
     image: ${FRONTEND_IMAGE}
     container_name: theramzee-frontend-1
     volumes:
-      - frontend-static:/usr/share/nginx/html
+      - frontend-static:/app/build
     depends_on:
       - backend
     restart: unless-stopped

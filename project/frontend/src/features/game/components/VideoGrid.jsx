@@ -1,21 +1,30 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { useOpenVidu } from '../../../contexts/OpenViduContext';
 import goodSquirrel from '../../../assets/images/characters/good-squirrel.png';
+import { useKillSystem } from '../../../hooks/useKillSystem';
+import { useGame } from '../../../contexts/GameContext';
+import KillAnimation from './KillAnimation';
+import DeadOverlay from './DeadOverlay';
 
 const VideoGrid = (props) => {
-  // OpenViduContext에서 session을 가져옵니다.
   const { session } = useOpenVidu();
-  const videoRefs = useRef({}); // 각 비디오 DOM 요소의 ref를 저장할 객체
+  const { gameState } = useGame();
+  const { killingPlayer, handleDragStart, isKillable, isDragging } = useKillSystem();
+  const [showDeadOverlay, setShowDeadOverlay] = useState(false);
+  const videoRefs = useRef({});
   const subscribers = props.players || [];
   const totalSlots = props.totalSlots;
   
-  // subscribers 배열의 길이가 totalSlots보다 작으면, 나머지는 null로 채워진 슬롯 배열 생성
   const slots = Array.from({ length: totalSlots }, (_, i) => subscribers[i] || null);
 
+  useEffect(() => {
+    if (gameState.isDead && !showDeadOverlay) {
+      setShowDeadOverlay(true);
+    }
+  }, [gameState.isDead]);
 
   useEffect(() => {
-    // 각 슬롯에서 subscriber가 존재하고, 내부 속성이 준비되었을 때 ref 초기화
     slots.forEach((player) => {
       if (player?.stream?.connection?.connectionId) {
         const connectionId = player.stream.connection.connectionId;
@@ -25,22 +34,31 @@ const VideoGrid = (props) => {
       }
     });
 
-    // 각 슬롯에서 subscriber가 존재하면, video 요소에 스트림을 할당
     slots.forEach((player) => {
       if (player?.stream?.connection?.connectionId) {
         const connectionId = player.stream.connection.connectionId;
         const videoElement = videoRefs.current[connectionId]?.current;
         if (videoElement && !videoElement.dataset.assigned) {
-          console.log("📌 Assigning video element for", connectionId);
           player.addVideoElement(videoElement);
-          videoElement.dataset.assigned = "true"; // 중복 할당 방지
+          videoElement.dataset.assigned = "true";
         }
       }
     });
   }, [slots]);
 
-  
-  // session이 준비되지 않았으면 로딩 상태 렌더링
+  const getPlayerInfo = (sub) => {
+    let playerNickname = '';
+    try {
+      const rawData = sub?.stream?.connection?.data.split("%/%")[0];
+      const playerData = JSON.parse(rawData);
+      playerNickname = playerData.clientData;
+    } catch (error) {
+      console.error("Error extracting nickname:", error);
+    }
+    const isPlayerDead = gameState.killedPlayers?.includes(playerNickname);
+    return { playerNickname, isPlayerDead };
+  };
+
   if (!session) {
     return <GridContainer>Loading...</GridContainer>;
   }
@@ -48,34 +66,50 @@ const VideoGrid = (props) => {
   return (
     <GridContainer>
       {slots.map((sub, idx) => {
-        // 옵셔널 체이닝으로 안전하게 connectionId 추출
         const connectionId = sub?.stream?.connection?.connectionId;
+        const { playerNickname, isPlayerDead } = getPlayerInfo(sub);
+
         return (
-          <VideoContainer key={idx}>
+          <VideoContainer
+            key={idx}
+            onMouseDown={(e) => isKillable && handleDragStart(e, playerNickname)}
+            style={{ cursor: isKillable ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+          >
             {connectionId ? (
-              <StyledVideo
-                ref={(el) => {
-                  if (el && connectionId) {
-                    if (!videoRefs.current[connectionId]) {
-                      videoRefs.current[connectionId] = { current: el };
-                    } else {
-                      videoRefs.current[connectionId].current = el;
+              <>
+                <StyledVideo
+                  ref={(el) => {
+                    if (el && connectionId) {
+                      if (!videoRefs.current[connectionId]) {
+                        videoRefs.current[connectionId] = { current: el };
+                      } else {
+                        videoRefs.current[connectionId].current = el;
+                      }
                     }
-                  }
-                }}
-                autoPlay
-              />
+                  }}
+                  autoPlay
+                  $isDead={isPlayerDead}
+                />
+                {killingPlayer === playerNickname && (
+                  <KillAnimation onAnimationEnd={() => setShowDeadOverlay(true)} />
+                )}
+                {isPlayerDead && <DeadIndicator>💀</DeadIndicator>}
+                <PlayerName>{playerNickname}</PlayerName>
+              </>
             ) : (
-              // subscriber가 없거나 준비되지 않았으면 placeholder 이미지 렌더링
               <ImageContainer>
-              <PlaceholderImage 
-                src={props.placeholderImage || goodSquirrel}  
-              />
+                <PlaceholderImage 
+                  src={props.placeholderImage || goodSquirrel}
+                />
               </ImageContainer>
             )}
           </VideoContainer>
         );
       })}
+
+      {showDeadOverlay && gameState.isDead && (
+        <DeadOverlay playerName={gameState.nickName} />
+      )}
     </GridContainer>
   );
 };
@@ -103,12 +137,12 @@ const VideoContainer = styled.div`
 const StyledVideo = styled.video`
   width: 100%;
   height: 100%;
-<<<<<<< HEAD
   object-fit: contain;
   transform: scaleX(-1);
-  max-width: 300px;
-  max-height: 300px;
-  opacity: 100%;
+  max-width: 200px;
+  max-height: 150px;
+  opacity: ${props => props.$isDead ? '0.5' : '1'};
+  filter: ${props => props.$isDead ? 'grayscale(100%)' : 'none'};
 `;
 
 const PlaceholderImage = styled.img`
@@ -123,12 +157,28 @@ const ImageContainer = styled.div`
   height: 100%;
   background-color: white;
   opacity: 80%;
-=======
-  object-fit: contain; /* 🔥 화면이 잘리지 않도록 설정 */
-  transform: scaleX(-1); /* 🔥 좌우 반전 유지 */
-  max-width: 200px;
-  max-height: 150px;
->>>>>>> develop
+`;
+
+const DeadIndicator = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+`;
+
+const PlayerName = styled.div`
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.8rem;
 `;
 
 export default VideoGrid;

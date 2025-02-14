@@ -10,31 +10,31 @@ const MainForestButtons = () => {
  const [timer, setTimer] = useState(null);
 
  const clkSave = () => {
-   if (gameState.evilSquirrel !== false || gameState.heldAcorns === 0 || isStorageActive) return;
+  if (gameState.evilSquirrel !== false || gameState.heldAcorns === 0 || isStorageActive || gameState.isDead) return;
    
-   setIsStorageActive(true);
-   const storageTimer = setTimeout(() => {
+  setIsStorageActive(true);
+  const storageTimer = setTimeout(() => {
     saveUserAcorns();
     setIsStorageActive(false);
-   }, 10000); // 10초
-   setTimer(storageTimer);
- };
+  }, 10000);
+  setTimer(storageTimer);
+};
 
- const clkFatigue = () => {
-   if (gameState.fatigue >= 3 || isEnergyActive) return;
+const clkFatigue = () => {
+  if (gameState.fatigue >= 3 || isEnergyActive || gameState.isDead) return;
 
-   setIsEnergyActive(true);
-   const energyTimer = setTimeout(() => {
+  setIsEnergyActive(true);
+  const energyTimer = setTimeout(() => {
     chargeFatigue();
     setIsEnergyActive(false);
-   }, gameState.evilSquirrel === false ? 5000 : 10000); // 착한 다람쥐 5초, 나쁜 다람쥐 10초
-   setTimer(energyTimer);
- };
+  }, gameState.evilSquirrel === false ? 5000 : 10000);
+  setTimer(energyTimer);
+};
 
- const clkEmergency = () => {
+const clkEmergency = () => {
+  if (gameState.isDead) return;
   startEmergency();
- }
-
+};
  const cancelAction = () => {
    clearTimeout(timer);
    setIsStorageActive(false);

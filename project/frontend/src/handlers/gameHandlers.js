@@ -126,7 +126,7 @@ export const useGameHandlers = (roomId, setGameState, joinSession) => {
               heldAcorns: 0,
               isGameOver: true,
               gameOverReason: 'acorns',
-              winner: prev.evilSquirrel ? 'bad' : 'good',
+              winner: 'good',
               timerRunning: false,
               isStarted: false
             }));setTimeout(() => {

@@ -98,7 +98,7 @@ const GameOverScreen = () => {
 
   const getMessage = () => {
     if (gameState.gameOverReason === 'acorns') {
-      return gameState.evilSquirrel 
+      return gameState.goodSquirrel 
         ? "도토리를 모두 모으지 못했습니다!\n나쁜 다람쥐 승리!" 
         : "도토리를 모두 모았습니다!\n착한 다람쥐 승리!";
     }
