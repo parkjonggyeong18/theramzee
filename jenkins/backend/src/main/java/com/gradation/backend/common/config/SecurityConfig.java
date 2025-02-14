@@ -98,7 +98,6 @@ public class SecurityConfig {
                         .requestMatchers("https://ramzee.online/api/v1/**","/api/v1/**", "/swagger-ui/**", "/v3/api-docs/**","/api-docs/**","/ws/**", "/user/**","/swagger-ui.html","/game-socket","/wss/**").permitAll() // 인증 없이 접근 가능 경로
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
-                .csrf(csrf -> csrf.disable())
                 // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 앞에 추가
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
