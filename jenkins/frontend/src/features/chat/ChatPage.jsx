@@ -27,7 +27,7 @@ const ChatPage = ({ receiver }) => {
     if (!accessToken) return;
 
     const stompClient = new Client({
-      brokerURL: 'ws://localhost:8080/ws', // WebSocket 서버 URL
+      brokerURL: 'wss://ramzee.online/ws', // WebSocket 서버 URL
       connectHeaders: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -58,7 +58,7 @@ const ChatPage = ({ receiver }) => {
     if (!accessToken) return;
 
     const stompClient = new Client({
-      brokerURL: 'ws://localhost:8080/ws',
+      brokerURL: 'wss://ramzee.online/ws',
       connectHeaders: {
         Authorization: `Bearer ${accessToken}`,
       },

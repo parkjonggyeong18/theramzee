@@ -65,7 +65,7 @@ public class GameWebSocketController {
      * 게임 내에서 사용자가 이동할 때 호출됩니다.
      */
     @MessageMapping("/game/{roomId}/move")
-    @SendTo("/topic/game/{roomId}/move")
+    @SendToUser("/queue/game/{roomId}/move")
     public BaseResponse<MoveForestResponse> handleGameMove(@Payload GameMoveRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
         MoveForestResponse token = gameService.moveForest(request.getRoomId(), request.getNickname(), request.getNewForest());
         return BaseResponse.success("사용자 이동", token);
@@ -109,7 +109,7 @@ public class GameWebSocketController {
      * 사용자의 피로도를 충전할 때 호출됩니다.
      */
     @MessageMapping("/game/{roomId}/charge-fatigue")
-    @SendTo("/topic/game/{roomId}/charge-fatigue")
+    @SendToUser("/queue/game/{roomId}/charge-fatigue")
     public BaseResponse<IncrementUserFatigueResponse> handleChargeFatigue(@Payload chargeFatigueRequest request) {
         IncrementUserFatigueResponse result = gameService.incrementUserFatigue(request.getRoomId(), request.getNickname());
         return BaseResponse.success("피로도 충전 성공", result);

@@ -31,13 +31,27 @@ public class RedisConfig {
         return factory;
     }
 
+    @Bean(name = "redisConnectionFactory1")
+    public RedisConnectionFactory redisConnectionFactory1() {
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(host,port);
+        factory.setDatabase(1); // 1번 데이터베이스 설정
+        return factory;
+    }
+
+    @Bean(name = "redisConnectionFactory2")
+    public RedisConnectionFactory redisConnectionFactory2() {
+        LettuceConnectionFactory factory = new LettuceConnectionFactory(host,port);
+        factory.setDatabase(2);
+        return factory;
+    }
+
     /**
      * RedisTemplate Bean 정의.
      *
      * @return {@link RedisTemplate} 객체로, Redis와의 데이터 작업을 수행할 수 있습니다.
      */
     @Bean(name = "redisTemplate")
-    public RedisTemplate<String, Object> redisTemplate(@Qualifier("redisConnectionFactory") RedisConnectionFactory redisConnectionFactory) {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
         // RedisTemplate 생성 및 설정
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory);
@@ -51,15 +65,8 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean(name = "redisConnectionFactory1")
-    public RedisConnectionFactory redisConnectionFactory1() {
-        LettuceConnectionFactory factory = new LettuceConnectionFactory(host,port);
-        factory.setDatabase(1); // 1번 데이터베이스 설정
-        return factory;
-    }
-
     @Bean(name = "redisTemplate1")
-    public RedisTemplate<String, String> redisTemplate1(@Qualifier("redisConnectionFactory1") RedisConnectionFactory redisConnectionFactory1) {
+    public RedisTemplate<String, String> redisTemplate1(RedisConnectionFactory redisConnectionFactory1) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory1);
 
@@ -71,15 +78,8 @@ public class RedisConfig {
         return template;
     }
 
-    @Bean(name = "redisConnectionFactory2")
-    public RedisConnectionFactory redisConnectionFactory2() {
-        LettuceConnectionFactory factory = new LettuceConnectionFactory(host,port);
-        factory.setDatabase(2);
-        return factory;
-    }
-
     @Bean(name = "redisTemplate2")
-    public RedisTemplate<String, String> redisTemplate2(@Qualifier("redisConnectionFactory2") RedisConnectionFactory redisConnectionFactory2) {
+    public RedisTemplate<String, String> redisTemplate2(RedisConnectionFactory redisConnectionFactory2) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(redisConnectionFactory2);
 

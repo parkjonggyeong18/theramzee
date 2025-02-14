@@ -15,27 +15,34 @@ const RoomPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const loadRooms = async () => {
-      try {
-        const response = await fetchRooms();
-        setRooms(response.data);
-      } catch (err) {
-        setError('방 목록을 불러오는데 실패했습니다');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // 방 목록 불러오기 함수
+  const loadRooms = async () => {
+    setLoading(true);
+    try {
+      const response = await fetchRooms();
+      console.log('방 목록:', response);
+     
+      setRooms(response.data);
+      setError(null); // 이전 에러 메시지 초기화
+    } catch (err) {
+      setError('방 목록을 불러오는데 실패했습니다');
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // 컴포넌트 마운트 시 방 목록 불러오기
+  useEffect(() => {
     loadRooms();
     // 주기적으로 방 목록 업데이트
     const interval = setInterval(loadRooms, 500000);
     return () => clearInterval(interval);
   }, []);
 
-  const handleRoomCreated = async (title) => {
+  // 방 생성 처리
+  const handleRoomCreated = async (title, password) => {
     try {
-      const response = await createRoom(title);
+      const response = await createRoom(title, password);
       const roomId = response.data.roomId;
       const openViduToken = response.data.token;
       sessionStorage.setItem('openViduToken', openViduToken);
@@ -53,13 +60,13 @@ const RoomPage = () => {
         <Header>
           <Title>THE RAMZEE</Title>
           <ButtonGroup>
-          <CreateRoomButton onClick={() => setIsModalOpen(true)}>
-            방 만들기
-          </CreateRoomButton>
-          <LogoutButton onClick={handleLogout}>
+            <CreateRoomButton onClick={() => setIsModalOpen(true)}>
+              방 만들기
+            </CreateRoomButton>
+            <LogoutButton onClick={handleLogout}>
               로그아웃
             </LogoutButton>
-            </ButtonGroup>
+          </ButtonGroup>
         </Header>
 
         {error && <ErrorMessage>{error}</ErrorMessage>}
@@ -68,6 +75,7 @@ const RoomPage = () => {
           <LoadingMessage>방 목록을 불러오는 중...</LoadingMessage>
         ) : (
           <RoomListContainer>
+            <RefreshButtonComponent onClick={loadRooms} loading={loading} />
             <RoomList rooms={rooms} />
           </RoomListContainer>
         )}
@@ -84,12 +92,55 @@ const RoomPage = () => {
     </PageContainer>
   );
 };
+const RefreshIcon = styled.svg`
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  fill: lightgreen;
+  transition: transform 0.2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.2);
+  }
+`;
+
+const RefreshButtonComponent = ({ onClick, loading }) => (
+  <RefreshIcon
+    onClick={onClick}
+    disabled={loading}
+    viewBox="0 0 24 24"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <path d="M12 2a10 10 0 110 20 10 10 0 010-20zm0-2C5.373 0 .5 4.873.5 11S5.373 22 .5 22C17.627" />
+    <path d="M12 5v4l3-2-3-2zm6.364-1.364A9.956 9.956 0 0112 4a9.956 9.956 0 01-6.364-2.364L4.222-.222A11.96 11.96 0 0012 .5c6.627-.001-.5z" />
+    <path d="M15.293,8.707l1.414-1.414L12,3L8,7h3v4h4V8H15Z" />
+  </RefreshIcon>
+);
 
 const ButtonGroup = styled.div`
   display: flex;
   gap: 1rem;
 `;
+const RefreshButton = styled.button`
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 
+  &:hover span {
+    transform: scale(1.2);
+    transition: transform 0.2s ease-in-out;
+  }
+`;
+
+const Emoji = styled.span`
+  font-size: 1.5rem;
+  display: inline-block;
+  color: #ff6b6b;
+`;
 const LogoutButton = styled.button`
   background-color: #ff6b6b;
   color: white;
