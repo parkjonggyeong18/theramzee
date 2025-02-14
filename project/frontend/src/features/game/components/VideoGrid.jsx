@@ -16,10 +16,8 @@ const VideoGrid = (props) => {
   const subscribers = props.players || [];
   const totalSlots = props.totalSlots;
   
-  // 슬롯 배열 생성 (빈 슬롯은 null로 채움)
   const slots = Array.from({ length: totalSlots }, (_, i) => subscribers[i] || null);
 
-  // 죽은 플레이어 처리
   useEffect(() => {
     if (gameState.isDead && !showDeadOverlay) {
       setShowDeadOverlay(true);
@@ -48,6 +46,19 @@ const VideoGrid = (props) => {
     });
   }, [slots]);
 
+  const getPlayerInfo = (sub) => {
+    let playerNickname = '';
+    try {
+      const rawData = sub?.stream?.connection?.data.split("%/%")[0];
+      const playerData = JSON.parse(rawData);
+      playerNickname = playerData.clientData;
+    } catch (error) {
+      console.error("Error extracting nickname:", error);
+    }
+    const isPlayerDead = gameState.killedPlayers?.includes(playerNickname);
+    return { playerNickname, isPlayerDead };
+  };
+
   if (!session) {
     return <GridContainer>Loading...</GridContainer>;
   }
@@ -56,19 +67,7 @@ const VideoGrid = (props) => {
     <GridContainer>
       {slots.map((sub, idx) => {
         const connectionId = sub?.stream?.connection?.connectionId;
-        
-        // 플레이어 닉네임 추출
-        let playerNickname = '';
-        try {
-          const rawData = sub?.stream?.connection?.data.split("%/%")[0];
-          const playerData = JSON.parse(rawData);
-          playerNickname = playerData.clientData;
-        } catch (error) {
-          console.error("Error extracting nickname:", error);
-        }
-
-        // 플레이어가 죽었는지 확인
-        const isPlayerDead = gameState.killedPlayers?.includes(playerNickname);
+        const { playerNickname, isPlayerDead } = getPlayerInfo(sub);
 
         return (
           <VideoContainer
@@ -91,6 +90,9 @@ const VideoGrid = (props) => {
                   autoPlay
                   $isDead={isPlayerDead}
                 />
+                {killingPlayer === playerNickname && (
+                  <KillAnimation onAnimationEnd={() => setShowDeadOverlay(true)} />
+                )}
                 {isPlayerDead && <DeadIndicator>💀</DeadIndicator>}
                 <PlayerName>{playerNickname}</PlayerName>
               </>
@@ -105,8 +107,9 @@ const VideoGrid = (props) => {
         );
       })}
 
-      {killingPlayer && <KillAnimation onAnimationEnd={() => setShowDeadOverlay(true)} />}
-      {showDeadOverlay && gameState.isDead && <DeadOverlay playerName={gameState.nickName} />}
+      {showDeadOverlay && gameState.isDead && (
+        <DeadOverlay playerName={gameState.nickName} />
+      )}
     </GridContainer>
   );
 };

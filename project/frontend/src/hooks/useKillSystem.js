@@ -31,7 +31,7 @@ export const useKillSystem = () => {
     const dragTime = Date.now() - dragStart.timestamp;
 
     // 50px 이상 아래로 드래그하고, 드래그 시간이 200ms 이상일 때
-    if (dragDistance > 50 && dragTime > 200) {
+    if (dragDistance > 5 && dragTime > 200) {
       // 킬 애니메이션 시작
       startKillAnimation(dragStart.playerId);
       setDragStart(null);
