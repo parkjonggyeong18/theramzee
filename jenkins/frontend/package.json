@@ -1,8 +1,8 @@
 {
   "name": "frontend",
+  "homepage": ".",
   "version": "0.1.0",
   "private": true,
-  "homepage": ".",
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -53,6 +53,5 @@
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@stomp/stompjs": "^7.0.0",
     "sockjs-client": "^1.6.1"
-  },
-
+  }
 }
