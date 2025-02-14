@@ -87,7 +87,7 @@ export const GameProvider = ({ children }) => {
   // ]);
   
   const [roomId, setRoomId] = useState(null);
-  const [players, setPlayers] = useState(['a', 'b', 'c', 'd', 'e']);
+  const [players, setPlayers] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
   const nickname = sessionStorage.getItem('nickName');
 

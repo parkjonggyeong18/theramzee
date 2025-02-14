@@ -2,15 +2,25 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../../../contexts/GameContext';
+import { useOpenVidu } from '../../../contexts/OpenViduContext';
 import styled from 'styled-components';
   // ✅ roomId 가져오기
 
 const GameOverScreen = () => {
   const navigate = useNavigate();
   const { gameState, roomId } = useGame();
+  const {
+    joinSession,
+    leaveSession,
+  } = useOpenVidu();
+  const token = sessionStorage.getItem('openViduToken');
+  const nickname = sessionStorage.getItem('nickName')
   console.log("🔴 GameOverScreen Rendered!", gameState);
 
   const handleExit = () => {
+    leaveSession();
+    joinSession(token, nickname)
+
     if (roomId) {
       setTimeout(() => {
         window.location.href = `/room/${roomId}/game`;  // ✅ 새로고침 후 방으로 이동
