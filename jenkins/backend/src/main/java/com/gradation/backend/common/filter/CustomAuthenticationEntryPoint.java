@@ -16,7 +16,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
         // 이메일 전송 API 경로는 인증하지 않음
-        if (request.getRequestURI().startsWith("/api/v1/email/")) {
+        if (request.getRequestURI().startsWith("/api/v1/email")) {
             response.setStatus(HttpServletResponse.SC_OK); // 인증 없이 처리하려면 OK 응답으로 설정
             return;
         }

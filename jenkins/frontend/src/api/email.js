@@ -12,6 +12,7 @@ export const findUsername = async (email) => {
 
 // 이메일 인증번호 전송
 export const sendEmailVerification = async (email) => {
+  console.log('이메일 전송 요청:', email);
   return await apiRequest('/api/v1/email/email-send', 'POST', { email }, false);
 };
 
