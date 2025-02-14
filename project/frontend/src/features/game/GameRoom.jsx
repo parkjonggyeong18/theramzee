@@ -36,7 +36,8 @@ const GameRoom = () => {
   const {
     joinSession,
     subscribers,
-    leaveSession
+    leaveSession,
+    initPreview
   } = useOpenVidu();
 
 
@@ -95,6 +96,7 @@ const GameRoom = () => {
     disconnectSocket();
     leaveRoom(roomId);
     leaveSession();
+    initPreview();
     navigate('/rooms');
   };
 
