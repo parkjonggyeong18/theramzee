@@ -35,11 +35,12 @@ const GameRoom = () => {
 
   const {
     joinSession,
+    subscribers,
   } = useOpenVidu();
 
 
   const { roomId } = useParams();  // roomId 가져오기
-  const handlers = useGameHandlers(roomId, gameState, setGameState, joinSession);
+  const handlers = useGameHandlers(roomId, setGameState, joinSession);
   const isSubscribed = useRef(false); // 중복 실행 방지 플래그
 
   useEffect(() => {
@@ -70,7 +71,7 @@ const GameRoom = () => {
             setShowRoleReveal(true); // 역할 공개 화면 활성화
           });
           subscribeToTopic(`/topic/game/${roomId}/emergency`, handlers.handleEmergencyResponse);
-          subscribeToTopic(`/user/queue/game/${roomId}/move`, handlers.handleMoveResponse);
+          subscribeToTopic(`/topic/game/${roomId}/move`, handlers.handleMoveResponse);
           subscribeToTopic(`/topic/game/${roomId}/save-acorns`, handlers.handleSaveAcornsResponse);
           subscribeToTopic(`/user/queue/game/${roomId}/charge-fatigue`, handlers.handleChargeFatigueResponse);
           subscribeToTopic(`/topic/game/${roomId}/kill`, handlers.handleKillResponse);
@@ -95,10 +96,18 @@ const GameRoom = () => {
     navigate('/rooms');
   };
 
+  const leftCam = subscribers.slice(0, 3);
+  console.log("leftPlayers:", leftCam);
+  const rightCam = subscribers.slice(3, 7);
+  console.log("rightPlayers:", rightCam);
+
+
   // GameLayout에 전달할 컴포넌트들
   const gameLayoutProps = {
-    leftVideoGrid: <VideoGrid players={players} gridPosition="left" />,
-    // rightVideoGrid: <VideoGrid players={players} gridPosition="right" />,
+      
+    leftVideoGrid: <VideoGrid players={leftCam} totalSlots={3} gridPosition="left" />,
+    rightVideoGrid: <VideoGrid players={rightCam} totalSlots={2} gridPosition="right" />,
+
     gameTimer: <GameTimer />,
     statePanel: <StatePanel />,
     buttonContainer: (
