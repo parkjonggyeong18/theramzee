@@ -1,4 +1,5 @@
 import { apiRequest } from './apiService';
+import axios from "axios";
 
 // 비밀번호 초기화
 export const resetPassword = async (email) => {
@@ -12,7 +13,7 @@ export const findUsername = async (email) => {
 
 // 이메일 인증번호 전송
 export const sendEmailVerification = async (email) => {
-  return await apiRequest('/api/v1/email/email-send', 'POST', { email }, false);
+  return axios('/api/v1/email/email-send', 'POST', {email});
 };
 
 // 이메일 인증번호 검증
