@@ -52,8 +52,8 @@ services:
     container_name: theramzee-frontend-1 # 컨테이너 이름 명시적으로 지정 (선택 사항, 권장)
     #ports:
     #  - "3000:80"
-    #volumes:
-    #  - ./build:/usr/share/nginx/html
+    volumes:
+      - frontend-static:/usr/share/nginx/html
     depends_on:
       - backend
     restart: unless-stopped
@@ -72,6 +72,7 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt
       #- ./certbot/conf:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
+      - frontend-static:/usr/share/nginx/html
     depends_on:
       - frontend
       - backend
@@ -82,6 +83,7 @@ services:
 volumes:
   theramzee-mysql-data: # 명명된 볼륨 정의 (MySQL)
   theramzee-redis-data: # 명명된 볼륨 정의 (Redis)
+  frontend-static:
 
 networks:
   theramzee-network: # theramzee-network 네트워크 정의
