@@ -52,6 +52,8 @@ const MiniMap = () => {
    if (!gameState.isStarted && gameState.isDead) return;
    if (!gameState.roomId) return;
    moveForest(forestNum);
+   console.log('🌲 숲 이동:', gameState.heldAcorns);
+   console.log('시이발', gameState.forestUsers)
    navigate(`/game/${gameState.roomId}/forest/${forestId}`);
  };
 

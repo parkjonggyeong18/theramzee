@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
+import { useOpenVidu } from '../../../contexts/OpenViduContext';
 import { backgroundImages, characterImages } from '../../../assets/images';
 import GameLayout from '../components/common/GameLayout';
 import { useNavigate } from 'react-router-dom';
@@ -18,6 +19,34 @@ import VoteScreen from '../components/vote/VoteScreen';
 const MainForest = () => {
   const { gameState, players, startEmergencyVote, endVote,resetGame } = useGame();
   const navigate = useNavigate();
+
+      const {
+        joinSession,
+        subscribers,
+      } = useOpenVidu();
+     
+      // 현재 사용자가 위치한 숲 번호 가져오기
+      const currentForestNum = gameState.forestNum;
+      const currentForestUser = gameState.forestUsers?.[currentForestNum]; // 배열열
+    
+      const filteredSubscribers = subscribers.filter(sub => {
+        try {
+            // 🔥 JSON 데이터와 추가 문자열(`%/%닉네임`) 분리
+            const rawData = sub.stream.connection.data.split("%/%")[0]; 
+            const subData = JSON.parse(rawData); // {"clientData": "test1"}
+            const subscriberNickname = subData.clientData;
+    
+            // 🔥 현재 숲에 속한 유저(`currentForestUser`)와 일치하는 경우만 필터링
+            return currentForestUser.includes(subscriberNickname);
+        } catch (error) {
+            console.error("🚨 OpenVidu 데이터 파싱 오류:", error);
+            return false; // 파싱 실패한 경우 필터링에서 제외
+        }
+    });
+  
+    const leftFilterCam = filteredSubscribers.slice(0, 3);
+    const rightFilterCam = filteredSubscribers.slice(3, 7);
+   
 
   // useEffect(() => {
   //   console.log("✅ 킬된 플레이어 목록 업데이트됨:", gameState.killedPlayers);
@@ -57,8 +86,8 @@ const MainForest = () => {
 
   const gameLayoutProps = {
     // 기본 레이아웃 요소
-    leftVideoGrid: <VideoGrid players={players} gridPosition="left" />,
-    // rightVideoGrid: <VideoGrid players={players} gridPosition="right" />,
+    leftVideoGrid: <VideoGrid players={leftFilterCam} totalSlots={3} gridPosition="left" />,
+    rightVideoGrid: <VideoGrid players={rightFilterCam} totalSlots={2} gridPosition="right" />,
     gameTimer: <GameTimer />,
     statePanel: <StatePanel />,
     myVideo: <MyVideo />,

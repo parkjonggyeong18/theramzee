@@ -40,7 +40,7 @@ const GameRoom = () => {
 
 
   const { roomId } = useParams();  // roomId 가져오기
-  const handlers = useGameHandlers(roomId, gameState, setGameState, joinSession);
+  const handlers = useGameHandlers(roomId, setGameState, joinSession);
   const isSubscribed = useRef(false); // 중복 실행 방지 플래그
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const GameRoom = () => {
             setShowRoleReveal(true); // 역할 공개 화면 활성화
           });
           subscribeToTopic(`/topic/game/${roomId}/emergency`, handlers.handleEmergencyResponse);
-          subscribeToTopic(`/user/queue/game/${roomId}/move`, handlers.handleMoveResponse);
+          subscribeToTopic(`/topic/game/${roomId}/move`, handlers.handleMoveResponse);
           subscribeToTopic(`/topic/game/${roomId}/save-acorns`, handlers.handleSaveAcornsResponse);
           subscribeToTopic(`/user/queue/game/${roomId}/charge-fatigue`, handlers.handleChargeFatigueResponse);
           subscribeToTopic(`/topic/game/${roomId}/kill`, handlers.handleKillResponse);

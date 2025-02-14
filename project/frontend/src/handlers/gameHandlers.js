@@ -1,9 +1,10 @@
 import { useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
+import { useGame } from '../contexts/GameContext';
 
-export const useGameHandlers = (roomId, gameState, setGameState, joinSession) => {
+export const useGameHandlers = (roomId, setGameState, joinSession) => {
+  const { gameState } = useGame();
   
-
   const nickName = sessionStorage.getItem('nickName');
   const navigate = useNavigate();
 
@@ -20,6 +21,7 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
           const initializedData = message.data;
           const userKey = `ROOM:${roomId}:USER:${nickName}`;
           console.log("게임 초기화 성공:", initializedData.users[userKey]);
+          console.log("게임 초기화 성공:", initializedData);
 
           setGameState((prev) => ({
             ...prev,
@@ -27,6 +29,7 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
             timerRunning: true,
             evilSquirrel: initializedData.users[userKey].evilSquirrel,
             forestToken: initializedData.users[userKey].forestToken,
+            forestUsers: initializedData.forestUsers,
           }));
         } else {
           console.error("Game initialization failed:", message.errorCode);
@@ -52,6 +55,8 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
           setGameState((prev) => ({
             ...prev,
             forestToken: initializedData[nickName],
+            foresetNum: initializedData.forestNum,
+            forestUsers: initializedData.forestUsers,
             timerRunning: false,
             isVoting: true, 
             isEmergencyVote: true,
@@ -72,10 +77,9 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
   const handleMoveResponse = useCallback(
     async (message) => {
       try {
-        console.log("숲 이동 응답:", message);
 
         
-        if (message.success && message.data['nickname'] === nickName) {
+        if (message.success) {
           const initializedData = message.data;
           console.log("숲 이동 성공:", initializedData);
 
@@ -83,11 +87,18 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
 
           setGameState((prev) => ({
             ...prev,
-            forestToken: initializedData.forestToken,
-            foresetNum: initializedData.forestNum,
             forestUsers: initializedData.forestUsers,
-
           }));
+          console.log("숲 이동 성공:", initializedData.forestNum);
+          if (message.data['nickname'] === nickName) {
+            console.log("숲 이동 성공:", initializedData.forestNum);
+            setGameState((prev) => ({
+              ...prev,
+              forestToken: initializedData.forestToken,
+              forestNum: initializedData.forestNum,
+            }));
+          }
+          // console.log("숲 이동 성공:", forestUsers);
         } else {
           console.error("Game initialization failed:", message.errorCode);
         }
@@ -149,7 +160,11 @@ export const useGameHandlers = (roomId, gameState, setGameState, joinSession) =>
         if (message.success && message.data['nickname'] === nickName) {
           const initializedData = message.data;
           console.log("피로도 충전 성공:", initializedData);
-
+          console.log("rhkjdfkjlkajs;ldkfj;lksadjf", gameState.forestUsers);
+          console.log("안되나??")
+          console.log("aaaaaaaa", gameState.fatigue);
+          console.log('bbbbbbbb', gameState);
+          console.log('CCCCCCCC', gameState.heldAcorns);
           setGameState((prev) => ({
             ...prev,
             fatigue: initializedData.userFatigue

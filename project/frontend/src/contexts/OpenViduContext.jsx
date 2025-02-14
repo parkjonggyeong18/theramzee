@@ -61,21 +61,10 @@ export const OpenViduProvider = ({ children }) => {
   
     // ✅ 중복된 subscriber 추가 방지
     newSession.on('streamCreated', (event) => {
-<<<<<<< HEAD
       console.log('New stream created:', event.stream);
       const subscriber = newSession.subscribe(event.stream, undefined);
       console.log('New stream created:', subscriber);
       setSubscribers((prev) => [...prev, subscriber]);
-=======
-      const connectionId = event.stream.connection.connectionId;
-      
-      setSubscribers((prev) => {
-        const alreadyExists = prev.some(sub => sub.stream.connection.connectionId === connectionId);
-        if (alreadyExists) return prev; // 중복 방지
-        const subscriber = newSession.subscribe(event.stream, undefined);
-        return [...prev, subscriber];
-      });
->>>>>>> develop
     });
   
     newSession.on('streamDestroyed', (event) => {

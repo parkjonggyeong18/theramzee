@@ -13,7 +13,7 @@ export const GameProvider = ({ children }) => {
     nickName: null,
 
     // 숲 별 유저 정보
-    forestUsers: {},
+    forestUsers: null,
 
     // 게임 진행 상태
     isStarted: false, // 게임 시작 여부
@@ -21,7 +21,7 @@ export const GameProvider = ({ children }) => {
     timerRunning: false,    // 타이머 실행 상태
     evilSquirrel: null, // true | false
     forestToken: null,  // 숲 토큰
-    currentForestNum: 1, // 현재 숲 번호 (초기는 메인 숲숲)
+    forestNum: 1, // 현재 숲 번호 (초기는 메인 숲숲)
 
     // 게임 리소스
     totalAcorns: 0, // 저장된 도토리
@@ -253,7 +253,15 @@ export const GameProvider = ({ children }) => {
   const moveForest = useCallback(async (forestNum) => {
     const nicknameList = players.map(player => player.nickName);
     if (isConnected && roomId && nickname && forestNum && nicknameList) {
+      console.log("여기까지1");
+      console.log(roomId, nickname, forestNum, nicknameList);
       try {
+        // ✅ 최신 nicknames 값을 받아오기
+        const updatedNicknames = await getPlayers();
+
+        // ✅ nickName 값만 추출하여 배열 형태로 변환
+        const nicknameList = updatedNicknames.map(player => player.nickName);
+
         await gameService.moveForest(roomId, nickname, forestNum, nicknameList);
         setGameState.currentForestNum = forestNum;
       } catch (error) {

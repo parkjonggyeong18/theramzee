@@ -13,7 +13,6 @@ const VideoGrid = (props) => {
   // subscribers 배열의 길이가 totalSlots보다 작으면, 나머지는 null로 채워진 슬롯 배열 생성
   const slots = Array.from({ length: totalSlots }, (_, i) => subscribers[i] || null);
 
-<<<<<<< HEAD
 
   useEffect(() => {
     // 각 슬롯에서 subscriber가 존재하고, 내부 속성이 준비되었을 때 ref 초기화
@@ -22,34 +21,10 @@ const VideoGrid = (props) => {
         const connectionId = player.stream.connection.connectionId;
         if (!videoRefs.current[connectionId]) {
           videoRefs.current[connectionId] = React.createRef();
-=======
-const VideoGrid = () => {
-  const { subscribers } = useOpenVidu();
-  const videoRefs = useRef({}); // ✅ 비디오 요소 저장
-  const prevSubscribers = useRef(new Map()); // ✅ connectionId 기반 중복 체크
-
-  useEffect(() => {
-    subscribers.forEach((sub) => {
-      const connectionId = sub.stream.connection.connectionId;
-      
-      // ✅ 새로운 subscriber인 경우만 videoRefs 초기화
-      if (!videoRefs.current[connectionId]) {
-        videoRefs.current[connectionId] = React.createRef();
-      }
-
-      // ✅ 중복 등록 방지
-      if (!prevSubscribers.current.has(connectionId)) {
-        const videoElement = videoRefs.current[connectionId]?.current;
-        if (videoElement) {
-          console.log("📌 Assigning video element for", connectionId);
-          sub.addVideoElement(videoElement);
-          prevSubscribers.current.set(connectionId, sub); // ✅ 등록된 subscriber 저장
->>>>>>> develop
         }
       }
     });
 
-<<<<<<< HEAD
     // 각 슬롯에서 subscriber가 존재하면, video 요소에 스트림을 할당
     slots.forEach((player) => {
       if (player?.stream?.connection?.connectionId) {
@@ -101,25 +76,6 @@ const VideoGrid = () => {
           </VideoContainer>
         );
       })}
-=======
-  }, [subscribers]); // ✅ subscribers가 변경될 때만 실행
-
-  return (
-    <GridContainer>
-      {subscribers.map((sub) => (
-        <VideoContainer key={sub.stream.connection.connectionId}>
-          <StyledVideo
-            ref={(el) => {
-              const connectionId = sub.stream.connection.connectionId;
-              if (el) {
-                videoRefs.current[connectionId] = { current: el };
-              }
-            }}
-            autoPlay
-          />
-        </VideoContainer>
-      ))}
->>>>>>> develop
     </GridContainer>
   );
 };
