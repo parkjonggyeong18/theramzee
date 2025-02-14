@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../../contexts/GameContext';
+import { useOpenVidu } from '../../contexts/OpenViduContext';
 import { backgroundImages, characterImages } from '../../assets/images';
 import { connectSocket, disconnectSocket } from '../../api/stomp';
 import { useGameHandlers } from '../../handlers/gameHandlers';
 import { subscribeToTopic } from '../../api/stomp';
-
+import { leaveRoom } from '../../api/room';
 // 공통 레이아웃 import
 import GameLayout from './components/common/GameLayout';
 import RoleReveal from './components/RoleReveal';
@@ -32,8 +33,13 @@ const GameRoom = () => {
     setGameState,
   } = useGame();
 
+  const {
+    joinSession,
+  } = useOpenVidu();
+
+
   const { roomId } = useParams();  // roomId 가져오기
-  const handlers = useGameHandlers(roomId, gameState, setGameState);
+  const handlers = useGameHandlers(roomId, gameState, setGameState, joinSession);
   const isSubscribed = useRef(false); // 중복 실행 방지 플래그
 
   useEffect(() => {
@@ -64,11 +70,12 @@ const GameRoom = () => {
             setShowRoleReveal(true); // 역할 공개 화면 활성화
           });
           subscribeToTopic(`/topic/game/${roomId}/emergency`, handlers.handleEmergencyResponse);
-          subscribeToTopic(`/topic/game/${roomId}/move`, handlers.handleMoveResponse);
+          subscribeToTopic(`/user/queue/game/${roomId}/move`, handlers.handleMoveResponse);
           subscribeToTopic(`/topic/game/${roomId}/save-acorns`, handlers.handleSaveAcornsResponse);
-          subscribeToTopic(`/topic/game/${roomId}/charge-fatigue`, handlers.handleChargeFatigueResponse);
+          subscribeToTopic(`/user/queue/game/${roomId}/charge-fatigue`, handlers.handleChargeFatigueResponse);
           subscribeToTopic(`/topic/game/${roomId}/kill`, handlers.handleKillResponse);
           subscribeToTopic(`/topic/game/${roomId}/complete-mission`, handlers.handleCompleteMissionResponse);
+          subscribeToTopic(`/topic/game/${roomId}/out`, handlers.handleOutResponse);
         }, 100);
       } catch (error) {
         console.error("⚠️ Failed to connect or subscribe:", error);
@@ -84,13 +91,14 @@ const GameRoom = () => {
 
   const clkExit = () => {
     disconnectSocket();
-    navigate('/lobby');
+    leaveRoom(roomId);
+    navigate('/rooms');
   };
 
   // GameLayout에 전달할 컴포넌트들
   const gameLayoutProps = {
     leftVideoGrid: <VideoGrid players={players} gridPosition="left" />,
-    rightVideoGrid: <VideoGrid players={players} gridPosition="right" />,
+    // rightVideoGrid: <VideoGrid players={players} gridPosition="right" />,
     gameTimer: <GameTimer />,
     statePanel: <StatePanel />,
     buttonContainer: (

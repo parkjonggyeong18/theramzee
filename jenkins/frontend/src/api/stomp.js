@@ -2,7 +2,7 @@ import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 //npm install --save-dev @babel/plugin-proposal-private-property-in-object 이것도 깔아라!
 
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://ramzee.online/api';
 
 let stompClient = null;
 
