@@ -85,5 +85,6 @@ export const apiRequest = async (url, method, data = null, requiresAuth = true) 
         
         throw error;
     }
-    
+
+
 };
