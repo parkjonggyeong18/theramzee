@@ -3,50 +3,26 @@ package com.gradation.backend.game.service;
 import com.gradation.backend.game.model.response.*;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.parameters.P;
+import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.lang.reflect.Field;
+import java.util.*;
 
 public interface GameService {
 
-    /**
-     * 방 정보 조회
-     *
-     * @param roomId 조회할 방의 Id
-     * @return 방의 전체 정보를 담은 RoomInfoResponseDto
-     */
     RoomInfoResponse getRoomInformation(int roomId);
 
-    /**
-     * 방 초기화 (시작하기 클릭 시)
-     *
-     * @param roomId 해당 방의 Id
-     * @param nicknames 모든 참가자의 닉네임
-     * @return 방의 전체 정보를 담은 RoomInitializationResponse 객체
-     */
     RoomInitializationResponse initializeRoomStructure(int roomId, List<String> nicknames)
             throws OpenViduJavaClientException, OpenViduHttpException;
 
-    /**
-     * 긴급 상황 처리
-     *
-     * @param roomId 해당 방의 Id
-     * @param nicknames 모든 참가자의 닉네임
-     * @return 모든 사용자의 닉네임과 새로운 토큰 값을 담은 EmergencyResponse 객체
-     */
-    EmergencyResponse emergency(int roomId, List<String> nicknames)
-            throws OpenViduJavaClientException, OpenViduHttpException;
+    EmergencyResponse emergency(int roomId, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException;
 
-    /**
-     * 특정 유저가 특정 숲으로 이동
-     *
-     * @param roomId 해당 방의 Id
-     * @param nickname 유저 닉네임
-     * @param newForest 새로운 forestToken 값
-     * @return MoveForestResponse 객체 (유저 닉네임과 새로운 forestToken)
-     */
-    MoveForestResponse moveForest(int roomId, String nickname, int newForest)
-            throws OpenViduJavaClientException, OpenViduHttpException;
-
+    MoveForestResponse moveForest(int roomId, String nickname, int newForest, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException;
     /**
      * 특정 유저의 도토리를 공용 저장소에 저장하고 초기화
      *
@@ -86,3 +62,5 @@ public interface GameService {
      */
     CompleteMissionResponse completeMission(int roomId, int forestNum, int missionNum, String nickname);
 }
+
+

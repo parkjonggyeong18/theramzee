@@ -51,8 +51,6 @@ dependencies {
 	implementation 'io.jsonwebtoken:jjwt:0.9.1'
 	//openvidu
 	implementation "io.openvidu:openvidu-java-client:2.31.0"
-	//validator
-	implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 }
 
 tasks.named('test') {

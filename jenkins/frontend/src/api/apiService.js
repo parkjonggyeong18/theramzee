@@ -1,23 +1,17 @@
 import axios from 'axios';
 
 // API 기본 URL
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://ramzee.online';
+const BASE_URL = 'https://ramzee.online';
 
 // 토큰 갱신 함수
 export const refreshToken = async () => {
     try {
         const expiredAccessToken = sessionStorage.getItem('accessToken'); // 만료된 Access Token
-        if (expiredAccessToken) {
-            const response = await axios.post(`${BASE_URL}/api/v1/auth/refresh-token`, null, {
-                headers: {
-                    Authorization: `Bearer ${expiredAccessToken}`, // 만료된 토큰 전달
-                },
-            });
-        } else {
-            const response = await axios.post(`${BASE_URL}/api/v1/auth/refresh-token`, null
-                );
-        }
-
+        const response = await axios.post(`${BASE_URL}/api/v1/auth/refresh-token`, 'POST', {
+            headers: {
+                Authorization: `Bearer ${expiredAccessToken}`, // 만료된 토큰 전달
+            },
+        });
         console.log('토큰 갱신 요청 성공:', response.data.data.accessToken);
         // 새 토큰 저장
         sessionStorage.setItem('accessToken', response.data.data.accessToken);

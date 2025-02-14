@@ -15,11 +15,12 @@ import TimeForest from '../features/game/forests/TimeForest';
 import ChatPage from '../features/chat/ChatPage';
 import FriendPage from '../features/friend/FriendPage';
 import RegisterPage from '../features/auth/RegisterPage';
-
+import BackgroundMusic from '../features/audio/BackgroundMusic';
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
+       <BackgroundMusic />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />

@@ -40,10 +40,13 @@ public class OpenViduServiceImpl implements OpenViduService {
     }
 
     /**
-     * 세션에 참여하기 위한 토큰 생성
+     * 토큰 생성
      *
      * @param sessionId 세션 ID
-     * @return 생성된 토큰
+     * @param nickname  사용자 닉네임
+     * @return
+     * @throws OpenViduJavaClientException
+     * @throws OpenViduHttpException
      */
     public String generateToken(String sessionId, String nickname) throws OpenViduJavaClientException, OpenViduHttpException {
         Session session = openVidu.getActiveSession(sessionId);
@@ -55,6 +58,7 @@ public class OpenViduServiceImpl implements OpenViduService {
         ConnectionProperties connectionProperties = new ConnectionProperties.Builder()
                 .type(ConnectionType.WEBRTC)
                 .role(OpenViduRole.PUBLISHER) // 동영상 전송과 스트림
+                .data(nickname)
                 .kurentoOptions(
                         new KurentoOptions.Builder()
                                 .allowedFilters(new String[]{"GStreamerFilter", "FaceOverlayFilter"})
