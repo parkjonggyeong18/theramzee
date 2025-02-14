@@ -34,7 +34,7 @@ const FriendPage = () => {
     if (!accessToken) return;
 
     const stompClient = new Client({
-      brokerURL: 'ws://localhost:8080/ws',
+      brokerURL: 'wss://ramzee.online/ws',
       connectHeaders: { Authorization: `Bearer ${accessToken}` },
       onConnect: () => {
         console.log('Connected to WebSocket');
