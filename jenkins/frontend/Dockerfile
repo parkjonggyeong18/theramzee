@@ -9,7 +9,8 @@ RUN ls -al /app/build
 
 FROM nginx:alpine
 RUN mkdir -p /usr/share/nginx/html
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=murhyun2/theramzee-frontend:latest /usr/share/nginx/html /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/nginx.conf
 RUN ls -al /usr/share/nginx/html
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
