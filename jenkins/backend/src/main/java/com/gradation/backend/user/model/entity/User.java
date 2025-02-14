@@ -40,7 +40,7 @@ public class User{
     private Boolean userStatus;
 
     @ManyToOne
-    @JoinColumn(name = "room_id", foreignKey = @ForeignKey(name = "FK_User_Room"), columnDefinition = "INT UNSIGNED")
+    @JoinColumn(name = "room_id", foreignKey = @ForeignKey(name = "fk_user_room"), columnDefinition = "INT UNSIGNED")
     private Room room;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
