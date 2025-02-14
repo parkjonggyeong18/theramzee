@@ -48,21 +48,18 @@ const MiniMap = () => {
  ];
 
  const clkForest = (forestId, forestNum) => {
-   // 죽었을 때도 관전은 가능하도록 함
-   if (!gameState.isStarted && gameState.isDead) return;
-   if (!gameState.roomId) return;
-   moveForest(forestNum);
-   console.log('🌲 숲 이동:', gameState.heldAcorns);
-   console.log('시이발', gameState.forestUsers)
-   navigate(`/game/${gameState.roomId}/forest/${forestId}`);
- };
+  if (!gameState.isStarted || gameState.isDead) return;
+  if (!gameState.roomId) return;
+  moveForest(forestNum);
+  navigate(`/game/${gameState.roomId}/forest/${forestId}`);
+};
 
- const clkMainForest = () => {
-   if (!gameState.isStarted && gameState.isDead) return;
-   if (!gameState.roomId) return;
-   moveForest(1);
-   navigate(`/game/${gameState.roomId}/main`);
- };
+const clkMainForest = () => {
+  if (!gameState.isStarted || gameState.isDead) return;
+  if (!gameState.roomId) return;
+  moveForest(1);
+  navigate(`/game/${gameState.roomId}/main`);
+};
 
  return (
   <MapContainer>
