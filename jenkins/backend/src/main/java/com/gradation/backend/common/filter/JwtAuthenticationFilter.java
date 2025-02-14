@@ -52,10 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        if (request.getRequestURI().startsWith("/api/v1/email")) {
-            chain.doFilter(request, response); // 인증을 건너뛰고 필터 체인 계속 진행
-            return;
-        }
 
         final String authorizationHeader = request.getHeader("Authorization");
         String username = null;

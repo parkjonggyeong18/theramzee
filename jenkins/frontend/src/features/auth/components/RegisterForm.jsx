@@ -66,7 +66,6 @@ const RegisterForm = ({ onRegister, loading }) => {
     }
 
     try {
-      console.log(formData.email);
       await sendEmailVerification(formData.email);
       setIsEmailSent(true);
       setEmailTimer(180);

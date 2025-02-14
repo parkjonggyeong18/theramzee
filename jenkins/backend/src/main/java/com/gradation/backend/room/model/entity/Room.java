@@ -29,7 +29,7 @@ public class Room {
     private Boolean gameStatus;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "host_id", foreignKey = @ForeignKey(name = "fk_user_name"), nullable = false, columnDefinition = "INT UNSIGNED")
+    @JoinColumn(name = "host_id", foreignKey = @ForeignKey(name = "FK_user_name"), nullable = false, columnDefinition = "INT UNSIGNED")
     private User host;
 
     @OneToMany(mappedBy = "room", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, fetch = FetchType.LAZY)

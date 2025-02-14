@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-public class EmergencyResponse {
-    Map<Integer, List<String>> forestUsers;
-    private Map<String, String> userTokens;
+@NoArgsConstructor
+@AllArgsConstructor
+public class ForestUserResponse {
+    private Map<Integer, List<String>> forestUser;
 }
