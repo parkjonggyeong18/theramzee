@@ -1,49 +1,31 @@
 package com.gradation.backend.openvidu.service;
 
-import io.openvidu.java.client.*;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import io.openvidu.java.client.OpenViduHttpException;
+import io.openvidu.java.client.OpenViduJavaClientException;
+import io.openvidu.java.client.Session;
 
-@Service
-@RequiredArgsConstructor
-public class OpenViduService {
-
-    private final OpenVidu openVidu;
+public interface OpenViduService {
 
     /**
      * 새로운 세션 생성
      *
-     * @param sessionId 세션 ID (roomId 와 동일하게 사용)
+     * @param sessionId 세션 ID (roomId와 동일하게 사용)
      * @return 생성된 세션 객체
+     * @throws OpenViduJavaClientException OpenVidu 클라이언트 예외
+     * @throws OpenViduHttpException       OpenVidu HTTP 예외
      */
-    public Session createSession(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException {
-
-        Session session = openVidu.getActiveSession(sessionId);
-
-        if (session != null) {
-            return session;
-        }
-
-        SessionProperties properties = new SessionProperties.Builder()
-                .customSessionId(sessionId)
-                .mediaMode(MediaMode.ROUTED)
-                .recordingMode(RecordingMode.MANUAL)
-                .defaultRecordingProperties(new RecordingProperties.Builder()
-                        .outputMode(Recording.OutputMode.COMPOSED) // 또는 OutputMode.INDIVIDUAL
-                        .hasAudio(true)
-                        .hasVideo(true)
-                        .build())
-                .build();
-
-        return openVidu.createSession(properties);
-    }
+    Session createSession(String sessionId) throws OpenViduJavaClientException, OpenViduHttpException;
 
     /**
      * 세션에 참여하기 위한 토큰 생성
      *
      * @param sessionId 세션 ID
-     * @return 생성된 토큰
+     * @param nickname  사용자 닉네임
+     * @return 생성된 토큰 문자열
+     * @throws OpenViduJavaClientException OpenVidu 클라이언트 예외
+     * @throws OpenViduHttpException       OpenVidu HTTP 예외
      */
+<<<<<<< HEAD
     public String generateToken(String sessionId, String nickname) throws OpenViduJavaClientException, OpenViduHttpException {
         Session session = openVidu.getActiveSession(sessionId);
 
@@ -67,4 +49,7 @@ public class OpenViduService {
 
         return token;
     }
+=======
+    String generateToken(String sessionId, String nickname) throws OpenViduJavaClientException, OpenViduHttpException;
+>>>>>>> develop
 }

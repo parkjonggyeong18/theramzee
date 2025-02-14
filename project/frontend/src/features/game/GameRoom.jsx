@@ -7,7 +7,7 @@ import { backgroundImages, characterImages } from '../../assets/images';
 import { connectSocket, disconnectSocket } from '../../api/stomp';
 import { useGameHandlers } from '../../handlers/gameHandlers';
 import { subscribeToTopic } from '../../api/stomp';
-
+import { leaveRoom } from '../../api/room';
 // 공통 레이아웃 import
 import GameLayout from './components/common/GameLayout';
 import RoleReveal from './components/RoleReveal';
@@ -71,11 +71,12 @@ const GameRoom = () => {
             setShowRoleReveal(true); // 역할 공개 화면 활성화
           });
           subscribeToTopic(`/topic/game/${roomId}/emergency`, handlers.handleEmergencyResponse);
-          subscribeToTopic(`/topic/game/${roomId}/move`, handlers.handleMoveResponse);
+          subscribeToTopic(`/user/queue/game/${roomId}/move`, handlers.handleMoveResponse);
           subscribeToTopic(`/topic/game/${roomId}/save-acorns`, handlers.handleSaveAcornsResponse);
-          subscribeToTopic(`/topic/game/${roomId}/charge-fatigue`, handlers.handleChargeFatigueResponse);
+          subscribeToTopic(`/user/queue/game/${roomId}/charge-fatigue`, handlers.handleChargeFatigueResponse);
           subscribeToTopic(`/topic/game/${roomId}/kill`, handlers.handleKillResponse);
           subscribeToTopic(`/topic/game/${roomId}/complete-mission`, handlers.handleCompleteMissionResponse);
+          subscribeToTopic(`/topic/game/${roomId}/out`, handlers.handleOutResponse);
         }, 100);
       } catch (error) {
         console.error("⚠️ Failed to connect or subscribe:", error);
@@ -91,7 +92,8 @@ const GameRoom = () => {
 
   const clkExit = () => {
     disconnectSocket();
-    navigate('/lobby');
+    leaveRoom(roomId);
+    navigate('/rooms');
   };
 
   const leftCam = subscribers.slice(0, 3);

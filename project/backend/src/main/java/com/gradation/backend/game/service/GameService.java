@@ -1,10 +1,9 @@
 package com.gradation.backend.game.service;
 
-import com.gradation.backend.common.utill.RedisUtil;
 import com.gradation.backend.game.model.response.*;
-import com.gradation.backend.openvidu.service.OpenViduService;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
+<<<<<<< HEAD
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,20 +13,26 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.*;
+=======
 
-@Service
-@RequiredArgsConstructor
-public class GameService {
+import java.util.List;
+>>>>>>> develop
 
+public interface GameService {
+
+<<<<<<< HEAD
     private final RedisUtil redisUtil;
     private final OpenViduService openViduService;
 
+=======
+>>>>>>> develop
     /**
      * 방 정보 조회
      *
-     * @param roomId: 조회할 방의 Id
+     * @param roomId 조회할 방의 Id
      * @return 방의 전체 정보를 담은 RoomInfoResponseDto
      */
+<<<<<<< HEAD
     public RoomInfoResponse getRoomInformation(int roomId) {
         RoomInfoResponse roomInfo = new RoomInfoResponse();
         String roomKey = "ROOM:" + roomId;
@@ -111,15 +116,18 @@ public class GameService {
         return forestUsers;
     }
 
+=======
+    RoomInfoResponse getRoomInformation(int roomId);
+>>>>>>> develop
 
     /**
-     * 시작하기 클릭 시 방 초기화
-     * 오픈비두 세션 추가 생성 (Forest 2 ~ 7)
+     * 방 초기화 (시작하기 클릭 시)
      *
-     * @param roomId: 해당 방의 Id
-     * @param nicknames: 모든 참가자의 닉네임
-     * @return 방의 전체 정보를 담은 Map
+     * @param roomId 해당 방의 Id
+     * @param nicknames 모든 참가자의 닉네임
+     * @return 방의 전체 정보를 담은 RoomInitializationResponse 객체
      */
+<<<<<<< HEAD
     public RoomInitializationResponse initializeRoomStructure(int roomId, List<String> nicknames)
             throws OpenViduJavaClientException, OpenViduHttpException {
         RoomInitializationResponse responseDto = new RoomInitializationResponse();
@@ -199,25 +207,19 @@ public class GameService {
         }
         return map;
     }
+=======
+    RoomInitializationResponse initializeRoomStructure(int roomId, List<String> nicknames)
+            throws OpenViduJavaClientException, OpenViduHttpException;
+>>>>>>> develop
 
     /**
-     * 미션 데이터 value값 사용자 정의
-     */
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class MissionData {
-        private boolean isCompleted;
-        private int acornReward;
-    }
-
-    /**
-     * 긴급을 누를 시 모든 사용자의 forestToken을 roomId-1세션으로 설정
-     * 긴급 상태 불가능으로 변경
+     * 긴급 상황 처리
      *
-     * @param roomId: 해당 방의 Id
-     * @return 모든 사용자의 닉네임과 새로운 토큰 값
+     * @param roomId 해당 방의 Id
+     * @param nicknames 모든 참가자의 닉네임
+     * @return 모든 사용자의 닉네임과 새로운 토큰 값을 담은 EmergencyResponse 객체
      */
+<<<<<<< HEAD
     public EmergencyResponse emergency(int roomId, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException {
         String roomKey = "ROOM:" + roomId;
         String forestKey = roomKey + ":FOREST:1";
@@ -252,16 +254,20 @@ public class GameService {
         return response;
     }
 
+=======
+    EmergencyResponse emergency(int roomId, List<String> nicknames)
+            throws OpenViduJavaClientException, OpenViduHttpException;
+>>>>>>> develop
 
     /**
      * 특정 유저가 특정 숲으로 이동
-     * 각 숲으로 참가하기 위한 토큰 발급
      *
-     * @param roomId: 해당 방의 Id
-     * @param nickname: 유저 닉네임
-     * @param newForest: 새로운 forestToken 값
-     * @return MoveForestResponse 객체 (유저 닉네임, 새로운 forestToken)
+     * @param roomId 해당 방의 Id
+     * @param nickname 유저 닉네임
+     * @param newForest 새로운 forestToken 값
+     * @return MoveForestResponse 객체 (유저 닉네임과 새로운 forestToken)
      */
+<<<<<<< HEAD
     public MoveForestResponse moveForest(int roomId, String nickname, int newForest, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException {
         String roomKey = "ROOM:" + roomId;
         String userKey = roomKey + ":USER:" + nickname;
@@ -298,175 +304,49 @@ public class GameService {
 //        // acorns 값을 정수로 변환하여 반환
 //        return (Integer) acornsObj;
 //    }
+=======
+    MoveForestResponse moveForest(int roomId, String nickname, int newForest)
+            throws OpenViduJavaClientException, OpenViduHttpException;
+>>>>>>> develop
 
     /**
-     * 특정 유저의 acorns값을 공용 저장소에 저장
-     * 특정 유저의 acorns값 0으로 초기화
+     * 특정 유저의 도토리를 공용 저장소에 저장하고 초기화
      *
-     * @param roomId: 해당 방의 Id
-     * @param nickname: 유저 닉네임
-     * @return SaveUserAcornsResponse 객체 (유저 닉네임, 새로운 totalAcorns 값, 유저가 저장한 acorns 값)
+     * @param roomId 해당 방의 Id
+     * @param nickname 유저 닉네임
+     * @return SaveUserAcornsResponse 객체 (유저 닉네임, 새로운 totalAcorns 값, 저장한 acorns 값)
      */
-    public SaveUserAcornsResponse saveUserAcorns(int roomId, String nickname) {
-        String roomKey = "ROOM:" + roomId;
-        String userKey = roomKey + ":USER:" + nickname;
-        String forestKey = roomKey + ":FOREST:1";
-
-        // 유저의 현재 acorns 값 가져오기
-        Integer currentAcorns = (Integer) redisUtil.hget(userKey, "acorns");
-
-        // 유저의 acorns를 0으로 초기화
-        redisUtil.hset(userKey, "acorns", 0);
-
-        // 방의 totalAcorns 업데이트
-        Integer totalAcorns = (Integer) redisUtil.hget(forestKey, "totalAcorns");
-        int newTotalAcorns = totalAcorns + currentAcorns;
-        redisUtil.hset(forestKey, "totalAcorns", newTotalAcorns);
-
-        // SaveUserAcornsResponse 객체 생성 및 반환
-        return new SaveUserAcornsResponse(nickname, newTotalAcorns, currentAcorns);
-    }
-
-//    /**
-//     * 특정 유저의 fatigue 값을 조회
-//     *
-//     * @param roomId: 해당 방의 Id
-//     * @param userNum: 유저 번호 (1-6)
-//     * @return 유저의 fatigue 값
-//     */
-//    public int getUserFatigue(int roomId, int userNum) {
-//        String roomKey = "ROOM:" + roomId;
-//        String userKey = roomKey + ":USER:" + userNum;
-//
-//        // 유저의 fatigue 값 가져오기
-//        Object fatigueObj = redisUtil.hget(userKey, "fatigue");
-//
-//        // fatigue 값을 정수로 반환
-//        return (Integer) fatigueObj;
-//    }
+    SaveUserAcornsResponse saveUserAcorns(int roomId, String nickname);
 
     /**
-     * 특정 유저의 fatigue 값을 1충전
+     * 특정 유저의 피로도를 증가시킴
      *
-     * @param roomId: 해당 방의 Id
-     * @param nickname: 유저 닉네임
-     * @return IncrementUserFatigueResponse 객체 (유저 닉네임, 증가된 fatigue 값)
+     * @param roomId 해당 방의 Id
+     * @param nickname 유저 닉네임
+     * @return IncrementUserFatigueResponse 객체 (유저 닉네임과 증가된 fatigue 값)
      */
-    public IncrementUserFatigueResponse incrementUserFatigue(int roomId, String nickname) {
-        String roomKey = "ROOM:" + roomId;
-        String userKey = roomKey + ":USER:" + nickname;
-
-        // 사용자의 현재 fatigue 값 가져오기
-        Object fatigueObj = redisUtil.hget(userKey, "fatigue");
-
-        // fatigue 값을 1 증가시킴
-        int currentFatigue = (Integer) fatigueObj;
-        int newFatigue = currentFatigue + 1;
-
-        // 증가된 fatigue 값을 Redis에 저장
-        redisUtil.hset(userKey, "fatigue", newFatigue);
-
-        // IncrementUserFatigueResponse 객체 생성 및 반환
-        return new IncrementUserFatigueResponse(nickname, newFatigue);
-    }
+    IncrementUserFatigueResponse incrementUserFatigue(int roomId, String nickname);
 
     /**
-     * 특정 유저의 alive 상태를 죽음 상태로 변경
-     * 나의 피로도 3 차감
+     * 특정 유저를 죽음 상태로 변경하고 살해자의 피로도를 감소시킴
      *
-     * @param roomId: 해당 방의 Id
-     * @param victimNickname: 살해자 닉네임
-     * @param killerNickname: 살인자 닉네임
-     * @return KillResponse 객체 (살해자 닉네임, 살해자의 새로운 피로도, 살해당한 유저의 닉네임)
+     * @param roomId 해당 방의 Id
+     * @param victimNickname 살해당한 유저 닉네임
+     * @param killerNickname 살해한 유저 닉네임
+     * @return KillResponse 객체 (살해자 닉네임, 새로운 피로도 값, 살해당한 유저 닉네임)
      */
-    public KillResponse Kill(int roomId, String victimNickname, String killerNickname) {
-        String roomKey = "ROOM:" + roomId;
-        String userKey = roomKey + ":USER:" + victimNickname;
-        String myKey = roomKey + ":USER:" + killerNickname;
-
-        // alive 상태를 false로 설정
-        redisUtil.hset(userKey, "alive", false);
-
-        // 살해자의 피로도 값 3 차감
-        Object fatigueObj = redisUtil.hget(myKey, "fatigue");
-        int currentFatigue = (Integer) fatigueObj;
-        int newFatigue = currentFatigue - 3;
-
-        // 새로운 fatigue 값을 Redis에 저장
-        redisUtil.hset(myKey, "fatigue", newFatigue);
-
-        // KillResponse 객체 생성 및 반환
-        return new KillResponse(killerNickname, newFatigue, victimNickname);
-    }
-
-//    /**
-//     * 특정 forest의 mission1, mission2, mission3 상태와 보상을 조회
-//     *
-//     * @param roomId: 해당 방의 Id
-//     * @param forestNum: forest 번호 (2-7)
-//     * @return Map<String, Map<String, Object>> 형태로 각 mission의 완료 상태와 보상을 반환
-//     */
-//    public Map<String, Map<String, Object>> getForestMissionStatus(int roomId, int forestNum) {
-//        String roomKey = "ROOM:" + roomId;
-//        String forestKey = roomKey + ":FOREST:" + forestNum;
-//
-//        Map<String, Map<String, Object>> missionStatus = new HashMap<>();
-//
-//        for (int i = 1; i <= 3; i++) {
-//            String missionKey = "mission" + i;
-//            Object missionObj = redisUtil.hget(forestKey, missionKey);
-//
-//            Map<String, Object> missionInfo = new HashMap<>();
-//            MissionData missionData = (MissionData) missionObj;
-//            missionInfo.put("isCompleted", missionData.isCompleted());
-//            missionInfo.put("acornReward", missionData.getAcornReward());
-//
-//            missionStatus.put(missionKey, missionInfo);
-//        }
-//
-//        return missionStatus;
-//    }
+    KillResponse Kill(int roomId, String victimNickname, String killerNickname);
 
     /**
-     * 특정 forest의 특정 mission 상태를 완료로 변경
-     * 보상을 유저에게 지급
-     * 유저의 피로도 -1
+     * 특정 미션을 완료 상태로 변경하고 보상을 지급함
      *
-     * @param roomId: 해당 방의 Id
-     * @param forestNum: forest 번호 (2-7)
-     * @param missionNum: mission 번호 (1-3)
-     * @param nickname: 보상을 받을 유저 닉네임(1-6)
-     * @return CompleteMissionResponse 객체
+     * @param roomId 해당 방의 Id
+     * @param forestNum 숲 번호 (2-7)
+     * @param missionNum 미션 번호 (1-3)
+     * @param nickname 보상을 받을 유저 닉네임
+     * @return CompleteMissionResponse 객체 (미션 완료 정보와 보상 내용)
      */
-    public CompleteMissionResponse completeMission(int roomId, int forestNum, int missionNum, String nickname) {
-        String roomKey = "ROOM:" + roomId;
-        String forestKey = roomKey + ":FOREST:" + forestNum;
-        String userKey = roomKey + ":USER:" + nickname;
-        String missionKey = "mission" + missionNum;
-
-        // 1. 미션 데이터 조회
-        MissionData missionData = (MissionData) redisUtil.hget(forestKey, missionKey);
-
-        // 2. 보상 획득 및 미션 상태 업데이트
-        int reward = missionData.getAcornReward();
-        missionData.setCompleted(true);
-
-        // 3. 업데이트된 미션 데이터 저장
-        redisUtil.hset(forestKey, missionKey, missionData);
-
-        // 4. 유저의 acorns 업데이트
-        Integer currentAcorns = (Integer) redisUtil.hget(userKey, "acorns");
-        int newAcorns = currentAcorns + reward;
-        redisUtil.hset(userKey, "acorns", newAcorns);
-
-        // 5. 유저의 피로도 업데이트
-        Integer currentFatigue = (Integer) redisUtil.hget(userKey, "fatigue");
-        int newFatigue = Math.max(currentFatigue - 1, 0);  // 피로도가 음수가 되지 않도록 함
-        redisUtil.hset(userKey, "fatigue", newFatigue);
-
-        // 6. CompleteMissionResponse 객체 생성 및 반환
-        return new CompleteMissionResponse(nickname, forestNum, missionNum, reward, newAcorns);
-    }
+    CompleteMissionResponse completeMission(int roomId, int forestNum, int missionNum, String nickname);
 }
 
 
