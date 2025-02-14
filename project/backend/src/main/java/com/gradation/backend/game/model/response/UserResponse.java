@@ -9,5 +9,6 @@ public class UserResponse {
     private int acorns;
     private int fatigue;
     private String forestToken;
+    private int forestNum;
     private boolean isEvilSquirrel;
 }
