@@ -13,6 +13,7 @@ const CreateRoomForm = ({ onRoomCreated }) => {
 
     setIsCreating(true);
     try {
+      sessionStorage.setItem('roomHost', true)
       sessionStorage.setItem('roomPassword', password || null);
       await onRoomCreated(roomTitle, isPasswordEnabled ? password : '');
     } catch (error) {

@@ -33,6 +33,7 @@ const RoomPage = () => {
 
   // 컴포넌트 마운트 시 방 목록 불러오기
   useEffect(() => {
+    sessionStorage.setItem('roomHost', false)
     loadRooms();
     // 주기적으로 방 목록 업데이트
     const interval = setInterval(loadRooms, 500000);

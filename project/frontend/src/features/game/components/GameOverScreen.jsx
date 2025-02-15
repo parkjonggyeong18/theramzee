@@ -13,12 +13,6 @@ const GameOverScreen = () => {
           setPlayers
         } 
         = useGame();
-  const {
-    joinSession,
-    leaveSession,
-  } = useOpenVidu();
-  const token = sessionStorage.getItem('openViduToken');
-  const nickname = sessionStorage.getItem('nickName')
   const { roomId } = useParams();
 
   const handleExit = async () => {
