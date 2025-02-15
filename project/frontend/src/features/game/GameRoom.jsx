@@ -28,7 +28,7 @@ const GameRoom = () => {
   const showDescriptionOverlay = () => setIsDescriptionVisible(true);
   const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
 
-
+  
   const { 
     gameState, 
     startGame, 

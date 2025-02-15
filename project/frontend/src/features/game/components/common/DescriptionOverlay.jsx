@@ -15,33 +15,51 @@ const DescriptionOverlay = ({ isVisible, onClose }) => {
         {/* 착한 다람쥐 */}
         <Section>
           <Image src="/cursors/good-squirrel.png" alt="착한 다람쥐" />
-          <Description>
-            착한 다람쥐는 팀을 도와 임무를 완수해야 합니다. 협력하여 목표를 달성하세요!
-          </Description>
+          <div>
+            <SectionTitle>착한 다람쥐</SectionTitle>
+            <Description>
+              착한 다람쥐는 팀을 도와 임무를 완수해야 합니다. 협력하여 목표를 달성하세요!
+              <br />미니게임을 통해 도토리를 획득하고 창고에 채워 승리를 이끌어 주세요.
+              <br />투표를 통해 나쁜 다람쥐를 색출해 승리를 이끌어 주세요.
+            </Description>
+          </div>
         </Section>
 
         {/* 나쁜 다람쥐 */}
         <Section>
           <Image src="/cursors/evil-squirrel.png" alt="나쁜 다람쥐" />
-          <Description>
-            나쁜 다람쥐는 착한 다람쥐를 방해하고 자신의 목표를 달성해야 합니다.
-          </Description>
+          <div>
+            <SectionTitle>나쁜 다람쥐</SectionTitle>
+            <Description>
+              나쁜 다람쥐는 착한 다람쥐를 방해하며 승리를 쟁취해야 합니다.
+              <br />에너지를 3 채워 킬을 통해 착한 다람쥐를 모두 제거하세요.
+              <br />두 번의 투표에서 모두 지목되지 않고 살아남아야 승리합니다.
+            </Description>
+          </div>
         </Section>
 
         {/* 투표 */}
         <Section>
           <Image src="/information/vote.png" alt="투표 아이콘" />
-          <Description>
-            투표는 게임의 중요한 부분입니다. 팀원들과 논의하여 올바른 결정을 내리세요.
-          </Description>
+          <div>
+            <SectionTitle>투표</SectionTitle>
+            <Description>
+              중간 투표와 최종 투표를 통해 나쁜 다람쥐를 색출하세요.
+              <br />최종 투표에서 나쁜 다람쥐를 찾지 못하면 착한 다람쥐는 패배합니다.
+            </Description>
+          </div>
         </Section>
 
         {/* 미니게임 */}
         <Section>
           <Image src="/information/mini-game.png" alt="미니게임 아이콘" />
-          <Description>
-            미니게임은 임무를 완수하거나 특별한 보상을 받을 수 있는 기회를 제공합니다.
-          </Description>
+          <div>
+            <SectionTitle>미니게임</SectionTitle>
+            <Description>
+              미니게임은 임무를 완수하고 도토리를 획득할 수 있는 기회를 제공합니다.
+              <br />획득한 도토리를 창고에 채워 승리를 이끌어 주세요.   
+            </Description>
+          </div>
         </Section>
       </Content>
     </Overlay>
@@ -65,22 +83,32 @@ const Overlay = styled.div`
 
 const Content = styled.div`
   background-color: white;
-  padding: 20px;
+  padding: 30px;
   border-radius: 10px;
-  text-align: center;
+  text-align: center; /* 텍스트 정렬 왼쪽으로 */
   position: relative; /* 닫기 버튼 위치를 위한 설정 */
 `;
 
 const Section = styled.div`
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* 이미지와 텍스트 상단 정렬 */
+  gap: 15px; /* 이미지와 텍스트 간격 */
   margin-bottom: 20px;
+  text-align: left; /* 텍스트 정렬 왼쪽으로 */
+
+  &:last-child {
+    margin-bottom: 0; /* 마지막 섹션 간격 제거 */
+  }
 `;
 
 const Image = styled.img`
-  width: 50px;
+  width: 60px; /* 이미지 크기 조정 */
   height: auto;
-  margin-right: 10px;
+`;
+
+const SectionTitle = styled.h3`
+  font-size: 18px;
+  margin-bottom: 5px;
 `;
 
 const Description = styled.p`
