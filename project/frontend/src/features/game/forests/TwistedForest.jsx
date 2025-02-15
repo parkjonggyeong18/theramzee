@@ -106,18 +106,22 @@ const TwistedForest = () => {
     // 미션 관련
     missionButtons: (
       <MissionButtons>
+      <MissionButtonWrapper style={{ top: '160px', right: '450px' }}>
         <MissionButton 
           onClick={() => handleMissionClick('snake')}
           completed={isMissionCompleted('snake')}
         />
+      </MissionButtonWrapper>
+      <MissionButtonWrapper style={{ top: '185px', left: '500px' }}>
         <MissionButton 
           onClick={() => handleMissionClick('matching')}
           completed={isMissionCompleted('matching')}
         />
-        <MissionButton isDisabled
-    
-        />
-      </MissionButtons>
+      </MissionButtonWrapper>
+      <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
+        <MissionButton isDisabled />
+      </MissionButtonWrapper>
+    </MissionButtons>
     ),
     
     // 미니게임 오버레이
@@ -159,7 +163,14 @@ const TwistedForest = () => {
 
 const MissionButtons = styled.div`
   display: flex;
-  gap: 50px;
+  position: relative;
+  justify-content: center;
+  width: 100%;
+  height: 100px; // 버튼 컨테이너의 높이 조정
+`;
+
+const MissionButtonWrapper = styled.div`
+  position: absolute;
 `;
 
 export default TwistedForest;

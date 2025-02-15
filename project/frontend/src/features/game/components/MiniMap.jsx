@@ -87,8 +87,11 @@ const clkMainForest = () => {
 };
 
 const MapContainer = styled.div`
- width: 200px;
- height: 200px;
+ width: 150px;
+ height: 150px;
+  background-color:rgba(240, 240, 240, 0.34); // 회색 배경 추가
+  padding: 10px; // 내부 여백 추가
+  border-radius: 10px; // 모서리 둥글게 처리
 `;
 
 const ForestGrid = styled.div`
