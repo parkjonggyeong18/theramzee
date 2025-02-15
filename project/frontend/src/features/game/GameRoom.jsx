@@ -23,7 +23,12 @@ import MiniMap from './components/MiniMap';
 const GameRoom = () => {
   const navigate = useNavigate();
   const [showRoleReveal, setShowRoleReveal] = useState(false);
+  const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
+  
+  const showDescriptionOverlay = () => setIsDescriptionVisible(true);
+  const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
 
+  
   const { 
     gameState, 
     startGame, 
@@ -88,6 +93,32 @@ const GameRoom = () => {
     };
 
     connectAndSubscribe();
+
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = ''; 
+      handleExit();
+    };
+  
+    // 뒤로가기 처리
+    const handlePopState = () => {
+      handleExit();
+    };
+  
+    // 공통 종료 처리 함수
+    const handleExit = () => {
+      disconnectSocket();
+      leaveRoom(roomId);
+      leaveSession();
+      initPreview();
+    };
+  
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, [roomId]);
 
   const clkStart = () => {
@@ -133,12 +164,17 @@ const GameRoom = () => {
     isGameStarted: gameState.isStarted,
     background: backgroundImages.mainForest,
     miniGameOverlay: null,   // GameRoom에서는 미니게임 없음
-    voteScreen: null        // GameRoom에서는 투표 화면 없음
-  };
+    voteScreen: null,        // GameRoom에서는 투표 화면 없음
 
+      // 설명서 관련 props 전달
+    isDescriptionVisible,
+    onShowDescription: showDescriptionOverlay,
+    onHideDescription: hideDescriptionOverlay,
+  };
+  
   return (
     <>
-      <GameLayout {...gameLayoutProps} />
+      <GameLayout {...gameLayoutProps}/>
       {showRoleReveal && <RoleReveal roomId={roomId} />}
     </>
   );

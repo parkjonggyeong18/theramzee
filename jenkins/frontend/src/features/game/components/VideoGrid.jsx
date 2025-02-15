@@ -49,15 +49,19 @@ const VideoGrid = (props) => {
   const getPlayerInfo = (sub) => {
     let playerNickname = '';
     try {
-      const rawData = sub?.stream?.connection?.data.split("%/%")[0];
-      const playerData = JSON.parse(rawData);
-      playerNickname = playerData.clientData;
+      const rawData = sub?.stream?.connection?.data;
+      if (rawData) {
+        const parsedData = rawData.split("%/%")[0];
+        const playerData = JSON.parse(parsedData);
+        playerNickname = playerData.clientData;
+      }
     } catch (error) {
       console.error("Error extracting nickname:", error);
     }
     const isPlayerDead = gameState.killedPlayers?.includes(playerNickname);
     return { playerNickname, isPlayerDead };
   };
+  
 
   if (!session) {
     return <GridContainer>Loading...</GridContainer>;

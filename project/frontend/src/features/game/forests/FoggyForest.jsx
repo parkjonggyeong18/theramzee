@@ -23,6 +23,10 @@ const FoggyForest = () => {
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [currentMission, setCurrentMission] = useState(null);
   const [completedMissions, setCompletedMissions] = useState([]);
+  const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
+  
+  const showDescriptionOverlay = () => setIsDescriptionVisible(true);
+  const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
   
     const {
       joinSession,
@@ -141,7 +145,10 @@ const FoggyForest = () => {
     isGameStarted: gameState.isStarted,
     background: backgroundImages.foggyForest,
     mainForestButtons: null,
-    voteScreen: null
+    voteScreen: null,
+    isDescriptionVisible,
+    onShowDescription: showDescriptionOverlay,
+    onHideDescription: hideDescriptionOverlay,
   };
 
   return <GameLayout {...gameLayoutProps} />;

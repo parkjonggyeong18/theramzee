@@ -78,85 +78,11 @@ export const GameProvider = ({ children }) => {
     videoEnabled: true,
     audioEnabled: true
   });
-
-  // const [players] = useState([
-  //   // 테스트용 더미 데이터
-  //   // { id: 1, name: '테스트 플레이어', isMe: true }
-  //   // 추후 6인용
-  //   { id: 1, nickName: 'Player 1', isMe: true },
-  //   { id: 2, nickName: 'Player 2', isMe: false },
-  //   { id: 3, nickName: 'Player 3', isMe: false },
-  //   { id: 4, nickName: 'Player 4', isMe: false },
-  //   { id: 5, nickName: 'Player 5', isMe: false },
-  //   { id: 6, nickName: 'Player 6', isMe: false }
-  // ]);
   
   const [roomId, setRoomId] = useState(null);
   const [players, setPlayers] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
   const nickname = sessionStorage.getItem('nickName');
-
-    // // 🔹 WebSocket 연결 설정
-    // useEffect(() => {
-    //   let socketClient;
-    //   connectSocket()
-    //     .then(client => {
-    //       socketClient = client;
-    //       setIsConnected(true);
-    //     })
-    //     .catch(error => {
-    //       console.error("❌ WebSocket connection error:", error);
-    //     });
-  
-    //   return () => {
-    //     disconnectSocket();
-    //     setIsConnected(false);
-    //   };
-    // }, []);
-
-/////////////////////////////////////핸들러 함수////////////////////////////////////////////////////////
-// const {
-//   handleGameInfo,
-//   handleGameStartResponse,
-//   handleEmergencyResponse,
-//   handleMoveResponse,
-//   handleSaveAcornsResponse,
-//   handleChargeFatigueResponse,
-//   handleKillResponse,
-//   handleCompleteMissionResponse,
-// } = useGameHandlers(roomId, gameState, setGameState);
-
-// // 🔹 useGameSocket에 핸들러 전달
-// const { isConnected, initializeSocket } = useGameSocket(roomId, {
-//   handleGameInfo,
-//   handleGameStartResponse,
-//   handleEmergencyResponse,
-//   handleMoveResponse,
-//   handleSaveAcornsResponse,
-//   handleChargeFatigueResponse,
-//   handleKillResponse,
-//   handleCompleteMissionResponse,
-// });
-
-////////////////////////////////////이벤트 함수////////////////////////////////////////////////////////////
-
-  // 구독 함수 (startGame을 누를 때 실행됨)
-  // const subscribeToGameTopics = useCallback(() => {
-  //   if (!isConnected || !roomId) {
-  //     console.error("⚠️ Cannot subscribe: WebSocket is not connected or roomId is missing.");
-  //     return;
-  //   }
-
-  //   console.log("📌 Subscribing to game topics...");
-  //   subscribeToTopic(`/user/queue/game/${roomId}/info`, handlers.handleGameInfo);
-  //   subscribeToTopic(`/topic/game/${roomId}/start`, handlers.handleGameStartResponse);
-  //   subscribeToTopic(`/topic/game/${roomId}/emergency`, handlers.handleEmergencyResponse);
-  //   subscribeToTopic(`/topic/game/${roomId}/move`, handlers.handleMoveResponse);
-  //   subscribeToTopic(`/topic/game/${roomId}/save-acorns`, handlers.handleSaveAcornsResponse);
-  //   subscribeToTopic(`/topic/game/${roomId}/charge-fatigue`, handlers.handleChargeFatigueResponse);
-  //   subscribeToTopic(`/topic/game/${roomId}/kill`, handlers.handleKillResponse);
-  //   subscribeToTopic(`/topic/game/${roomId}/complete-mission`, handlers.handleCompleteMissionResponse);
-  // }, [isConnected, roomId]);
 
   // 최신 닉네임 리스트 가져오기 (startGame을 누를 때 실행됨)
   const getPlayers = useCallback(async () => {
@@ -425,8 +351,7 @@ export const GameProvider = ({ children }) => {
     roomId,
     setIsConnected,
     players,
-    
-    
+    setPlayers
   };
 
   return (
