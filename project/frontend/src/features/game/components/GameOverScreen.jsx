@@ -5,6 +5,7 @@ import { useGame } from '../../../contexts/GameContext';
 import { useOpenVidu } from '../../../contexts/OpenViduContext';
 import styled from 'styled-components';
 import { joinRoom } from '../../../api/room';
+import { disconnectSocket } from '../../../api/stomp';
 
 const GameOverScreen = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ const GameOverScreen = () => {
   const { roomId } = useParams();
 
   const handleExit = async () => {
+    await disconnectSocket();
     setGameState((prev) => ({
       ...prev,
       // 유저 정보
