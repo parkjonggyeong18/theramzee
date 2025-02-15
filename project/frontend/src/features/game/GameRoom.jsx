@@ -28,7 +28,7 @@ const GameRoom = () => {
   const showDescriptionOverlay = () => setIsDescriptionVisible(true);
   const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
 
-
+  
   const { 
     gameState, 
     startGame, 
@@ -49,6 +49,9 @@ const GameRoom = () => {
   const { roomId } = useParams();  // roomId 가져오기
   const handlers = useGameHandlers(roomId, setGameState, joinSession);
   const isSubscribed = useRef(false); // 중복 실행 방지 플래그
+  const nickName = sessionStorage.getItem('nickName')
+  const roomHost = sessionStorage.getItem('roomHost') || null;
+
 
   useEffect(() => {
     setRoomId(roomId);
@@ -72,7 +75,6 @@ const GameRoom = () => {
 
         setTimeout(() => {
           console.log("📌 Subscribing to game topics...");
-          subscribeToTopic(`/user/queue/game/${roomId}/info`, handlers.handleGameInfo);
           subscribeToTopic(`/topic/game/${roomId}/start`, (response) => {
             handlers.handleGameStartResponse(response);
             setShowRoleReveal(true); // 역할 공개 화면 활성화
@@ -147,7 +149,12 @@ const GameRoom = () => {
     statePanel: <StatePanel />,
     buttonContainer: (
       <ButtonContainer>
-        <StartButton onClick={clkStart}>GAME START</StartButton>
+        <StartButton 
+          onClick={clkStart} 
+          disabled={roomHost !== "true"}
+        >
+          GAME START
+        </StartButton>
         <ExitButton onClick={clkExit}>나가기</ExitButton>
       </ButtonContainer>  
     ),
@@ -191,7 +198,13 @@ const StartButton = styled.button`
   &:hover {
     background-color: #98FB98;
   }
+
+  &:disabled {
+    background-color: #d3d3d3;
+    cursor: not-allowed;
+  }
 `;
+
 
 const ExitButton = styled.button`
   padding: 10px 20px;

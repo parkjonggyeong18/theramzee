@@ -4,44 +4,23 @@ import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
 
 const MainForestButtons = () => {
- const { gameState, chargeFatigue, saveUserAcorns, startEmergency } = useGame();
- const [isStorageActive, setIsStorageActive] = useState(false);
- const [isEnergyActive, setIsEnergyActive] = useState(false);
- const [timer, setTimer] = useState(null);
+  const { gameState, startSaveAcorns, 
+          startChargeFatigue, startEmergency, 
+          cancelAction, isStorageActive, 
+          isEnergyActive } = useGame();
 
  const clkSave = () => {
-  if (gameState.evilSquirrel !== false || gameState.heldAcorns === 0 || isStorageActive || gameState.isDead) return;
-   
-  setIsStorageActive(true);
-  const storageTimer = setTimeout(() => {
-    saveUserAcorns();
-    setIsStorageActive(false);
-  }, 10000);
-  setTimer(storageTimer);
+  startSaveAcorns();
 };
 
 const clkFatigue = () => {
-  if (gameState.fatigue >= 3 || isEnergyActive || gameState.isDead) return;
-
-  setIsEnergyActive(true);
-  const energyTimer = setTimeout(() => {
-    chargeFatigue();
-    setIsEnergyActive(false);
-  }, gameState.evilSquirrel === false ? 5000 : 10000);
-  setTimer(energyTimer);
+  startChargeFatigue();
 };
 
 const clkEmergency = () => {
   if (gameState.isDead) return;
   startEmergency();
 };
- const cancelAction = () => {
-   clearTimeout(timer);
-   setIsStorageActive(false);
-   setIsEnergyActive(false);
-   setTimer(null);
- };
-
  return (
   <ButtonContainer>
 
