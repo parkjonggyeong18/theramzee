@@ -70,7 +70,6 @@ const GameRoom = () => {
 
         setTimeout(() => {
           console.log("📌 Subscribing to game topics...");
-          subscribeToTopic(`/user/queue/game/${roomId}/info`, handlers.handleGameInfo);
           subscribeToTopic(`/topic/game/${roomId}/start`, (response) => {
             handlers.handleGameStartResponse(response);
             setShowRoleReveal(true); // 역할 공개 화면 활성화

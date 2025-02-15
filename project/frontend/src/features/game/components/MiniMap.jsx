@@ -6,7 +6,7 @@ import { backgroundImages } from '../../../assets/images';
 
 const MiniMap = () => {
  const navigate = useNavigate();
- const { gameState, moveForest, players } = useGame();
+ const { gameState, moveForest, players, cancelAction  } = useGame();
 
  const forests = [
    { 
@@ -50,6 +50,7 @@ const MiniMap = () => {
  const clkForest = (forestId, forestNum) => {
   if (!gameState.isStarted || gameState.isDead) return;
   if (!gameState.roomId) return;
+  cancelAction();
   moveForest(forestNum);
   navigate(`/game/${gameState.roomId}/forest/${forestId}`);
 };
@@ -57,10 +58,10 @@ const MiniMap = () => {
 const clkMainForest = () => {
   if (!gameState.isStarted || gameState.isDead) return;
   if (!gameState.roomId) return;
+  cancelAction();
   moveForest(1);
   navigate(`/game/${gameState.roomId}/main`);
 };
-
  return (
   <MapContainer>
     <ForestGrid>
