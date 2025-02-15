@@ -46,29 +46,30 @@ const VideoGrid = (props) => {
     });
   }, [slots]);
 
-  // 오디오 제어 로직 추가
-  useEffect(() => {
-    subscribers.forEach((player) => {
-      if (player?.stream?.connection?.data) {
-        try {
-          const rawData = player.stream.connection.data.split("%/%")[0];
-          const parsedData = JSON.parse(rawData);
-          const subscriberNickname = parsedData.clientData;
-          // 현재 숲에 포함되어 있다면 오디오 활성화, 아니면 음소거
-          console.log("🔊 오디오 제어:", gameState.forestUsers);
-          if (gameState.forestUsers?.[gameState.forestNum]?.includes(subscriberNickname)) {
-            player.subscribeToAudio(true);
-            console.log(` ${subscriberNickname} 오디오 ON`);
-          } else {
-            player.subscribeToAudio(false);
-            console.log(` ${subscriberNickname} 오디오 OFF`);
+    // 오디오 제어 로직 추가
+    useEffect(() => {
+      subscribers.forEach((player) => {
+        if (player?.stream?.connection?.data) {
+          try {
+            const rawData = player.stream.connection.data.split("%/%")[0];
+            const parsedData = JSON.parse(rawData);
+            const subscriberNickname = parsedData.clientData;
+            // 현재 숲에 포함되어 있다면 오디오 활성화, 아니면 음소거
+            console.log("🔊 오디오 제어:", gameState.forestUsers);
+            if (gameState.forestUsers?.[gameState.forestNum]?.includes(subscriberNickname)) {
+              player.subscribeToAudio(true);
+              console.log(` ${subscriberNickname} 오디오 ON`);
+            } else {
+              player.subscribeToAudio(false);
+              console.log(` ${subscriberNickname} 오디오 OFF`);
+            }
+          } catch (error) {
+            console.error("오디오 제어 처리 중 오류:", error);
           }
-        } catch (error) {
-          console.error("오디오 제어 처리 중 오류:", error);
         }
-      }
-    });
-  }, [subscribers, gameState.forestNum, gameState.forestUsers]);
+      });
+    }, [subscribers, gameState.forestNum, gameState.forestUsers]);
+
 
 
   const getPlayerInfo = (sub) => {
