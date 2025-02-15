@@ -8,15 +8,15 @@ import KillAnimation from './KillAnimation';
 import DeadOverlay from './DeadOverlay';
 
 const VideoGrid = (props) => {
-  const { session } = useOpenVidu();
+  const { session, subscribers } = useOpenVidu();
   const { gameState } = useGame();
   const { killingPlayer, handleDragStart, isKillable, isDragging } = useKillSystem();
   const [showDeadOverlay, setShowDeadOverlay] = useState(false);
   const videoRefs = useRef({});
-  const subscribers = props.players || [];
+  const currentSubscribers = props.players || [];
   const totalSlots = props.totalSlots;
   
-  const slots = Array.from({ length: totalSlots }, (_, i) => subscribers[i] || null);
+  const slots = Array.from({ length: totalSlots }, (_, i) => currentSubscribers[i] || null);
 
   useEffect(() => {
     if (gameState.isDead && !showDeadOverlay) {
@@ -45,6 +45,31 @@ const VideoGrid = (props) => {
       }
     });
   }, [slots]);
+
+  // 오디오 제어 로직 추가
+  useEffect(() => {
+    subscribers.forEach((player) => {
+      if (player?.stream?.connection?.data) {
+        try {
+          const rawData = player.stream.connection.data.split("%/%")[0];
+          const parsedData = JSON.parse(rawData);
+          const subscriberNickname = parsedData.clientData;
+          // 현재 숲에 포함되어 있다면 오디오 활성화, 아니면 음소거
+          console.log("🔊 오디오 제어:", gameState.forestUsers);
+          if (gameState.forestUsers?.[gameState.forestNum]?.includes(subscriberNickname)) {
+            player.subscribeToAudio(true);
+            console.log(` ${subscriberNickname} 오디오 ON`);
+          } else {
+            player.subscribeToAudio(false);
+            console.log(` ${subscriberNickname} 오디오 OFF`);
+          }
+        } catch (error) {
+          console.error("오디오 제어 처리 중 오류:", error);
+        }
+      }
+    });
+  }, [subscribers, gameState.forestNum, gameState.forestUsers]);
+
 
   const getPlayerInfo = (sub) => {
     let playerNickname = '';
