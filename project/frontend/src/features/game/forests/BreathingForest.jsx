@@ -33,9 +33,7 @@ const BreathingForest = () => {
  
   // 현재 사용자가 위치한 숲 번호 가져오기
   const currentForestNum = gameState.forestNum;
-  console.log('currentForestNum:', currentForestNum);
-  const currentForestUser = gameState.forestUsers?.[currentForestNum]; // 배열열
-  console.log('currentForestUser:', currentForestUser);
+  const currentForestUser = gameState.forestUsers?.[currentForestNum]; // 배열
 
   const filteredSubscribers = subscribers.filter(sub => {
     try {
@@ -69,7 +67,6 @@ const BreathingForest = () => {
     setShowMiniGame(true);
   };
 
-
   const handleMissionComplete = async () => {
     try {
       const missionNum = currentMission === 'maze' ? 1 : 
@@ -82,6 +79,7 @@ const BreathingForest = () => {
       console.error('Failed to complete mission:', error);
     }
   };
+
   useEffect(() => {
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
@@ -95,6 +93,7 @@ const BreathingForest = () => {
       document.body.style.cursor = 'auto';
     };
   }, [gameState.isStarted, gameState.evilSquirrel]);
+  
   const gameLayoutProps = {
     // 기본 레이아웃 요소
     leftVideoGrid: <VideoGrid players={leftFilterCam} totalSlots={3} gridPosition="left" />,
