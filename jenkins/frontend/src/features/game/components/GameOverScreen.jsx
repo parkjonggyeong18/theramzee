@@ -5,6 +5,7 @@ import { useGame } from '../../../contexts/GameContext';
 import { useOpenVidu } from '../../../contexts/OpenViduContext';
 import styled from 'styled-components';
 import { joinRoom } from '../../../api/room';
+import { disconnectSocket } from '../../../api/stomp';
 
 const GameOverScreen = () => {
   const navigate = useNavigate();
@@ -13,15 +14,10 @@ const GameOverScreen = () => {
           setPlayers
         } 
         = useGame();
-  const {
-    joinSession,
-    leaveSession,
-  } = useOpenVidu();
-  const token = sessionStorage.getItem('openViduToken');
-  const nickname = sessionStorage.getItem('nickName')
   const { roomId } = useParams();
 
   const handleExit = async () => {
+    await disconnectSocket();
     setGameState((prev) => ({
       ...prev,
       // 유저 정보
@@ -90,7 +86,8 @@ const GameOverScreen = () => {
       "7_3": [false, 3], // 6번 숲 3번 미션
     }));
     setPlayers([]);
-    const response = await joinRoom(roomId);
+    const roomPassword = sessionStorage.getItem('roomPassword');
+    const response = await joinRoom(roomId, roomPassword);
     const openViduToken = response.data.token;
     sessionStorage.setItem('openViduToken', openViduToken);
     navigate(`/room/${roomId}/game`);

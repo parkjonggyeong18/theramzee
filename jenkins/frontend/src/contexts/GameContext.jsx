@@ -1,11 +1,10 @@
-import { createContext, useContext, useState, useCallback,useEffect } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import * as gameService from '../api/gameService';
 import { fetchRoomById } from '../api/room';
 
 const GameContext = createContext();
 
 export const GameProvider = ({ children }) => {
-  
   // 게임의 전체 상태 관리
   const [gameState, setGameState] = useState({
     // 유저 정보
@@ -33,7 +32,7 @@ export const GameProvider = ({ children }) => {
     isEmergencyVote: false,   // 긴급 투표인지 여부
     hasUsedEmergency: false,  // 긴급 투표 사용 여부
     voteTimer: 180, // 투표 시간 (3분)
-    
+
     // 게임 전체 정지(추후)
     isPaused: false, // 게임 타이머 일시정지 여부
 
@@ -47,13 +46,13 @@ export const GameProvider = ({ children }) => {
     forceVideosOff: false,    // 안개 숲 캠 강제 OFF
     foggyVoiceEffect: false,  // 안개 숲 음성 변조
     miniMapEnabled: false,  // 미니맵 활성화 상태 (게임 시작 후 true)
-     // 종료 상태
+    // 종료 상태
     isGameOver: false,           // 게임 종료 여부
     gameOverReason: null,        // 'acorns' | 'emergency' | 'time'
     winner: null,                // 'good' | 'bad'
     lastKilledPlayer: null,      // 마지막으로 죽은 플레이어
     //미션 상태
-    
+
     "2_1": [false, 1], // 2번 숲 1번 미션
     "2_2": [false, 2], // 2번 숲 2번 미션
     "2_3": [false, 3], // 2번 숲 3번 미션
@@ -78,18 +77,23 @@ export const GameProvider = ({ children }) => {
     videoEnabled: true,
     audioEnabled: true
   });
-  
+
   const [roomId, setRoomId] = useState(null);
   const [players, setPlayers] = useState([]);
   const [isConnected, setIsConnected] = useState(false);
   const nickname = sessionStorage.getItem('nickName');
+
+  // 피로도 및 도토리 저장 
+  const [isStorageActive, setIsStorageActive] = useState(false);
+  const [isEnergyActive, setIsEnergyActive] = useState(false);
+  const timerRef = useRef(null);
 
   // 최신 닉네임 리스트 가져오기 (startGame을 누를 때 실행됨)
   const getPlayers = useCallback(async () => {
     if (isConnected && roomId) {
       try {
         const response = await fetchRoomById(roomId);
-        
+
         // 최신 닉네임 리스트 생성
         const updatedPlayers = [...players, ...response.data['nicknames']]
           .map((nick, index) => ({
@@ -145,7 +149,9 @@ export const GameProvider = ({ children }) => {
       console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
-  const checkGameOver = useCallback(() => {console.log("Checking game over condition - total acorns:", gameState.totalAcorns);
+
+  // 게임 종료 처리
+  const checkGameOver = useCallback(() => {
     if (gameState.totalAcorns >= 1) {
       console.log("Game should be over now");
       setGameState(prev => ({
@@ -158,6 +164,7 @@ export const GameProvider = ({ children }) => {
       }));
     }
   }, [gameState.totalAcorns]);
+
   // 도토리 저장 처리
   const saveUserAcorns = useCallback(async () => {
     if (isConnected && roomId && nickname) {
@@ -179,8 +186,6 @@ export const GameProvider = ({ children }) => {
   const moveForest = useCallback(async (forestNum) => {
     const nicknameList = players.map(player => player.nickName);
     if (isConnected && roomId && nickname && forestNum && nicknameList) {
-      console.log("여기까지1");
-      console.log(roomId, nickname, forestNum, nicknameList);
       try {
         // ✅ 최신 nicknames 값을 받아오기
         const updatedNicknames = await getPlayers();
@@ -197,7 +202,7 @@ export const GameProvider = ({ children }) => {
       console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
-
+  
   // 플레이어 사망 처리
   const killUser = useCallback(async (vitimNickname) => {
     if (isConnected && roomId && nickname && vitimNickname) {
@@ -232,20 +237,15 @@ export const GameProvider = ({ children }) => {
       try {
         console.log("Sending mission completion to server");
         await gameService.completeMission(roomId, forestNum, missionNum, nickname);
-        
+
         const missionKey = `${forestNum}_${missionNum}`;
-        console.log("Updating mission state:", {
-          missionKey,
-          before: gameState[missionKey],
-        });
-        
+
         setGameState(prev => {
           const newState = {
             ...prev,
             [missionKey]: [true, prev[missionKey][1]],
             // 피로도 업데이트 제거
           };
-          console.log("New game state:", newState);
           return newState;
         });
       } catch (error) {
@@ -272,7 +272,7 @@ export const GameProvider = ({ children }) => {
         gameOverReason: prev.isEmergencyVote ? 'emergency' : 'time',
         winner: result.winner,
         lastKilledPlayer: result.eliminatedPlayer,
-        killedPlayers: result.eliminatedPlayer 
+        killedPlayers: result.eliminatedPlayer
           ? [...prev.killedPlayers, result.eliminatedPlayer]
           : prev.killedPlayers
       }));
@@ -305,6 +305,8 @@ export const GameProvider = ({ children }) => {
       foggyVoiceEffect: isInFoggyForest   // openVidu 넣었을때, 실행되는 코드 구현 필요
     }));
   };
+
+  // 게임 초기화 처리
   const resetGame = useCallback(() => {
     setGameState(prev => ({
       ...prev,
@@ -331,6 +333,37 @@ export const GameProvider = ({ children }) => {
       lastKilledPlayer: null
     }));
   }, []);
+
+  // 액션 취소 함수
+  const cancelAction = useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    setIsStorageActive(false);
+    setIsEnergyActive(false);
+    timerRef.current = null;
+  }, []);
+
+  // 도토리 저장 시작
+  const startSaveAcorns = useCallback(() => {
+    if (gameState.evilSquirrel !== false && gameState.heldAcorns === 0 && isStorageActive && gameState.isDead) return;
+    setIsStorageActive(true);
+    timerRef.current = setTimeout(() => {
+      saveUserAcorns();
+      setIsStorageActive(false);
+    }, 10000);
+  }, [gameState.evilSquirrel, gameState.heldAcorns, isStorageActive, gameState.isDead, saveUserAcorns]);
+
+  // 피로도 충전 시작
+  const startChargeFatigue = useCallback(() => {
+    if (gameState.fatigue >= 3 || isEnergyActive || gameState.isDead) return;
+    setIsEnergyActive(true);
+    timerRef.current = setTimeout(() => {
+      chargeFatigue();
+      setIsEnergyActive(false);
+    }, gameState.evilSquirrel === false ? 5000 : 10000);
+  }, [gameState.fatigue, isEnergyActive, gameState.isDead, gameState.evilSquirrel, chargeFatigue]);
+
   const value = {
     gameState,         // 게임 전체 상태
     setGameState,      // 게임 상태 변경
@@ -351,7 +384,14 @@ export const GameProvider = ({ children }) => {
     roomId,
     setIsConnected,
     players,
-    setPlayers
+    setPlayers,
+    isStorageActive,
+    setIsStorageActive,
+    isEnergyActive,
+    setIsEnergyActive,
+    cancelAction,
+    startSaveAcorns,
+    startChargeFatigue
   };
 
   return (
@@ -368,3 +408,4 @@ export const useGame = () => {
   }
   return context;
 };
+

@@ -20,6 +20,7 @@ const RoomListItem = ({ room }) => {
     
     setIsJoining(true);
     setError(null);
+    sessionStorage.setItem('roomPassword', inputPassword);
   
     try {
       const response = await joinRoom(room.roomId, inputPassword);
