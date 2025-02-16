@@ -19,7 +19,7 @@ const BackgroundMusic = () => {
       const currentMusic = matchedKey ? musicMap[matchedKey] : null;
 
       // 음악이 변경되어야 할 경우만 src 업데이트 및 재생
-      if (currentMusic && audioRef.current.src !== window.location.origin + currentMusic) {
+      if (currentMusic && audioRef.current.src !== window.location.origin  + currentMusic) {
         audioRef.current.src = currentMusic;
         audioRef.current.play().catch((error) => {
           console.error('오디오 재생 오류:', error);

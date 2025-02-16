@@ -8,10 +8,8 @@ const MyVideo = () => {
 
   useEffect(() => {
     if (publisher && videoRef.current) {
-      console.log("🎥 Assigning video element to publisher");
       publisher.addVideoElement(videoRef.current);
       console.log("🎥 Assigned video element to publisher", publisher);
-      console.log("시발 제발", publisher.stream);
     }
   }, [publisher]);
 

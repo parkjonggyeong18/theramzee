@@ -6,7 +6,7 @@ import lombok.*;
 
 @Data
 @Entity
-@Table(name = "Friends")
+@Table(name = "friends")
 public class Friends {
 
     @Id
@@ -15,11 +15,11 @@ public class Friends {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "FK_Friends_User"), nullable = false)
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_friends_User"), nullable = false)
     private User user; // User와의 다대일 관계
 
     @ManyToOne
-    @JoinColumn(name = "friends_id", foreignKey = @ForeignKey(name = "FK_Friends_Friend"), nullable = false)
+    @JoinColumn(name = "friends_id", foreignKey = @ForeignKey(name = "fk_friends_Friend"), nullable = false)
     private User friend;
 
     @Enumerated(EnumType.STRING)

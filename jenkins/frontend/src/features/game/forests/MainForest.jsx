@@ -18,6 +18,10 @@ import VoteScreen from '../components/vote/VoteScreen';
 
 const MainForest = () => {
   const { gameState, players, startEmergencyVote, endVote,resetGame } = useGame();
+  const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
+  
+  const showDescriptionOverlay = () => setIsDescriptionVisible(true);
+  const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
   const navigate = useNavigate();
 
       const {
@@ -116,7 +120,10 @@ const MainForest = () => {
     isGameStarted: gameState.isStarted,
     background: backgroundImages.mainForest,
     missionButtons: null,    // 메인 숲은 미션 버튼 없음
-    miniGameOverlay: null    // 메인 숲은 미니게임 없음
+    miniGameOverlay: null,    // 메인 숲은 미니게임 없음
+    isDescriptionVisible,
+    onShowDescription: showDescriptionOverlay,
+    onHideDescription: hideDescriptionOverlay,
   };
   
 

@@ -1,9 +1,9 @@
 // components/game/common/GameLayout.jsx
 import styled from 'styled-components';
 import { Z_INDEX } from '../../../../constants/zIndex';
-
+import DescriptionOverlay from './DescriptionOverlay';
 const GameLayout = ({
-  // 기본 구성요소
+  // 기존 props
   leftVideoGrid,
   rightVideoGrid,
   gameTimer,
@@ -11,74 +11,92 @@ const GameLayout = ({
   buttonContainer,
   myVideo,
   miniMap,
-  
-  // 게임 상태
   isGameStarted,
   background,
-  
-  // 숲별 특수 기능
-  mainForestButtons,    // 메인 숲 버튼
-  missionButtons,       // 미션 숲 버튼
-  miniGameOverlay,      // 미니게임 오버레이
-  voteScreen,          // 투표 화면
+  mainForestButtons,
+  missionButtons,
+  miniGameOverlay,
+  voteScreen,
+
+  // 설명서 관련 props
+  isDescriptionVisible,
+  onShowDescription,
+  onHideDescription,
 }) => {
   return (
     <LayoutContainer>
       <BackgroundImage $background={background} />
-      
+
       <TopSection>
-        <LeftVideoGridArea>
-          {leftVideoGrid}
-        </LeftVideoGridArea>
-        
-        <GameTimerArea>
-          {gameTimer}
-        </GameTimerArea>
-        
-        <RightVideoGridArea>
-          {rightVideoGrid}
-        </RightVideoGridArea>
-        
+        <LeftVideoGridArea>{leftVideoGrid}</LeftVideoGridArea>
+        <GameTimerArea>{gameTimer}</GameTimerArea>
+        <RightVideoGridArea>{rightVideoGrid}</RightVideoGridArea>
+
         {isGameStarted ? (
-          <StatePanelArea>
-            {statePanel}
-          </StatePanelArea>
+          <StatePanelArea>{statePanel}</StatePanelArea>
         ) : (
-          <ButtonContainerArea>
-            {buttonContainer}
-          </ButtonContainerArea>
+          <ButtonContainerArea>{buttonContainer}</ButtonContainerArea>
         )}
       </TopSection>
 
-      {/* 미션 버튼 영역 */}
       {isGameStarted && missionButtons && (
-        <MissionSection>
-          {missionButtons}
-        </MissionSection>
+        <MissionSection>{missionButtons}</MissionSection>
       )}
 
       <BottomSection>
-        <MyVideoArea>
-          {myVideo}
-        </MyVideoArea>
-        
+        <MyVideoArea>{myVideo}</MyVideoArea>
+
         {isGameStarted && mainForestButtons && (
-          <MainForestButtonsArea>
-            {mainForestButtons}
-          </MainForestButtonsArea>
+          <MainForestButtonsArea>{mainForestButtons}</MainForestButtonsArea>
         )}
-        
+
+        {/* 미니맵과 "i" 아이콘 */}
         <MiniMapArea>
           {miniMap}
+          <InfoIcon onClick={onShowDescription}>i</InfoIcon>
         </MiniMapArea>
       </BottomSection>
 
       {/* 오버레이 영역 */}
       {miniGameOverlay}
       {voteScreen}
+
+      {/* 설명서 오버레이 */}
+      <DescriptionOverlay
+        isVisible={isDescriptionVisible}
+        onClose={onHideDescription}
+        description="이 게임의 주요 목표는 다람쥐를 도와 임무를 완수하는 것입니다!"
+      />
     </LayoutContainer>
   );
 };
+
+const MiniMapArea = styled.div`
+  position: relative;
+  margin-left: auto;
+  margin-right: 20px;
+`;
+
+const InfoIcon = styled.button`
+  position: absolute;
+  top: -20px;
+  right: -10px;
+  width: 30px;
+  height: 30px;
+  background-color: #fff;
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f0f0f0;
+    color: #555;
+  }
+`;
+
 
 const LayoutContainer = styled.div`
   width: 100vw;
@@ -171,9 +189,5 @@ const MainForestButtonsArea = styled.div`
   // transform: translateX(-50%);
 `;
 
-const MiniMapArea = styled.div`
-  margin-left: auto;
-  margin-right: 20px;
-`;
 
 export default GameLayout;
