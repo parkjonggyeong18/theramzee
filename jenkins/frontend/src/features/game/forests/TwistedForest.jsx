@@ -64,6 +64,7 @@ const TwistedForest = () => {
   const handleMissionClick = (missionId) => {
     if (isMissionCompleted(missionId)) return;
     if (gameState.fatigue < 1) return;
+    if (gameState.evilSquirrel) return;
     setCurrentMission(missionId);
     setShowMiniGame(true);
   };
@@ -85,7 +86,6 @@ const TwistedForest = () => {
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
       document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;
-      console.log('✅ 커서 변경:', cursorImage);
     } else {
       document.body.style.cursor = 'auto';
     }

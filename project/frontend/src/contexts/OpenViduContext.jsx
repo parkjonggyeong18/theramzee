@@ -4,12 +4,11 @@ import { OpenVidu } from 'openvidu-browser';
 // OpenViduContext 생성
 const OpenViduContext = createContext();
 
-// OpenViduProvider 컴포넌트
 export const OpenViduProvider = ({ children }) => {
   const [session, setSession] = useState(undefined);
   const [mainStreamManager, setMainStreamManager] = useState(undefined);
   const [publisher, setPublisher] = useState(undefined);
-  const [subscribers, setSubscribers] = useState([]);
+  const [subscribers, setSubscribers] = useState([]); // 빈 배열로 초기화
   const [isPreview, setIsPreview] = useState(true);
   const [previewPublisher, setPreviewPublisher] = useState(null);
   
@@ -34,7 +33,7 @@ export const OpenViduProvider = ({ children }) => {
         audio: true,
       });
 
-      const previewPublisher = await OV.initPublisherAsync(undefined, {
+      const previewPub = await OV.initPublisherAsync(undefined, {
         videoSource: processedStream.getVideoTracks()[0],
         audioSource: processedStream.getAudioTracks()[0],
         publishAudio: true,
@@ -42,14 +41,14 @@ export const OpenViduProvider = ({ children }) => {
         mirror: true,
       });
 
-      setPreviewPublisher(previewPublisher);
+      setPreviewPublisher(previewPub);
+
+      // 미리보기가 필요하면 dispose 코드는 제거하거나 조건을 달아주세요.
+      // previewPub.stream.disposeWebRtcPeer();
+      // previewPub.stream.disposeMediaStream();
+
     } catch (error) {
       console.error('Preview init error:', error);
-    }
-
-    if (previewPublisher) {
-      previewPublisher.stream.disposeWebRtcPeer();
-      previewPublisher.stream.disposeMediaStream();
     }
   };
 
@@ -63,18 +62,36 @@ export const OpenViduProvider = ({ children }) => {
     }
   
     const newSession = OV.initSession();
-  
-    //  중복된 subscriber 추가 방지
+
+    // 이벤트 핸들러 등록 전에 구독자 배열 초기화
+    setSubscribers([]);
+
+    // 구독자 추가 이벤트
     newSession.on('streamCreated', (event) => {
-      const subscriber = newSession.subscribe(event.stream, undefined);
-      console.log('New stream created:', subscriber);
-      setSubscribers((prev) => [...prev, subscriber]);
+      setSubscribers((prevSubscribers) => {
+        const alreadyExists = prevSubscribers.some(
+          (subscriber) =>
+            subscriber.stream.connection.connectionId === event.stream.connection.connectionId
+        );
+        if (!alreadyExists) {
+          const subscriber = newSession.subscribe(event.stream, undefined);
+          console.log('New stream created:', subscriber);
+          return [...prevSubscribers, subscriber];
+        }
+        return prevSubscribers;
+      });
     });
-  
+
+    // 구독자 제거 이벤트
     newSession.on('streamDestroyed', (event) => {
-      setSubscribers((prev) => prev.filter(sub => sub.stream.connection.connectionId !== event.stream.connection.connectionId));
+      setSubscribers((prevSubscribers) =>
+        prevSubscribers.filter(
+          (sub) =>
+            sub.stream.connection.connectionId !== event.stream.connection.connectionId
+        )
+      );
     });
-  
+
     newSession.on('exception', (exception) => {
       console.warn(exception);
     });
@@ -117,7 +134,7 @@ export const OpenViduProvider = ({ children }) => {
       console.error("❌ Error disconnecting session:", error);
     }
   
-    // ✅ 상태 변경을 보장하기 위해 상태를 먼저 클리어
+    // 상태 초기화
     setSession(undefined);
     setSubscribers([]);
     setMainStreamManager(undefined);
@@ -149,7 +166,6 @@ export const OpenViduProvider = ({ children }) => {
   );
 };
 
-// Context를 사용하는 훅
 export const useOpenVidu = () => {
   return useContext(OpenViduContext);
 };

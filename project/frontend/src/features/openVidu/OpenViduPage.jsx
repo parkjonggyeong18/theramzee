@@ -23,7 +23,7 @@ const OpenViduPage = () => {
   const token = sessionStorage.getItem('openViduToken');
 
   /**
-   * "게임에 입장하기" 버튼 클릭 시 처리
+   * "게임에 입장하기" 버튼 클릭
    */
   const enterGame = async () => {
     await joinSession(token, nickname);
@@ -31,117 +31,104 @@ const OpenViduPage = () => {
     navigate(`/room/${roomId}/game`);
   };
 
-  const goBack = () => {
-    leaveSession();
-    navigate(`/rooms`);
-  }
-  
-  // 미리보기 상태일 때 렌더링
+  // 미리보기 화면
   if (isPreview) {
     return (
       <PreviewContainer>
-        <PreviewTitle>다람쥐 월드 미리보기</PreviewTitle>
-        <PreviewText>카메라 영상을 미리 확인하세요.</PreviewText>
+        <Header>
+          <Title>RAMZEE 미리보기</Title>
+        </Header>
         <VideoWrapper>
-          {previewPublisher && (
+          {previewPublisher ? (
             <UserVideoComponent streamManager={previewPublisher} />
+          ) : (
+            <Placeholder>카메라가 활성화되지 않았습니다</Placeholder>
           )}
         </VideoWrapper>
         <ButtonGroup>
-          <LeaveButton onClick={goBack}>돌아가기</LeaveButton>
           <EnterButton onClick={enterGame}>게임에 입장하기</EnterButton>
         </ButtonGroup>
       </PreviewContainer>
     );
   }
 
-  // 세션 화면: mainStreamManager와 subscribers를 합쳐서 스트림 배열 생성
-  const topStreams = [
-    ...(mainStreamManager ? [mainStreamManager] : []),
-    ...((Array.isArray(subscribers) && subscribers) || []),
-  ];
-
+  // 세션 화면
   return (
     <SessionContainer>
-      <SessionTitle>다람쥐 월드: {sessionId}</SessionTitle>
-      <LeaveButton onClick={leaveSession}>돌아가기</LeaveButton>
-      <VideoGridContainer>
-        {topStreams.map((stream, idx) => (
+      <Header>
+        <Title>다람쥐 월드: {roomId}</Title>
+      </Header>
+      <VideoGrid>
+        {[...(mainStreamManager ? [mainStreamManager] : []), ...subscribers].map((stream, idx) => (
           <UserVideoComponent key={idx} streamManager={stream} />
         ))}
-      </VideoGridContainer>
+      </VideoGrid>
     </SessionContainer>
   );
 };
 
+export default OpenViduPage;
+
+// 스타일 컴포넌트
 const PreviewContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  width: 100vw;
-  height: 100vh;
-  background-color: #f0f0f0;
+  min-height: 100vh;
+  background-color: rgba(34, 17, 7, 0.9); /* 로비와 유사한 배경색 */
 `;
 
-const PreviewTitle = styled.h1`
-  font-size: 2rem;
-  margin-bottom: 10px;
+const Header = styled.div`
+
 `;
 
-const PreviewText = styled.p`
+const Title = styled.h1`
+  font-size: 2.5rem;
+  color: #a4e17d; /* 밝은 녹색 */
+`;
+
+const Subtitle = styled.p`
   font-size: 1.2rem;
-  margin-bottom: 20px;
+  color: #fff;
 `;
 
 const VideoWrapper = styled.div`
-  width: 45%;
-  margin-bottom: 20px;
+  width: 60%;
+  max-width: 650px;
+  height: auto;
+  margin: 2rem auto;
+`;
+
+const Placeholder = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 300px;
+  background-color: #444;
+  color: #fff;
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
-  flex-direction: row;
-  gap: 20px;
-`;
-
-const LeaveButton = styled.button`
-  padding: 10px 20px;
-  background-color: #ff4444;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
+  gap: 1rem;
 `;
 
 const EnterButton = styled.button`
-  padding: 10px 20px;
-  background-color: #90ee90;
-  color: #000;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
+  background-color: #a4e17d; /* 밝은 녹색 */
+  color: black;
+  padding: 1rem 2rem;
+  border-radius: 10px;
+  font-size: 1.2rem;
+`;
+
+const LeaveButton = styled.button`
+  background-color: #ff6b6b; /* 밝은 빨간색 */
 `;
 
 const SessionContainer = styled.div`
-  padding: 20px;
-  width: 100vw;
-  height: 100vh;
-  background-color: #ffffff;
 `;
 
-const SessionTitle = styled.h1`
-  font-size: 2rem;
-  margin-bottom: 20px;
+const VideoGrid = styled.div`
 `;
-
-const VideoGridContainer = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-`;
-
-export default OpenViduPage;

@@ -17,11 +17,11 @@ export const connectSocket = async () => {
         Authorization: `Bearer ${token}`,
       },
       onConnect: (frame) => {
-        console.log("✅ Connected to WebSocket:", frame);
+        console.log("Connected to WebSocket:", frame);
         resolve(stompClient);
       },
       onStompError: (frame) => {
-        console.error("🚨 STOMP error:", frame);
+        console.error("STOMP error:", frame);
         reject(frame);
       },
       onDisconnect: () => {

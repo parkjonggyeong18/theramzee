@@ -34,6 +34,10 @@ public class RedisUtil {
         return Boolean.TRUE.equals(redisTemplate1.hasKey(key));
     }
 
+    public void del(String key) {
+        redisTemplate.delete(key);
+    }
+
     public void hset(String key, String hashKey, Object value) {
         redisTemplate.opsForHash().put(key, hashKey, value);
     }
