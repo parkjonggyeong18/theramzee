@@ -36,7 +36,7 @@ const BreathingForest = () => {
     return () => clearTimeout(timer);
   }, [currentForestNum]);
   
-  const filteredSubscribers = subscribers.filter(sub => {
+  const filteredSubscribers = subscribers.slice().reverse().filter(sub => {
     try {
       const rawData = sub.stream.connection.data.split("%/%")[0];
       const subData = JSON.parse(rawData);
@@ -46,7 +46,7 @@ const BreathingForest = () => {
       console.error("🚨 OpenVidu 데이터 파싱 오류:", error);
       return false;
     }
-  });
+  }).reverse();
 
   const leftFilterCam = filteredSubscribers.slice(0, 3);
   const rightFilterCam = filteredSubscribers.slice(3, 7);
