@@ -1,12 +1,23 @@
-import React, { useState } from 'react';
-import { useVolume } from '../../contexts/VolumeContext'; // 전역 볼륨 상태 사용
+import React, { useState, useEffect } from 'react';
+import { useVolume } from '../../contexts/VolumeContext';
 import styled from 'styled-components';
 
 const VolumeControl = () => {
   const { volume, setVolume } = useVolume();
-  const [isMuted, setIsMuted] = useState(false); // 음소거 상태 관리
+
+  // localStorage에서 음소거 상태를 초기화하거나 기본값 false로 설정
+  const [isMuted, setIsMuted] = useState(() => {
+    const savedMuteState = localStorage.getItem('isMuted');
+    return savedMuteState === 'true'; // 문자열을 불리언으로 변환
+  });
+
   const [previousVolume, setPreviousVolume] = useState(volume); // 음소거 전 볼륨 저장
-  const [showVolume, setShowVolume] = useState(false); // 숫자 표시 상태
+  const [showVolume, setShowVolume] = useState(false); // 슬라이더 숫자 표시
+
+  // 음소거 상태가 변경될 때 localStorage에 저장
+  useEffect(() => {
+    localStorage.setItem('isMuted', isMuted);
+  }, [isMuted]);
 
   const toggleMute = () => {
     if (isMuted) {
@@ -24,11 +35,11 @@ const VolumeControl = () => {
   return (
     <VolumeContainer>
       <MuteButton onClick={toggleMute}>
-        {isMuted ? '🔇' : '🔊'} {/* 음소거 상태에 따라 이모티콘 변경 */}
+        {isMuted ? '🔇' : '🔊'}
       </MuteButton>
       <SliderWrapper
-        onMouseEnter={() => setShowVolume(true)} // 호버 시 숫자 표시
-        onMouseLeave={() => setShowVolume(false)} // 호버 해제 시 숫자 숨김
+        onMouseEnter={() => setShowVolume(true)} // 마우스 호버 시 숫자 표시
+        onMouseLeave={() => setShowVolume(false)} // 마우스 나가면 숨김
       >
         <StyledSlider
           type="range"
@@ -39,6 +50,7 @@ const VolumeControl = () => {
           onChange={(e) => {
             const newVolume = parseFloat(e.target.value);
             setVolume(newVolume);
+
             if (newVolume > 0 && isMuted) {
               // 슬라이더 조작 시 음소거 해제
               setIsMuted(false);
@@ -54,7 +66,6 @@ const VolumeControl = () => {
     </VolumeContainer>
   );
 };
-
 // 스타일 컴포넌트로 고정된 위치 설정
 const VolumeContainer = styled.div`
   position: fixed;
