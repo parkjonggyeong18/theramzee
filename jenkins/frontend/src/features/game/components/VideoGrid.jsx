@@ -100,7 +100,7 @@ const VideoGrid = (props) => {
 
         return (
           <VideoContainer
-            key={idx}
+            key={connectionId}
             onMouseDown={(e) => isKillable && handleDragStart(e, playerNickname)}
             style={{ cursor: isKillable ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
           >
