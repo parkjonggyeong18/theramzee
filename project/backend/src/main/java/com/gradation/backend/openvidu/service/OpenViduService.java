@@ -25,5 +25,6 @@ public interface OpenViduService {
      * @throws OpenViduJavaClientException OpenVidu 클라이언트 예외
      * @throws OpenViduHttpException       OpenVidu HTTP 예외
      */
+
     String generateToken(String sessionId, String nickname) throws OpenViduJavaClientException, OpenViduHttpException;
 }

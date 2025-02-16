@@ -23,7 +23,12 @@ import MiniMap from './components/MiniMap';
 const GameRoom = () => {
   const navigate = useNavigate();
   const [showRoleReveal, setShowRoleReveal] = useState(false);
+  const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
+  
+  const showDescriptionOverlay = () => setIsDescriptionVisible(true);
+  const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
 
+  
   const { 
     gameState, 
     startGame, 
@@ -35,12 +40,18 @@ const GameRoom = () => {
 
   const {
     joinSession,
+    subscribers,
+    leaveSession,
+    initPreview
   } = useOpenVidu();
 
 
   const { roomId } = useParams();  // roomId 가져오기
-  const handlers = useGameHandlers(roomId, gameState, setGameState, joinSession);
+  const handlers = useGameHandlers(roomId, setGameState, joinSession);
   const isSubscribed = useRef(false); // 중복 실행 방지 플래그
+  const nickName = sessionStorage.getItem('nickName')
+  const roomHost = sessionStorage.getItem('roomHost') || null;
+
 
   useEffect(() => {
     setRoomId(roomId);
@@ -64,13 +75,12 @@ const GameRoom = () => {
 
         setTimeout(() => {
           console.log("📌 Subscribing to game topics...");
-          subscribeToTopic(`/user/queue/game/${roomId}/info`, handlers.handleGameInfo);
           subscribeToTopic(`/topic/game/${roomId}/start`, (response) => {
             handlers.handleGameStartResponse(response);
             setShowRoleReveal(true); // 역할 공개 화면 활성화
           });
           subscribeToTopic(`/topic/game/${roomId}/emergency`, handlers.handleEmergencyResponse);
-          subscribeToTopic(`/user/queue/game/${roomId}/move`, handlers.handleMoveResponse);
+          subscribeToTopic(`/topic/game/${roomId}/move`, handlers.handleMoveResponse);
           subscribeToTopic(`/topic/game/${roomId}/save-acorns`, handlers.handleSaveAcornsResponse);
           subscribeToTopic(`/user/queue/game/${roomId}/charge-fatigue`, handlers.handleChargeFatigueResponse);
           subscribeToTopic(`/topic/game/${roomId}/kill`, handlers.handleKillResponse);
@@ -83,6 +93,32 @@ const GameRoom = () => {
     };
 
     connectAndSubscribe();
+
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = ''; 
+      handleExit();
+    };
+  
+    // 뒤로가기 처리
+    const handlePopState = () => {
+      handleExit();
+    };
+  
+    // 공통 종료 처리 함수
+    const handleExit = () => {
+      disconnectSocket();
+      leaveRoom(roomId);
+      leaveSession();
+      initPreview();
+    };
+  
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, [roomId]);
 
   const clkStart = () => {
@@ -92,18 +128,33 @@ const GameRoom = () => {
   const clkExit = () => {
     disconnectSocket();
     leaveRoom(roomId);
+    leaveSession();
+    initPreview();
     navigate('/rooms');
   };
 
+  const leftCam = subscribers.slice(0, 3);
+  console.log("leftPlayers:", leftCam);
+  const rightCam = subscribers.slice(3, 7);
+  console.log("rightPlayers:", rightCam);
+
+
   // GameLayout에 전달할 컴포넌트들
   const gameLayoutProps = {
-    leftVideoGrid: <VideoGrid players={players} gridPosition="left" />,
-    // rightVideoGrid: <VideoGrid players={players} gridPosition="right" />,
+      
+    leftVideoGrid: <VideoGrid players={leftCam} totalSlots={3} gridPosition="left" />,
+    rightVideoGrid: <VideoGrid players={rightCam} totalSlots={2} gridPosition="right" />,
+
     gameTimer: <GameTimer />,
     statePanel: <StatePanel />,
     buttonContainer: (
       <ButtonContainer>
-        <StartButton onClick={clkStart}>GAME START</StartButton>
+        <StartButton 
+          onClick={clkStart} 
+          disabled={roomHost !== "true"}
+        >
+          GAME START
+        </StartButton>
         <ExitButton onClick={clkExit}>나가기</ExitButton>
       </ButtonContainer>  
     ),
@@ -113,12 +164,17 @@ const GameRoom = () => {
     isGameStarted: gameState.isStarted,
     background: backgroundImages.mainForest,
     miniGameOverlay: null,   // GameRoom에서는 미니게임 없음
-    voteScreen: null        // GameRoom에서는 투표 화면 없음
-  };
+    voteScreen: null,        // GameRoom에서는 투표 화면 없음
 
+      // 설명서 관련 props 전달
+    isDescriptionVisible,
+    onShowDescription: showDescriptionOverlay,
+    onHideDescription: hideDescriptionOverlay,
+  };
+  
   return (
     <>
-      <GameLayout {...gameLayoutProps} />
+      <GameLayout {...gameLayoutProps}/>
       {showRoleReveal && <RoleReveal roomId={roomId} />}
     </>
   );
@@ -142,7 +198,13 @@ const StartButton = styled.button`
   &:hover {
     background-color: #98FB98;
   }
+
+  &:disabled {
+    background-color: #d3d3d3;
+    cursor: not-allowed;
+  }
 `;
+
 
 const ExitButton = styled.button`
   padding: 10px 20px;

@@ -39,6 +39,7 @@ const OpenViduPage = () => {
       <div className="preview-container">
         <h1>다람쥐 월드 미리보기</h1>
         <p>AI/AR 필터가 적용된 카메라 영상을 미리 확인하세요.</p>
+        <button onClick={leaveSession}>Leave session</button>
         <div className="preview-video">
           {previewPublisher && <UserVideoComponent streamManager={previewPublisher} />}
         </div>

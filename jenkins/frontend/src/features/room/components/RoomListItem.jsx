@@ -14,19 +14,16 @@ const RoomListItem = ({ room }) => {
   const hostNickname = room?.host?.nickname || '알 수 없음';
   const userCount = room?.users?.length || 0;
   const passwordEnabled = room?.password ? true : false;
+
   const handleJoinRoom = async (inputPassword = null) => {
     if (isJoining) return;
     
     setIsJoining(true);
     setError(null);
+    sessionStorage.setItem('roomPassword', inputPassword);
   
     try {
-      const token = sessionStorage.getItem('accessToken');
-      console.log('Current token:', token);
-  
       const response = await joinRoom(room.roomId, inputPassword);
-      console.log('Join room response:', response);
-      
       const openViduToken = response.data.token;
       sessionStorage.setItem('openViduToken', openViduToken);
       navigate(`/room/${room.roomId}`);

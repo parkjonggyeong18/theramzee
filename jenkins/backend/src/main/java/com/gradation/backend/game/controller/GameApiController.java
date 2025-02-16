@@ -48,7 +48,7 @@ public class GameApiController {
     @PostMapping("/game-move")
     @Operation(summary = "숲 이동", description = "특정 숲으로 이동")
     public ResponseEntity<BaseResponse<MoveForestResponse>> move(@RequestBody GameMoveRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-        MoveForestResponse token = gameService.moveForest(request.getRoomId(), request.getNickname(), request.getNewForest());
+        MoveForestResponse token = gameService.moveForest(request.getRoomId(), request.getNickname(), request.getNewForest(), request.getNicknames());
         return ResponseEntity.ok(BaseResponse.success("숲 이동 성공", token));
     }
 

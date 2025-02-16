@@ -4,9 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Map;
 
 @Data
 public class EmergencyResponse {
+    Map<Integer, List<String>> forestUsers;
     private Map<String, String> userTokens;
 }

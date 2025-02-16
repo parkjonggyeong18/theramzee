@@ -45,6 +45,7 @@ public class GameWebSocketController {
     @SendTo("/topic/game/{roomId}/start")
     public BaseResponse<RoomInitializationResponse> handleGameStart(@Payload GameStartRequest request)
             throws OpenViduJavaClientException, OpenViduHttpException {
+        System.out.println("게임시작 요청은 백에서 옴🙌🙌🙌");
         RoomInitializationResponse initializedData = gameService.initializeRoomStructure(request.getRoomId(), request.getNicknames());
         return BaseResponse.success("게임 시작 성공", initializedData);
     }
@@ -65,9 +66,14 @@ public class GameWebSocketController {
      * 게임 내에서 사용자가 이동할 때 호출됩니다.
      */
     @MessageMapping("/game/{roomId}/move")
-    @SendToUser("/queue/game/{roomId}/move")
+    @SendTo("/topic/game/{roomId}/move")
     public BaseResponse<MoveForestResponse> handleGameMove(@Payload GameMoveRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-        MoveForestResponse token = gameService.moveForest(request.getRoomId(), request.getNickname(), request.getNewForest());
+        System.out.println("여기까지3");
+        System.out.println("request.getNickname() = " + request.getNickname());
+        System.out.println("request.getRoomId() = " + request.getRoomId());
+        System.out.println("request.getNewForest() = " + request.getNewForest());
+        System.out.println("request.getNicknames() = " + request.getNicknames());
+        MoveForestResponse token = gameService.moveForest(request.getRoomId(), request.getNickname(), request.getNewForest(), request.getNicknames());
         return BaseResponse.success("사용자 이동", token);
     }
 
@@ -148,3 +154,5 @@ public class GameWebSocketController {
         return BaseResponse.success("미션 완료", result);
     }
 }
+
+//    public forestUserResponse getForestUserMap()
