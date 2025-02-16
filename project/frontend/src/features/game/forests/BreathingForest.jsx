@@ -59,6 +59,7 @@ const BreathingForest = () => {
   const handleMissionClick = (missionId) => {
     if (isMissionCompleted(missionId)) return;
     if (gameState.fatigue < 1) return;
+    if (gameState.evilSquirrel) return;
     setCurrentMission(missionId);
     setShowMiniGame(true);
   };
@@ -85,7 +86,6 @@ const BreathingForest = () => {
       document.body.style.cursor = 'auto';
     };
   }, [gameState.isStarted, gameState.evilSquirrel]);
-
   const gameLayoutProps = {
     leftVideoGrid: <VideoGrid players={leftFilterCam} totalSlots={3} gridPosition="left" />,
     rightVideoGrid: <VideoGrid players={rightFilterCam} totalSlots={2} gridPosition="right" />,
