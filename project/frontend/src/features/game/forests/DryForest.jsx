@@ -62,6 +62,7 @@ const rightFilterCam = filteredSubscribers.slice(3, 7);
   const handleMissionClick = (missionId) => {
     if (isMissionCompleted(missionId)) return;
     if (gameState.fatigue < 1) return;
+    if (gameState.evilSquirrel) return;
     setCurrentMission(missionId);
     setShowMiniGame(true);
   };

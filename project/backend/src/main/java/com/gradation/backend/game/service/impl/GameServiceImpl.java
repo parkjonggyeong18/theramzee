@@ -103,6 +103,9 @@ public class GameServiceImpl implements GameService {
         // 1. Room 기본 정보 저장
         String roomKey = "ROOM:" + roomId;
 
+        // RoomKey 아래 모든 데이터 초기화
+        redisUtil.del(roomKey + "*");
+
         // 2. Users 데이터 추가 + 각 유저가 현재 위치한 숲 정보 표시( 지금은 로비라서 1)
         Random random = new Random();
         String evilSquirrelNickname = nicknames.get(random.nextInt(nicknames.size()));
