@@ -6,7 +6,7 @@ import { backgroundImages } from '../../../assets/images';
 
 const MiniMap = () => {
  const navigate = useNavigate();
- const { gameState, moveForest, players } = useGame();
+ const { gameState, moveForest, players, cancelAction  } = useGame();
 
  const forests = [
    { 
@@ -50,6 +50,7 @@ const MiniMap = () => {
  const clkForest = (forestId, forestNum) => {
   if (!gameState.isStarted || gameState.isDead) return;
   if (!gameState.roomId) return;
+  cancelAction();
   moveForest(forestNum);
   navigate(`/game/${gameState.roomId}/forest/${forestId}`);
 };
@@ -57,10 +58,10 @@ const MiniMap = () => {
 const clkMainForest = () => {
   if (!gameState.isStarted || gameState.isDead) return;
   if (!gameState.roomId) return;
+  cancelAction();
   moveForest(1);
   navigate(`/game/${gameState.roomId}/main`);
 };
-
  return (
   <MapContainer>
     <ForestGrid>
@@ -87,8 +88,11 @@ const clkMainForest = () => {
 };
 
 const MapContainer = styled.div`
- width: 200px;
- height: 200px;
+ width: 150px;
+ height: 150px;
+  background-color:rgba(240, 240, 240, 0.34); // 회색 배경 추가
+  padding: 10px; // 내부 여백 추가
+  border-radius: 10px; // 모서리 둥글게 처리
 `;
 
 const ForestGrid = styled.div`
