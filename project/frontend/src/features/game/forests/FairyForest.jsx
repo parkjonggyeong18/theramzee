@@ -23,6 +23,7 @@ const FairyForest = () => {
   const [currentMission, setCurrentMission] = useState(null);
   const [completedMissions, setCompletedMissions] = useState([]);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
+  const [isForestTransitioning, setIsForestTransitioning] = useState(false);
   
   const showDescriptionOverlay = () => setIsDescriptionVisible(true);
   const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
@@ -34,7 +35,17 @@ const FairyForest = () => {
    
     // 현재 사용자가 위치한 숲 번호 가져오기
     const currentForestNum = gameState.forestNum;
-    const currentForestUser = gameState.forestUsers?.[currentForestNum]; // 배열열
+    const currentForestUser = gameState.forestUsers?.[currentForestNum]; // 배열
+
+      // 숲 이동 시 전환 애니메이션: forestNum 변경 시 1초 전환
+    useEffect(() => {
+      setIsForestTransitioning(true);
+      const timer = setTimeout(() => {
+        setIsForestTransitioning(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }, [currentForestNum]);
+
   
     const filteredSubscribers = subscribers.filter(sub => {
       try {
@@ -84,7 +95,6 @@ const FairyForest = () => {
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
       document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;
-      console.log('✅ 커서 변경:', cursorImage);
     } else {
       document.body.style.cursor = 'auto';
     }
@@ -154,8 +164,26 @@ const FairyForest = () => {
     onHideDescription: hideDescriptionOverlay,
   };
 
-  return <GameLayout {...gameLayoutProps} />;
+  return (
+    <>
+      <GameLayout {...gameLayoutProps}>
+        {isForestTransitioning && <TransitionOverlay />}
+      </GameLayout>
+      {/* RoleReveal 등의 추가 컴포넌트가 있을 수 있음 */}
+    </>
+  );
 };
+
+const TransitionOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: url('/path/to/transition3.gif') center center no-repeat;
+  background-size: cover;
+  z-index: 9999;
+`;
 
 const MissionButtons = styled.div`
   display: flex;

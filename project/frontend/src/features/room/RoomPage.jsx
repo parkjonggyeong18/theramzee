@@ -20,7 +20,6 @@ const RoomPage = () => {
     setLoading(true);
     try {
       const response = await fetchRooms();
-      console.log('방 목록:', response);
      
       setRooms(response.data);
       setError(null); // 이전 에러 메시지 초기화

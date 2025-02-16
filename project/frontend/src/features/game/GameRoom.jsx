@@ -74,7 +74,6 @@ const GameRoom = () => {
         setIsConnected(true);
 
         setTimeout(() => {
-          console.log("📌 Subscribing to game topics...");
           subscribeToTopic(`/topic/game/${roomId}/start`, (response) => {
             handlers.handleGameStartResponse(response);
             setShowRoleReveal(true); // 역할 공개 화면 활성화
@@ -134,9 +133,7 @@ const GameRoom = () => {
   };
 
   const leftCam = subscribers.slice(0, 3);
-  console.log("leftPlayers:", leftCam);
   const rightCam = subscribers.slice(3, 7);
-  console.log("rightPlayers:", rightCam);
 
 
   // GameLayout에 전달할 컴포넌트들

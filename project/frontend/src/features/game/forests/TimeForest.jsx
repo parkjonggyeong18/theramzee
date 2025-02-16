@@ -84,7 +84,6 @@ const TimeForest = () => {
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
       document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;
-      console.log('✅ 커서 변경:', cursorImage);
     } else {
       document.body.style.cursor = 'auto';
     }
