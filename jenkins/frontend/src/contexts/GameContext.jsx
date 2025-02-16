@@ -153,7 +153,7 @@ export const GameProvider = ({ children }) => {
   // 게임 종료 처리
   const checkGameOver = useCallback(() => {
     if (gameState.totalAcorns >= 1) {
-      console.log("Game should be over now");
+      console.log("게임 종료");
       setGameState(prev => ({
         ...prev,
         isGameOver: true,
@@ -235,7 +235,7 @@ export const GameProvider = ({ children }) => {
   const completeMission = useCallback(async (forestNum, missionNum) => {
     if (isConnected && roomId) {
       try {
-        console.log("Sending mission completion to server");
+        console.log("미션 완료 전송");
         await gameService.completeMission(roomId, forestNum, missionNum, nickname);
 
         const missionKey = `${forestNum}_${missionNum}`;

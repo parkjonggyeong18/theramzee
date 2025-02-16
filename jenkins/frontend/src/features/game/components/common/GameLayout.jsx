@@ -1,7 +1,7 @@
-// components/game/common/GameLayout.jsx
 import styled from 'styled-components';
 import { Z_INDEX } from '../../../../constants/zIndex';
 import DescriptionOverlay from './DescriptionOverlay';
+
 const GameLayout = ({
   // 기존 props
   leftVideoGrid,
@@ -17,11 +17,12 @@ const GameLayout = ({
   missionButtons,
   miniGameOverlay,
   voteScreen,
-
   // 설명서 관련 props
   isDescriptionVisible,
   onShowDescription,
   onHideDescription,
+  // 추가: 전환 애니메이션 등 persistent하게 표시할 children
+  children,
 }) => {
   return (
     <LayoutContainer>
@@ -45,23 +46,21 @@ const GameLayout = ({
 
       <BottomSection>
         <MyVideoArea>{myVideo}</MyVideoArea>
-
         {isGameStarted && mainForestButtons && (
           <MainForestButtonsArea>{mainForestButtons}</MainForestButtonsArea>
         )}
-
-        {/* 미니맵과 "i" 아이콘 */}
         <MiniMapArea>
           {miniMap}
           <InfoIcon onClick={onShowDescription}>i</InfoIcon>
         </MiniMapArea>
       </BottomSection>
 
-      {/* 오버레이 영역 */}
       {miniGameOverlay}
       {voteScreen}
 
-      {/* 설명서 오버레이 */}
+      {/* 전환 애니메이션 및 기타 persistent 요소를 children으로 전달 */}
+      {children}
+
       <DescriptionOverlay
         isVisible={isDescriptionVisible}
         onClose={onHideDescription}
@@ -70,33 +69,6 @@ const GameLayout = ({
     </LayoutContainer>
   );
 };
-
-const MiniMapArea = styled.div`
-  position: relative;
-  margin-left: auto;
-  margin-right: 20px;
-`;
-
-const InfoIcon = styled.button`
-  position: absolute;
-  top: -20px;
-  right: -10px;
-  width: 30px;
-  height: 30px;
-  background-color: #fff;
-  color: #000;
-  border: none;
-  border-radius: 50%;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #f0f0f0;
-    color: #555;
-  }
-`;
-
 
 const LayoutContainer = styled.div`
   width: 100vw;
@@ -135,10 +107,8 @@ const LeftVideoGridArea = styled.div`
 `;
 
 const GameTimerArea = styled.div`
-  // position: absolute;
   top: 20px;
   left: 50%;
-  // transform: translateX(-50%);
   margin-right: 20px;
 `;
 
@@ -171,7 +141,6 @@ const BottomSection = styled.div`
   position: fixed;
   bottom: 20px;
   width: 100%;
-  // padding: 0 20px;
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
@@ -184,10 +153,33 @@ const MyVideoArea = styled.div`
 `;
 
 const MainForestButtonsArea = styled.div`
-  // position: absolute;
   left: 50%;
-  // transform: translateX(-50%);
 `;
 
+const MiniMapArea = styled.div`
+  position: relative;
+  margin-left: auto;
+  margin-right: 20px;
+`;
+
+const InfoIcon = styled.button`
+  position: absolute;
+  top: -20px;
+  right: -10px;
+  width: 30px;
+  height: 30px;
+  background-color: #fff;
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f0f0f0;
+    color: #555;
+  }
+`;
 
 export default GameLayout;

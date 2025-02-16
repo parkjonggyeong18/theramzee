@@ -55,7 +55,6 @@ const VideoGrid = (props) => {
             const parsedData = JSON.parse(rawData);
             const subscriberNickname = parsedData.clientData;
             // 현재 숲에 포함되어 있다면 오디오 활성화, 아니면 음소거
-            console.log("🔊 오디오 제어:", gameState.forestUsers);
             if (gameState.forestUsers?.[gameState.forestNum]?.includes(subscriberNickname)) {
               player.subscribeToAudio(true);
               console.log(` ${subscriberNickname} 오디오 ON`);
