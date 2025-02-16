@@ -45,20 +45,17 @@ const DryForest = () => {
     return () => clearTimeout(timer);
   }, [currentForestNum]);
 
-  const filteredSubscribers = subscribers.filter(sub => {
+  const filteredSubscribers = subscribers.slice().reverse().filter(sub => {
     try {
-        // 🔥 JSON 데이터와 추가 문자열(`%/%닉네임`) 분리
-        const rawData = sub.stream.connection.data.split("%/%")[0]; 
-        const subData = JSON.parse(rawData); // {"clientData": "test1"}
-        const subscriberNickname = subData.clientData;
-
-        // 🔥 현재 숲에 속한 유저(`currentForestUser`)와 일치하는 경우만 필터링
-        return currentForestUser.includes(subscriberNickname);
+      const rawData = sub.stream.connection.data.split("%/%")[0];
+      const subData = JSON.parse(rawData);
+      const subscriberNickname = subData.clientData;
+      return currentForestUser?.includes(subscriberNickname);
     } catch (error) {
-        console.error("🚨 OpenVidu 데이터 파싱 오류:", error);
-        return false; // 파싱 실패한 경우 필터링에서 제외
+      console.error("🚨 OpenVidu 데이터 파싱 오류:", error);
+      return false;
     }
-});
+  }).reverse();
 
 const leftFilterCam = filteredSubscribers.slice(0, 3);
 const rightFilterCam = filteredSubscribers.slice(3, 7);
