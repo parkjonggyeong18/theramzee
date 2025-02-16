@@ -63,6 +63,7 @@ const BreathingForest = () => {
   const handleMissionClick = (missionId) => {
     if (isMissionCompleted(missionId)) return;
     if (gameState.fatigue < 1) return;
+    if (gameState.evilSquirrel) return;
     setCurrentMission(missionId);
     setShowMiniGame(true);
   };
