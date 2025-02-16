@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 import { useGame } from '../contexts/GameContext';
 
-export const useGameHandlers = (roomId, setGameState, joinSession) => {
+export const useGameHandlers = (roomId, setGameState) => {
   const { gameState } = useGame();
   
   const nickName = sessionStorage.getItem('nickName');
@@ -44,8 +44,6 @@ export const useGameHandlers = (roomId, setGameState, joinSession) => {
           const initializedData = message.data.userTokens;
           console.log("긴급 요청 성공:", initializedData);
 
-          // await joinSession(initializedData[nickName], nickName);
-
           setGameState((prev) => ({
             ...prev,
             forestToken: initializedData[nickName],
@@ -73,7 +71,7 @@ export const useGameHandlers = (roomId, setGameState, joinSession) => {
       try {
         if (message.success) {
           const initializedData = message.data;
-          // await joinSession(initializedData['forestToken'], nickName)
+
           setGameState((prev) => ({
             ...prev,
             forestUsers: initializedData.forestUsers,
