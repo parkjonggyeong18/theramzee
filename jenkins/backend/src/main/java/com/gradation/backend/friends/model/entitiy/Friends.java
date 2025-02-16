@@ -15,11 +15,11 @@ public class Friends {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_friends_User"), nullable = false)
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_friends_user"), nullable = false)
     private User user; // User와의 다대일 관계
 
     @ManyToOne
-    @JoinColumn(name = "friends_id", foreignKey = @ForeignKey(name = "fk_friends_Friend"), nullable = false)
+    @JoinColumn(name = "friends_id", foreignKey = @ForeignKey(name = "fk_friends_friend"), nullable = false)
     private User friend;
 
     @Enumerated(EnumType.STRING)

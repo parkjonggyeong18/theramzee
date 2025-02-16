@@ -59,14 +59,13 @@ export const OpenViduProvider = ({ children }) => {
   const joinSession = async (token, userName) => {
     if (session) {
       console.warn("⚠️ Already connected to a session. Leaving current session first...");
-      await leaveSession(); // ✅ 기존 세션 정리 후 다시 연결
+      await leaveSession(); // 기존 세션 정리 후 다시 연결
     }
   
     const newSession = OV.initSession();
   
-    // ✅ 중복된 subscriber 추가 방지
+    //  중복된 subscriber 추가 방지
     newSession.on('streamCreated', (event) => {
-      console.log('New stream created:', event.stream);
       const subscriber = newSession.subscribe(event.stream, undefined);
       console.log('New stream created:', subscriber);
       setSubscribers((prev) => [...prev, subscriber]);
@@ -107,13 +106,12 @@ export const OpenViduProvider = ({ children }) => {
    * 세션 떠나기
    */
   const leaveSession = async () => {
-    console.log("🔴 Leaving session...");
     try {
       if (session) {
         await session.disconnect();
-        console.log("✅ Session disconnected successfully.");
+        console.log(" Session disconnected successfully.");
       } else {
-        console.warn("⚠️ session.disconnect is not a function. Skipping...");
+        console.warn(" session.disconnect is not a function. Skipping...");
       }
     } catch (error) {
       console.error("❌ Error disconnecting session:", error);

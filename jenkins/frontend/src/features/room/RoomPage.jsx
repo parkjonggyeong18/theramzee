@@ -20,7 +20,6 @@ const RoomPage = () => {
     setLoading(true);
     try {
       const response = await fetchRooms();
-      console.log('방 목록:', response);
      
       setRooms(response.data);
       setError(null); // 이전 에러 메시지 초기화
@@ -36,7 +35,10 @@ const RoomPage = () => {
     sessionStorage.setItem('roomHost', false)
     loadRooms();
     // 주기적으로 방 목록 업데이트
-    const interval = setInterval(loadRooms, 500000);
+    const interval = setInterval(() => {
+      console.log('🔄 방 목록 갱신 중...');
+      loadRooms();
+    }, 30000);
     return () => clearInterval(interval);
   }, []);
 
