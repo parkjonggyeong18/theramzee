@@ -61,6 +61,8 @@ public interface GameService {
      * @return CompleteMissionResponse 객체 (미션 완료 정보와 보상 내용)
      */
     CompleteMissionResponse completeMission(int roomId, int forestNum, int missionNum, String nickname);
+
+    VoteResponse vote(int roomId, String nickname);
 }
 
 

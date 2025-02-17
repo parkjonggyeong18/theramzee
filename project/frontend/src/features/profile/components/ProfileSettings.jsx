@@ -180,7 +180,7 @@ const ProfileSettings = () => {
 };
 
 const SettingsContainer = styled.div`
-  width: 100%;
+  // width: 100%;
   padding: 1rem;
   background-color: rgba(45, 24, 16, 0.95);
 `;
@@ -193,7 +193,7 @@ const ButtonGroup = styled.div`
 
 const SettingButton = styled.button`
   flex: 1;
-  padding: 0.5rem;
+  padding: 0.3rem;
   background-color: #4a3228;
   color: white;
   border: none;
@@ -207,7 +207,7 @@ const SettingButton = styled.button`
 `;
 
 const DeleteButton = styled(SettingButton)`
-  background-color: #9b2c2c;
+background-color: #9b2c2c;
 
   &:hover {
     background-color: #c53030;
@@ -215,9 +215,10 @@ const DeleteButton = styled(SettingButton)`
 `;
 
 const SlideForm = styled.form`
+  // width: 100%;  // 너비 제한
   padding: 1rem;
   border-radius: 8px;
-  margin-top: 1rem;
+  // margin-top: 1rem;
   background-color: rgba(255, 255, 255, 0.05);
   animation: slideDown 0.3s ease-out;
 
@@ -240,6 +241,7 @@ const FormTitle = styled.h3`
 `;
 
 const Input = styled.input`
+  box-sizing: border-box;
   width: 100%;
   padding: 0.5rem;
   margin-bottom: 0.5rem;

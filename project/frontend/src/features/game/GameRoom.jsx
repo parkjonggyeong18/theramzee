@@ -87,6 +87,7 @@ const GameRoom = () => {
           subscribeToTopic(`/topic/game/${roomId}/kill`, handlers.handleKillResponse);
           subscribeToTopic(`/topic/game/${roomId}/complete-mission`, handlers.handleCompleteMissionResponse);
           subscribeToTopic(`/topic/game/${roomId}/out`, handlers.handleOutResponse);
+          subscribeToTopic(`/topic/game/${roomId}/vote`, handlers.handleVoteResponse);
         }, 100);
       } catch (error) {
         console.error("⚠️ Failed to connect or subscribe:", error);

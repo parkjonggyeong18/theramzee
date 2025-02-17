@@ -123,6 +123,7 @@ public class GameServiceImpl implements GameService {
             userData.setFatigue(0);
             userData.setForestToken(token);
             userData.setForestNum(1);
+            userData.setVote(0);
             userData.setEvilSquirrel(nickname.equals(evilSquirrelNickname));
 
             // Redis Hash로 저장
@@ -473,6 +474,25 @@ public class GameServiceImpl implements GameService {
 
         // 6. CompleteMissionResponse 객체 생성 및 반환
         return new CompleteMissionResponse(nickname, forestNum, missionNum, reward, newAcorns);
+    }
+
+    /**
+     * 각 유저에 대한 투표 결과 처리
+     *
+     * @param roomId
+     * @param nickname
+     * @return VoteResponse 객체
+     */
+    public VoteResponse vote(int roomId, String nickname) {
+        String roomKey = "ROOM:" + roomId;
+        String userKey = roomKey + ":USER:" + nickname;
+
+        Object voteNumObj = redisUtil.hget(userKey, "vote");
+        int voteNum = (Integer) voteNumObj + 1;
+
+        redisUtil.hset(userKey, "vote", voteNum);
+
+        return new VoteResponse(nickname, voteNum);
     }
 
 }

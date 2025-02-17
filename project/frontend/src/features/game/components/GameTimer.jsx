@@ -1,10 +1,10 @@
-// components/game/GameTimer.jsx
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
 
 const GameTimer = () => {
   const { gameState, setGameState, startFinalVote } = useGame();
+  const INITIAL_TIME = 420; // 7분 = 420초
 
   useEffect(() => {
     let timerInterval;
@@ -14,10 +14,9 @@ const GameTimer = () => {
         setGameState(prev => {
           const newTimer = prev.timer - 1;
           
-          // 게임 시간 종료 (7분 = 0초)
           if (newTimer === 0) {
             clearInterval(timerInterval);
-            startFinalVote();  // GameContext의 함수 사용
+            startFinalVote();
             return {
               ...prev,
               timer: 0
@@ -41,33 +40,66 @@ const GameTimer = () => {
     return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   };
 
+  const getProgressBarColor = (timer) => {
+    const percentage = (timer / INITIAL_TIME) * 100;
+    if (percentage > 66) return '#4CAF50'; // 녹색
+    if (percentage > 33) return '#FFC107'; // 노란색
+    return '#FF5252'; // 빨간색
+  };
+
   return (
     <TimerContainer $timer={gameState.timer}>
-      {formatTime(gameState.timer)}
+      <TimeText>남은 시간</TimeText>
+      <ProgressBarContainer>
+        <ProgressBar 
+          $progress={(gameState.timer / INITIAL_TIME) * 100}
+          $color={getProgressBarColor(gameState.timer)}
+        />
+      </ProgressBarContainer>
     </TimerContainer>
   );
 };
 
 const TimerContainer = styled.div`
- font-size: 2.5rem;
- font-family: 'JejuHallasan';
- color: white;
- background: rgba(0, 0, 0, 0.5);
- padding: 10px 20px;
- border-radius: 10px;
- display: flex;
- justify-content: center;
- align-items: center;
- min-width: 150px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 10px 20px;
+  border-radius: 10px;
+  min-width: 200px;
+`;
 
- // 1분(60초) 이하일 때 깜빡이는 효과
- animation: ${props => props.timer <= 60 ? 'pulse 1s infinite' : 'none'};
+const TimeText = styled.div`
+  font-size: 1rem;
+  font-family: 'JejuHallasan';
+  color: white;
+  text-align: center;
+`;
 
- @keyframes pulse {
-   0% { opacity: 1; }
-   50% { opacity: 0.5; }
-   100% { opacity: 1; }
- }
+const ProgressBarContainer = styled.div`
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+`;
+
+const ProgressBar = styled.div`
+  width: ${props => props.$progress}%;
+  height: 100%;
+  background-color: ${props => props.$color};
+  transition: all 1s linear;
+  border-radius: 4px;
+
+  @keyframes flash {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+
+  animation: ${props => props.$progress <= 25 ? 'flash 1s infinite' : 'none'};
 `;
 
 export default GameTimer;
