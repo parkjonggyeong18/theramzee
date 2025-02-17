@@ -15,6 +15,7 @@ import MiniMap from '../components/MiniMap';
 import MissionButton from '../components/MissionButton';
 import SnakeGame from '../components/missions/SnakeGame';
 import MatchingGame from '../components/missions/MatchingGame';
+import MushiroomCollectionGame from '../components/missions/MushiroomCollectionGame'
 
 
 
@@ -106,22 +107,25 @@ const TwistedForest = () => {
     // 미션 관련
     missionButtons: (
       <MissionButtons>
-      <MissionButtonWrapper style={{ top: '160px', right: '450px' }}>
-        <MissionButton 
-          onClick={() => handleMissionClick('snake')}
-          completed={isMissionCompleted('snake')}
-        />
-      </MissionButtonWrapper>
-      <MissionButtonWrapper style={{ top: '185px', left: '500px' }}>
-        <MissionButton 
-          onClick={() => handleMissionClick('matching')}
-          completed={isMissionCompleted('matching')}
-        />
-      </MissionButtonWrapper>
-      <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-        <MissionButton isDisabled />
-      </MissionButtonWrapper>
-    </MissionButtons>
+        <MissionButtonWrapper style={{ top: '160px', right: '450px' }}>
+          <MissionButton 
+            onClick={() => handleMissionClick('snake')}
+            completed={isMissionCompleted('snake')}
+          />
+        </MissionButtonWrapper>
+        <MissionButtonWrapper style={{ top: '185px', left: '500px' }}>
+          <MissionButton 
+            onClick={() => handleMissionClick('matching')}
+            completed={isMissionCompleted('matching')}
+          />
+        </MissionButtonWrapper>
+        <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
+          <MissionButton 
+            onClick={() => handleMissionClick('mushroom')}
+            completed={isMissionCompleted('mushroom')}
+          />
+        </MissionButtonWrapper>
+      </MissionButtons>
     ),
     
     // 미니게임 오버레이
@@ -142,8 +146,17 @@ const TwistedForest = () => {
             setCurrentMission(null);
           }}
         />
+      ) : currentMission === 'mushroom' ? (
+        <MushiroomCollectionGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
       ) : null
     ),
+    
     
     // 기타
     isGameStarted: gameState.isStarted,

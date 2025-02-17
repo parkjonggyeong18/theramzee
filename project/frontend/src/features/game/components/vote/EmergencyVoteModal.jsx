@@ -120,7 +120,7 @@ const Header = styled.div`
 
 const Title = styled.h2`
   font-size: 2rem;
-  font-family: 'JejuHallasan';
+  font-family: 'NeoDunggeunmoPro-Regular', sans-serif; 
   color: #333;
   margin: 0;
 `;
@@ -145,7 +145,7 @@ const AlertBox = styled.div`
   padding: 16px;
   border-radius: 8px;
   margin-bottom: 24px;
-  font-family: 'JejuHallasan';
+  font-family: 'NeoDunggeunmoPro-Regular', sans-serif; 
 `;
 
 const PlayerGrid = styled.div`
@@ -179,7 +179,7 @@ const PlayerInfo = styled.div`
 `;
 
 const PlayerName = styled.span`
-  font-family: 'JejuHallasan';
+ 
   font-size: 1.2rem;
   color: #333;
 `;
@@ -188,7 +188,7 @@ const VoteCount = styled.span`
   background-color: #f0f0f0;
   padding: 4px 12px;
   border-radius: 16px;
-  font-family: 'JejuHallasan';
+  font-family: 'NeoDunggeunmoPro-Regular', sans-serif; 
   font-size: 0.9rem;
   color: #666;
 `;
@@ -202,7 +202,7 @@ const ButtonGroup = styled.div`
 const BaseButton = styled.button`
   padding: 12px 24px;
   border-radius: 8px;
-  font-family: 'JejuHallasan';
+  font-family: 'NeoDunggeunmoPro-Regular', sans-serif; 
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;

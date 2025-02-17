@@ -16,6 +16,7 @@ import MainForestButtons from '../components/MainForestButtons';
 import MiniMap from '../components/MiniMap';
 import EmergencyVoteModal from '../../game/components/vote/EmergencyVoteModal';
 
+
 const MainForest = () => {
   const { 
     gameState, 

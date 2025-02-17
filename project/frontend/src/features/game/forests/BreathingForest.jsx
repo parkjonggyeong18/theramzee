@@ -12,6 +12,7 @@ import MiniMap from '../components/MiniMap';
 import MissionButton from '../components/MissionButton';
 import MazeGame from '../components/missions/MazeGame';
 import VineSlashGame from '../components/missions/VineSlashGame';
+import PlantGame from '../components/missions/PlantTimingGame'
 
 const BreathingForest = () => {
   const { gameState, players, completeMission } = useGame();
@@ -102,7 +103,7 @@ const BreathingForest = () => {
           <MissionButton onClick={() => handleMissionClick('vine')} completed={isMissionCompleted('vine')} />
         </MissionButtonWrapper>
         <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-          <MissionButton isDisabled />
+          <MissionButton onClick={() => handleMissionClick('plant')} completed={isMissionCompleted('plant')} />
         </MissionButtonWrapper>
       </MissionButtons>
     ),
@@ -111,6 +112,8 @@ const BreathingForest = () => {
         <MazeGame onComplete={handleMissionComplete} onClose={() => { setShowMiniGame(false); setCurrentMission(null); }} />
       ) : currentMission === 'vine' ? (
         <VineSlashGame onComplete={handleMissionComplete} onClose={() => { setShowMiniGame(false); setCurrentMission(null); }} />
+      ) : currentMission === 'plant' ? (
+        <PlantGame onComplete={handleMissionComplete} onClose={() => { setShowMiniGame(false); setCurrentMission(null); }} />
       ) : null
     ),
     isGameStarted: gameState.isStarted,

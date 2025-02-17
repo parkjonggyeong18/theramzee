@@ -201,6 +201,7 @@ const PageContainer = styled.div`
   min-height: 100vh;
   width: 100vw;
   display: flex;
+  
   flex-direction: column;
   align-items: center;
   position: relative;
@@ -235,6 +236,7 @@ const Title = styled.h1`
   font-size: 3rem;
   font-weight: bold;
   color: white;
+  
   text-shadow: 
     0 0 10px #00ff00,
     0 0 20px #00ff00,
