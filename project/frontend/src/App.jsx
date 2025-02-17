@@ -6,17 +6,20 @@ import { OpenViduProvider } from './contexts/OpenViduContext';  // OpenViduConte
 import AppRoutes from './routes/AppRoutes';
 import VolumeControl from './features/audio/VolumeControl';
 import { VolumeProvider } from './contexts/VolumeContext';
+import { FriendProvider } from './contexts/FriendContext';
 
 const App = () => (
   <VolumeProvider>
     <VolumeControl />
   <AuthProvider>
     <UserProvider>
+    <FriendProvider>
       <GameProvider>
         <OpenViduProvider>  {/* OpenViduProvider 추가 */}
           <AppRoutes></AppRoutes>
         </OpenViduProvider>
       </GameProvider>
+      </FriendProvider>
     </UserProvider>
   </AuthProvider>
   </VolumeProvider>
