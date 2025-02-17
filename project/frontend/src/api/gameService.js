@@ -83,13 +83,7 @@ export const startEmergencyVote = async (roomId, nicknames) => {
 
 export const sendVote = async (roomId, votedPlayer) => {
   try {
-    // 순수 데이터 객체만 전송
-    const voteData = {
-      roomId,
-      votedPlayer,    
-    };
-
-    await sendMessage(`/app/game/${roomId}/vote`, { roomId, votedPlayer });
+    await sendMessage(`/app/game/${roomId}/vote`, { roomId, votedPlayer});
   } catch (error) {
     console.error('Failed to send vote:', error);
     throw error;

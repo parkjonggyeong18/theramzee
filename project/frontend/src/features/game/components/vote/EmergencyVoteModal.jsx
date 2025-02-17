@@ -48,22 +48,10 @@ const EmergencyVoteModal = ({ isOpen, onClose, players, roomId }) => {
   const handleVote = async (nickname) => {
     try {
       // DOM 이벤트나 엘리먼트 대신 순수 데이터만 전달
-      await sendVote(roomId, currentPlayer, nickname);
+      await sendVote(roomId, nickname);
       
       setSelectedPlayer(nickname);
-      setVotes(prev => ({
-        ...prev,
-        [nickname]: (prev[nickname] || 0) 
-      }));
   
-      // GameContext 상태 업데이트
-      setGameState(prev => ({
-        ...prev,
-        currentVotes: {
-          ...prev.currentVotes,
-          [currentPlayer]: nickname
-        }
-      }));
     } catch (error) {
       console.error('Failed to send vote:', error);
     }
