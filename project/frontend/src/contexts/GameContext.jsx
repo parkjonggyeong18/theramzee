@@ -127,6 +127,18 @@ export const GameProvider = ({ children }) => {
         // ✅ nickName 값만 추출하여 배열 형태로 변환
         const nicknameList = updatedNicknames.map(player => player.nickName);
 
+        // ✅ 각 nickname을 키로 하고 값은 0으로 설정
+        const nicknameState = nicknameList.reduce((acc, nickname) => {
+          acc[nickname] = 0;
+          return acc;
+        }, {});
+
+        // ✅ GameState 업데이트
+        setGameState(prev => ({
+          ...prev,
+          ...nicknameState,
+        }));
+
         // ✅ 게임 시작 요청
         gameService.startGame(roomId, nicknameList);
       } catch (error) {
