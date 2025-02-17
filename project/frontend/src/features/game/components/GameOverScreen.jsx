@@ -44,7 +44,7 @@ const GameOverScreen = () => {
       isVoting: false,          // 투표 중인지 여부
       isEmergencyVote: false,   // 긴급 투표인지 여부
       hasUsedEmergency: false,  // 긴급 투표 사용 여부
-      voteTimer: 180, // 투표 시간 (3분)
+      voteTimer: 20, // 투표 시간 (3분)
       
       // 게임 전체 정지(추후)
       isPaused: false, // 게임 타이머 일시정지 여부
