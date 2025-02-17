@@ -23,8 +23,10 @@ const ProfilePage = () => {
 };
 
 const ProfileContainer = styled.div`
-  width: 100%;
-  margin-bottom: 2rem;
+  // width: 100%;
+  // margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
 `;
 
 const Section = styled.div`
