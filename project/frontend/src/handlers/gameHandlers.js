@@ -51,15 +51,15 @@ export const useGameHandlers = (roomId, setGameState) => {
     }
   };
 
-  const handleVoteResponse = (response) => {
-    const data = response.data;
-    if (data) {
-      setGameState(prev => ({
-        ...prev,
-        currentVotes: data.votes
-      }));
-    }
-  };
+  // const handleVoteResponse = (response) => {
+  //   const data = response.data;
+  //   if (data) {
+  //     setGameState(prev => ({
+  //       ...prev,
+  //       currentVotes: data.votes
+  //     }));
+  //   }
+  // };
   // 숲 이동 응답 처리
   const handleMoveResponse = useCallback(
     async (message) => {
@@ -282,11 +282,7 @@ export const useGameHandlers = (roomId, setGameState) => {
     handleKillResponse,
     handleCompleteMissionResponse,
     handleOutResponse,
-<<<<<<< HEAD
     handleEmergencyResponse,
-    handleVoteResponse,
-=======
     handleVoteResponse
->>>>>>> develop
   };
 };
