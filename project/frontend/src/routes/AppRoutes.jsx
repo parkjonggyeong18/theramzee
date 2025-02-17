@@ -12,10 +12,9 @@ import BreathingForest from '../features/game/forests/BreathingForest';
 import FoggyForest from '../features/game/forests/FoggyForest';
 import FairyForest from '../features/game/forests/FairyForest';
 import TimeForest from '../features/game/forests/TimeForest';
-import ChatPage from '../features/chat/ChatPage';
-import FriendPage from '../features/friend/FriendPage';
 import RegisterPage from '../features/auth/RegisterPage';
 import BackgroundMusic from '../features/audio/BackgroundMusic';
+import ForgotPassword from '../features/auth/components/ForgotPasswordForm';
 
 const AppRoutes = () => {
   return (
@@ -35,9 +34,8 @@ const AppRoutes = () => {
         <Route path="/game/:roomId/forest/foggy" element={<FoggyForest />} />
         <Route path="/game/:roomId/forest/fairy" element={<FairyForest />} />
         <Route path="/game/:roomId/forest/time" element={<TimeForest />} />
-        <Route path="/chat" element={<ChatPage />} />
-        <Route path="/friends" element={<FriendPage />} />
         <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
     </BrowserRouter>
   );
