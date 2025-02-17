@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Z_INDEX } from '../../../../constants/zIndex';
 import { useGame } from '../../../../contexts/GameContext';
-import { sendMessage } from '../../../../api/stomp';
 import { subscribeToTopic, unsubscribeTopic } from '../../../../api/stomp';
 import { sendVote } from '../../../../api/gameService';
 
@@ -45,28 +44,8 @@ const EmergencyVoteModal = ({ isOpen, onClose, players, roomId }) => {
 
   if (!isOpen) return null;
 
-  const handleVote = async (nickname) => {
-    try {
-      // DOM 이벤트나 엘리먼트 대신 순수 데이터만 전달
-      await sendVote(roomId, currentPlayer, nickname);
-      
-      setSelectedPlayer(nickname);
-      setVotes(prev => ({
-        ...prev,
-        [nickname]: (prev[nickname] || 0) 
-      }));
-  
-      // GameContext 상태 업데이트
-      setGameState(prev => ({
-        ...prev,
-        currentVotes: {
-          ...prev.currentVotes,
-          [currentPlayer]: nickname
-        }
-      }));
-    } catch (error) {
-      console.error('Failed to send vote:', error);
-    }
+  const clkVote = (roomId, nickName) => {
+    sendVote(roomId, nickName)
   };
 
   return (
@@ -87,11 +66,11 @@ const EmergencyVoteModal = ({ isOpen, onClose, players, roomId }) => {
               key={player.nickName}
               $isSelected={selectedPlayer === player.nickName}
               $isDisabled={player.nickName === currentPlayer}
-              onClick={() => player.nickName !== currentPlayer && handleVote(player.nickName)}
+              onClick={() => clkVote(roomId, player.nickName)}
             >
               <PlayerInfo>
                 <PlayerName>{player.nickName}</PlayerName>
-                <VoteCount>{gameState?.player?.nickName}</VoteCount>
+                <VoteCount>{gameState[player.nickName] || 0}</VoteCount>
               </PlayerInfo>
             </PlayerCard>
           ))}

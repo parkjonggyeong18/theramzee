@@ -86,7 +86,6 @@ const GameRoom = () => {
           subscribeToTopic(`/topic/game/${roomId}/save-acorns`, handlers.handleSaveAcornsResponse);
           subscribeToTopic(`/user/queue/game/${roomId}/charge-fatigue`, handlers.handleChargeFatigueResponse);
           subscribeToTopic(`/topic/game/${roomId}/kill`, handlers.handleKillResponse);
-          subscribeToTopic(`/topic/game/${roomId}/vote`, handlers.handleVoteResponse);
           subscribeToTopic(`/topic/game/${roomId}/complete-mission`, handlers.handleCompleteMissionResponse);
           subscribeToTopic(`/topic/game/${roomId}/out`, handlers.handleOutResponse);
           subscribeToTopic(`/topic/game/${roomId}/vote`, handlers.handleVoteResponse);
