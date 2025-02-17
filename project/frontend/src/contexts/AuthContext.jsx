@@ -15,15 +15,13 @@ export const AuthProvider = ({ children }) => {
 
   const handleLogout = async () => {
     try {
-      await logout(); // 서버에 로그아웃 요청
+      logout(); // 서버에 로그아웃 요청
     } catch (error) {
       console.error('로그아웃 실패', error);
     }
     // 토큰 삭제 및 로그인 페이지로 리다이렉트
     setAccessToken(null);
-    sessionStorage.removeItem('accessToken')
-    sessionStorage.removeItem('nickName')
-    sessionStorage.removeItem('openViduToken');
+    sessionStorage.clear();
     window.location.href = '/login'; // ✅ useNavigate 대신 사용
   };
 

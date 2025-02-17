@@ -17,7 +17,10 @@ const VideoGrid = (props) => {
   const totalSlots = props.totalSlots;
   
   const slots = Array.from({ length: totalSlots }, (_, i) => currentSubscribers[i] || null);
+<<<<<<< HEAD
 
+=======
+>>>>>>> develop
 
   useEffect(() => {
     if (gameState.isDead && !showDeadOverlay) {
@@ -29,7 +32,10 @@ const VideoGrid = (props) => {
     slots.forEach((player) => {
       if (player?.stream?.connection?.connectionId) {
         const connectionId = player.stream.connection.connectionId;
+<<<<<<< HEAD
 
+=======
+>>>>>>> develop
         if (!videoRefs.current[connectionId]) {
           videoRefs.current[connectionId] = React.createRef();
         }
@@ -59,10 +65,8 @@ const VideoGrid = (props) => {
             // 현재 숲에 포함되어 있다면 오디오 활성화, 아니면 음소거
             if (gameState.forestUsers?.[gameState.forestNum]?.includes(subscriberNickname)) {
               player.subscribeToAudio(true);
-              console.log(` ${subscriberNickname} 오디오 ON`);
             } else {
               player.subscribeToAudio(false);
-              console.log(` ${subscriberNickname} 오디오 OFF`);
             }
           } catch (error) {
             console.error("오디오 제어 처리 중 오류:", error);

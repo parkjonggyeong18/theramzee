@@ -10,5 +10,6 @@ public class UserResponse {
     private int fatigue;
     private String forestToken;
     private int forestNum;
+    private int vote;
     private boolean isEvilSquirrel;
 }

@@ -254,6 +254,26 @@ export const useGameHandlers = (roomId, setGameState) => {
     [setGameState]
   );
 
+  const handleVoteResponse = useCallback(
+    (message) => {
+      try {
+        if (message.success) {
+          const initializedData = message.data;
+          console.log("투표 성공:", initializedData);
+          setGameState(prev => ({
+            ...prev,
+            [initializedData.nickname]: initializedData.voteNum
+          }));
+        } else {
+          console.error("투표 실패:", message.errorCode);
+        }
+      } catch (error) {
+        console.error("투표 응답 처리 중 에러:", error);
+      }
+    },
+    [setGameState]
+  );
+
   return {
     handleGameStartResponse,
     handleMoveResponse,
@@ -262,7 +282,11 @@ export const useGameHandlers = (roomId, setGameState) => {
     handleKillResponse,
     handleCompleteMissionResponse,
     handleOutResponse,
+<<<<<<< HEAD
     handleEmergencyResponse,
     handleVoteResponse,
+=======
+    handleVoteResponse
+>>>>>>> develop
   };
 };

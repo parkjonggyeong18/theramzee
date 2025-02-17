@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { sendEmailVerification, verifyEmailCode } from '../../../api/email';
 
 const RegisterForm = ({ onRegister, loading }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     name: '',
@@ -65,13 +67,14 @@ const RegisterForm = ({ onRegister, loading }) => {
       setErrors((prev) => ({ ...prev, email: '올바른 이메일을 입력해주세요' }));
       return;
     }
-
+    setIsEmailSent(true);
     try {
       await sendEmailVerification(formData.email);
-      setIsEmailSent(true);
+      
       setEmailTimer(180);
       setErrors((prev) => ({ ...prev, email: '' }));
     } catch (error) {
+      setIsEmailSent(false);
       setErrors((prev) => ({ ...prev, email: '인증번호 전송 실패: ' + error.message }));
     }
   };
@@ -167,8 +170,10 @@ const RegisterForm = ({ onRegister, loading }) => {
           {emailTimer > 0 && <Timer>{emailTimer}s</Timer>}
         </EmailContainer>
       )}
-
+        <ButtonGroup>
       <Button type="submit" disabled={loading}>{loading ? '가입 중...' : '가입하기'}</Button>
+      <LoginButton onClick={() => navigate('/')}>뒤로가기</LoginButton>
+      </ButtonGroup>
     </FormContainer>
   );
 };
@@ -231,5 +236,14 @@ const ErrorText = styled.p`
   font-size: 0.8rem;
   margin-bottom: 0.5rem;
 `;
+const ButtonGroup=styled.div`display
+:flex;
+justify-content:flex-end;
+gap:.5rem;`;
+const LoginButton=styled.button`
+background:black;
+color:white;
+border-radius:.5rem;
+cursor:pointer;`;
 
 export default RegisterForm;
