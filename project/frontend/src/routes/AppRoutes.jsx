@@ -16,6 +16,7 @@ import RegisterPage from '../features/auth/RegisterPage';
 import BackgroundMusic from '../features/audio/BackgroundMusic';
 import ForgotPassword from '../features/auth/components/ForgotPasswordForm';
 
+
 const AppRoutes = () => {
   return (
     <BrowserRouter>

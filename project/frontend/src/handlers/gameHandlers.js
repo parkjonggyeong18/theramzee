@@ -99,7 +99,7 @@ export const useGameHandlers = (roomId, setGameState) => {
           console.log("도토리 저장 성공:", initializedData);
           
           // 도토리가 3개 이상이면 게임 종료
-          if (initializedData.newTotalAcorns >= 1) {
+          if (initializedData.newTotalAcorns >= 10) {
             navigate(`/game/${roomId}/main`);
             setGameState((prev) => ({
               ...prev,
