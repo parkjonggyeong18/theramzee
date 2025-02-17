@@ -7,7 +7,7 @@ const EmergencyVoteForm = ({ onVoteEnd }) => {
   const { gameState, players } = useGame();
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [votes, setVotes] = useState({});
-  const [timeLeft, setTimeLeft] = useState(180); // 3분
+  const [timeLeft, setTimeLeft] = useState(20); // 3분
   const [hasVoted, setHasVoted] = useState(false);
   const [showResults, setShowResults] = useState(false);
 

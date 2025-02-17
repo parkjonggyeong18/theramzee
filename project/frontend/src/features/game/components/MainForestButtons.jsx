@@ -1,66 +1,101 @@
-// components/game/MainForestButtons.jsx
 import { useState } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
+import EmergencyVoteModal from '../../../features/game/components/vote/EmergencyVoteModal';
+import * as gameService from '../../../api/gameService';  // gameService import 추가
+import { useParams } from 'react-router-dom';  // useParam
 
 const MainForestButtons = () => {
-  const { gameState, startSaveAcorns, 
-          startChargeFatigue, startEmergency, 
-          cancelAction, isStorageActive, 
-          isEnergyActive } = useGame();
+  const { roomId } = useParams();
+  const { 
+    gameState, 
+    startSaveAcorns, 
+    startChargeFatigue, 
+    startEmergency,
+    cancelAction, 
+    isStorageActive, 
+    isEnergyActive,
+    setGameState,players  
+  } = useGame();
+  const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
+  const clkSave = () => {
+    startSaveAcorns();
+  };
 
- const clkSave = () => {
-  startSaveAcorns();
-};
+  const clkFatigue = () => {
+    startChargeFatigue();
+  };
 
-const clkFatigue = () => {
-  startChargeFatigue();
-};
+  const clkEmergency = async () => {
+    if (gameState.isDead || gameState.hasUsedEmergency) return;
+    
+    try {
+      const nicknameList = players.map(player => player.nickName);
+      await gameService.startEmergencyVote(roomId, nicknameList);
+    } catch (error) {
+      console.error('Failed to start emergency vote:', error);
+    }
+  };
+  
+  const handleVote = (selectedPlayer) => {
+    setGameState(prev => ({
+      ...prev,
+      isVoting: true,
+      voteType: 'emergency',
+      votes: {}
+    }));
+    
+    startEmergency();
+    setIsVoteModalOpen(false);
+  };
 
-const clkEmergency = () => {
-  if (gameState.isDead) return;
-  startEmergency();
-};
- return (
-  <ButtonContainer>
-
-
-    <EnergyButton 
-      onClick={clkFatigue}
-      disabled={isEnergyActive || gameState.fatigue >= 3}
-      $isActive={isEnergyActive}
-      $evilSquirrel={gameState.evilSquirrel}
-    >
-      {isEnergyActive ? '충전중...' : '에너지'}
-      {isEnergyActive && <ProgressBar />}
-    </EnergyButton>
-
-    <EmergencyButton 
-      onClick={clkEmergency}
-      disabled={gameState.hasUsedEmergency}
-    >
-      긴급
-    </EmergencyButton>
-
-    {(isStorageActive || isEnergyActive) && (
-      <CancelButton onClick={cancelAction}>
-        취소
-      </CancelButton>
-    )}
-
-{gameState.evilSquirrel === false && (
-      <StorageButton 
-        onClick={clkSave}
-        disabled={isStorageActive || gameState.heldAcorns === 0}
-        $isActive={isStorageActive}
+  return (
+    <ButtonContainer>
+      <EnergyButton 
+        onClick={clkFatigue}
+        disabled={isEnergyActive || gameState.fatigue >= 3}
+        $isActive={isEnergyActive}
+        $evilSquirrel={gameState.evilSquirrel}
       >
-        {isStorageActive ? '저장중...' : '창고'}
-        {isStorageActive && <ProgressBar />}
-      </StorageButton>
-    )}
-  </ButtonContainer>
- );
+        {isEnergyActive ? '충전중...' : '에너지'}
+        {isEnergyActive && <ProgressBar />}
+      </EnergyButton>
+
+      <EmergencyButton 
+        onClick={clkEmergency}
+        disabled={gameState.hasUsedEmergency}
+      >
+        긴급
+      </EmergencyButton>
+
+      {(isStorageActive || isEnergyActive) && (
+        <CancelButton onClick={cancelAction}>
+          취소
+        </CancelButton>
+      )}
+
+      {gameState.evilSquirrel === false && (
+        <StorageButton 
+          onClick={clkSave}
+          disabled={isStorageActive || gameState.heldAcorns === 0}
+          $isActive={isStorageActive}
+        >
+          {isStorageActive ? '저장중...' : '창고'}
+          {isStorageActive && <ProgressBar />}
+        </StorageButton>
+      )}
+
+      {/* 모달 컴포넌트를 분리하여 렌더링 */}
+      <EmergencyVoteModal
+        isOpen={isVoteModalOpen}
+        onClose={() => setIsVoteModalOpen(false)}
+        players={players}
+        onVote={handleVote}
+      />
+    </ButtonContainer>
+  );
 };
+
 
 const ButtonContainer = styled.div`
   display: flex;

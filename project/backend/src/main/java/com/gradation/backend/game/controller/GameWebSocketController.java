@@ -152,6 +152,13 @@ public class GameWebSocketController {
         CompleteMissionResponse result = gameService.completeMission(request.getRoomId(), request.getForestNum(), request.getMissionNum(), request.getNickname());
         return BaseResponse.success("미션 완료", result);
     }
+
+    @MessageMapping("/game/{roomId}/vote")
+    @SendTo("/topic/game/{roomId}/vote")
+    public BaseResponse<VoteResponse> handleVote(@Payload VoteRequest request) {
+        VoteResponse result = gameService.vote(request.getRoomId(), request.getNickname());
+        return BaseResponse.success("투표 완료", result);
+    }
 }
 
 //    public forestUserResponse getForestUserMap()
