@@ -21,6 +21,7 @@ import MainForestButtons from './components/MainForestButtons';
 import MiniMap from './components/MiniMap';
 
 const GameRoom = () => {
+  
   const navigate = useNavigate();
   const [showRoleReveal, setShowRoleReveal] = useState(false);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
@@ -54,6 +55,8 @@ const GameRoom = () => {
 
 
   useEffect(() => {
+  setIsDescriptionVisible(true);
+
     setRoomId(roomId);
     if (!roomId) {
       console.error("⚠️ roomId is missing.");
