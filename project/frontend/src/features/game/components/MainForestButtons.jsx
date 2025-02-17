@@ -15,9 +15,11 @@ const MainForestButtons = () => {
     cancelAction, 
     isStorageActive, 
     isEnergyActive,
-    setGameState,players  
+    setGameState,
+    players,
+    startEmergencyVote
   } = useGame();
-  const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
+
   const clkSave = () => {
     startSaveAcorns();
   };
@@ -29,24 +31,12 @@ const MainForestButtons = () => {
   const clkEmergency = async () => {
     if (gameState.isDead || gameState.hasUsedEmergency) return;
     
-    try {
-      const nicknameList = players.map(player => player.nickName);
-      await gameService.startEmergencyVote(roomId, nicknameList);
+    try { 
+      startEmergencyVote();
+      gameState.hasUsedEmergency = true;
     } catch (error) {
       console.error('Failed to start emergency vote:', error);
     }
-  };
-  
-  const handleVote = (selectedPlayer) => {
-    setGameState(prev => ({
-      ...prev,
-      isVoting: true,
-      voteType: 'emergency',
-      votes: {}
-    }));
-    
-    startEmergency();
-    setIsVoteModalOpen(false);
   };
 
   return (
@@ -87,10 +77,7 @@ const MainForestButtons = () => {
 
       {/* 모달 컴포넌트를 분리하여 렌더링 */}
       <EmergencyVoteModal
-        isOpen={isVoteModalOpen}
-        onClose={() => setIsVoteModalOpen(false)}
         players={players}
-        onVote={handleVote}
       />
     </ButtonContainer>
   );

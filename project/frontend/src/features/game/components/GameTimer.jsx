@@ -7,7 +7,7 @@ const GameTimer = () => {
 
   useEffect(() => {
     let timerInterval;
-
+  
     if (gameState.isStarted && !gameState.isPaused && gameState.timer > 0) {
       timerInterval = setInterval(() => {
         setGameState(prev => {
@@ -31,9 +31,10 @@ const GameTimer = () => {
         });
       }, 1000);
     }
-
+  
     return () => clearInterval(timerInterval);
-  }, [gameState.isStarted, gameState.isPaused]);
+  }, [gameState.isStarted, gameState.isPaused, gameState.timer]);
+  
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);

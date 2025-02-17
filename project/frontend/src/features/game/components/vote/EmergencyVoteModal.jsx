@@ -1,51 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { Z_INDEX } from '../../../../constants/zIndex';
 import { useGame } from '../../../../contexts/GameContext';
-import { subscribeToTopic, unsubscribeTopic } from '../../../../api/stomp';
 import { sendVote } from '../../../../api/gameService';
 
-const EmergencyVoteModal = ({ isOpen, onClose, players, roomId }) => {
-  const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [votes, setVotes] = useState({});
-  const currentPlayer = sessionStorage.getItem('nickName');
-  const { gameState, setGameState } = useGame();
-
-  useEffect(() => {
-    if (isOpen && roomId) {
-      const voteSubscription = subscribeToTopic(
-        `/topic/game/${roomId}/vote`,
-        (message) => {
-          if (message.success) {
-            setVotes(prev => ({
-              ...prev,
-              [message.data.votedPlayer]: message.data.voteCount
-            }));
-
-            // 투표 상태 업데이트
-            setGameState(prev => ({
-              ...prev,
-              currentVotes: {
-                ...prev.currentVotes,
-                [message.data.voter]: message.data.votedPlayer
-              }
-            }));
-          }
-        }
-      );
-
-      return () => {
-        if (voteSubscription) {
-          unsubscribeTopic(voteSubscription);
-        }
-      };
-    }
-  }, [isOpen, roomId, setGameState]);
+const EmergencyVoteModal = ({ isOpen, players, roomId }) => {
+  const { gameState } = useGame();
+  const [isVoteCompleted, setIsVoteCompleted] = useState(false);
 
   if (!isOpen) return null;
 
   const clkVote = (roomId, nickName) => {
+    // 이미 투표가 완료된 경우 클릭 방지
+    if (isVoteCompleted) return;
+
+    // 투표 처리
     sendVote(roomId, nickName)
+
+    // 투표 완료 상태로 변경
+    setIsVoteCompleted(true);
   };
 
   return (
@@ -53,19 +27,18 @@ const EmergencyVoteModal = ({ isOpen, onClose, players, roomId }) => {
       <ModalContainer>
         <Header>
           <Title>긴급 투표</Title>
-          <CloseButton onClick={onClose}>✕</CloseButton>
         </Header>
 
         <AlertBox>
-          의심되는 플레이어를 선택하여 투표해주세요. 다수결로 결정됩니다.
+          의심되는 플레이어를 선택하여 투표해주세요.
+          기회는 단 한번, 신중하게 선택하세요.
         </AlertBox>
 
         <PlayerGrid>
           {players.map((player) => (
             <PlayerCard
               key={player.nickName}
-              $isSelected={selectedPlayer === player.nickName}
-              $isDisabled={player.nickName === currentPlayer}
+              $isDisabled={isVoteCompleted}
               onClick={() => clkVote(roomId, player.nickName)}
             >
               <PlayerInfo>
@@ -75,18 +48,6 @@ const EmergencyVoteModal = ({ isOpen, onClose, players, roomId }) => {
             </PlayerCard>
           ))}
         </PlayerGrid>
-
-        <ButtonGroup>
-          <CancelButton onClick={onClose}>
-            취소
-          </CancelButton>
-          <VoteButton
-            onClick={sendVote}
-            disabled={!selectedPlayer}
-          >
-            투표하기
-          </VoteButton>
-        </ButtonGroup>
       </ModalContainer>
     </Overlay>
   );
@@ -95,7 +56,7 @@ const EmergencyVoteModal = ({ isOpen, onClose, players, roomId }) => {
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -123,20 +84,6 @@ const Title = styled.h2`
   font-family: 'JejuHallasan';
   color: #333;
   margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: #666;
-  cursor: pointer;
-  padding: 4px;
-  transition: color 0.2s;
-
-  &:hover {
-    color: #333;
-  }
 `;
 
 const AlertBox = styled.div`
@@ -191,49 +138,6 @@ const VoteCount = styled.span`
   font-family: 'JejuHallasan';
   font-size: 0.9rem;
   color: #666;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-`;
-
-const BaseButton = styled.button`
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-family: 'JejuHallasan';
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const CancelButton = styled(BaseButton)`
-  background-color: #f0f0f0;
-  color: #666;
-
-  &:hover {
-    background-color: #e0e0e0;
-  }
-`;
-
-const VoteButton = styled(BaseButton)`
-  background-color: #4a90e2;
-  color: white;
-
-  &:hover:not(:disabled) {
-    background-color: #357abd;
-  }
-
-  &:disabled {
-    background-color: #cccccc;
-  }
 `;
 
 export default EmergencyVoteModal;

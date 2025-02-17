@@ -26,10 +26,8 @@ const MainForest = () => {
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const nickname = sessionStorage.getItem('nickName');
 
   const {
-    joinSession,
     subscribers,
   } = useOpenVidu();
 
@@ -52,32 +50,6 @@ const MainForest = () => {
   const leftFilterCam = filteredSubscribers.slice(0, 3);
   const rightFilterCam = filteredSubscribers.slice(3, 7);
 
-  // WebSocket 구독 설정
-  useEffect(() => {
-    if (roomId) {
-      const emergencySubscription = subscribeToTopic(
-        `/topic/game/${roomId}/emergency`,
-        (response) => {
-          if (response.success && response.data.action === 'START_EMERGENCY_VOTE') {
-            setGameState(prev => ({
-              ...prev,
-              isVoting: true,
-              isEmergencyVote: true,
-              votingInProgress: true,
-              currentVotes: {},
-            }));
-          }
-        }
-      );
-
-      return () => {
-        if (emergencySubscription) {
-          unsubscribeTopic(emergencySubscription);
-        }
-      };
-    }
-  }, [roomId, setGameState]);
-
   // 커서 효과 설정
   useEffect(() => {
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
@@ -94,15 +66,6 @@ const MainForest = () => {
 
   const handleExitGame = () => {
     navigate('/rooms');
-  };
-
-  const handleCloseVote = () => {
-    setGameState(prev => ({
-      ...prev,
-      isVoting: false,
-      isEmergencyVote: false,
-      votingInProgress: false
-    }));
   };
 
   const gameLayoutProps = {
@@ -131,8 +94,7 @@ const MainForest = () => {
           <GameLayout {...gameLayoutProps} />
           {gameState.isVoting && gameState.isEmergencyVote && (
             <EmergencyVoteModal
-              isOpen={true}
-              onClose={handleCloseVote}
+              isOpen={gameState.isVoting && !gameState.isDead}
               players={players.filter(p => !gameState.killedPlayers.includes(p.nickName))}
               roomId={roomId}
             />

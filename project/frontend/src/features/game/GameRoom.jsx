@@ -37,6 +37,9 @@ const GameRoom = () => {
     setRoomId,
     setIsConnected,
     setGameState,
+    moveForest,
+    cancelAction,
+    endVote
   } = useGame();
 
   const {
@@ -48,7 +51,7 @@ const GameRoom = () => {
 
 
   const { roomId } = useParams();  // roomId 가져오기
-  const handlers = useGameHandlers(roomId, setGameState);
+  const handlers = useGameHandlers(roomId, setGameState, moveForest, cancelAction, endVote);
   const isSubscribed = useRef(false); // 중복 실행 방지 플래그
   const nickName = sessionStorage.getItem('nickName')
   const roomHost = sessionStorage.getItem('roomHost') || null;
