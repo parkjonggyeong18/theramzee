@@ -67,13 +67,14 @@ const RegisterForm = ({ onRegister, loading }) => {
       setErrors((prev) => ({ ...prev, email: '올바른 이메일을 입력해주세요' }));
       return;
     }
-
+    setIsEmailSent(true);
     try {
       await sendEmailVerification(formData.email);
-      setIsEmailSent(true);
+      
       setEmailTimer(180);
       setErrors((prev) => ({ ...prev, email: '' }));
     } catch (error) {
+      setIsEmailSent(false);
       setErrors((prev) => ({ ...prev, email: '인증번호 전송 실패: ' + error.message }));
     }
   };
