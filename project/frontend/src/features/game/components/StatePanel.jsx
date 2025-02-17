@@ -13,7 +13,7 @@ const StatePanel = () => {
        <>
          <StateItem>
            <StateLabel>총 도토리 수:</StateLabel>
-           <StateValue>{gameState.totalAcorns} / 3</StateValue>
+           <StateValue>{gameState.totalAcorns} / 10</StateValue>
          </StateItem>
          <StateItem>
            <StateLabel>보유 도토리:</StateLabel>

@@ -124,6 +124,7 @@ public class GameServiceImpl implements GameService {
             userData.setForestToken(token);
             userData.setForestNum(1);
             userData.setVote(0);
+            userData.setLastVote(0);
             userData.setEvilSquirrel(nickname.equals(evilSquirrelNickname));
 
             // Redis Hash로 저장
@@ -142,6 +143,7 @@ public class GameServiceImpl implements GameService {
                 forestData.setEmergencyPossible(true);
                 forestData.setTotalAcorns(0);
                 forestData.setTotalVote(0);
+                forestData.setTotalLastVote(0);
                 forestData.setEvilSquirrelNickname(evilSquirrelNickname);
             } else {
                 forestData.setMission1(new MissionData(false, 1));
@@ -488,6 +490,23 @@ public class GameServiceImpl implements GameService {
 
         redisUtil.hset(userKey, "vote", voteNum);
         redisUtil.hset(forestKey, "totalVote", totalVote);
+
+        return new VoteResponse(nickname, voteNum, totalVote);
+    }
+
+    public VoteResponse lastVote (int roomId, String nickname) {
+        String roomKey = "ROOM:" + roomId;
+        String userKey = roomKey + ":USER:" + nickname;
+        String forestKey = roomKey + ":FOREST:1";
+
+        Object voteNumObj = redisUtil.hget(userKey, "lastVote");
+        int voteNum = (Integer) voteNumObj + 1;
+
+        Object totalVoteObj = redisUtil.hget(forestKey, "totalLastVote");
+        int totalVote = (Integer) totalVoteObj + 1;
+
+        redisUtil.hset(userKey, "lastVote", voteNum);
+        redisUtil.hset(forestKey, "totalLastVote", totalVote);
 
         return new VoteResponse(nickname, voteNum, totalVote);
     }

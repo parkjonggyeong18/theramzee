@@ -15,6 +15,7 @@ import StatePanel from '../components/StatePanel';
 import MainForestButtons from '../components/MainForestButtons';
 import MiniMap from '../components/MiniMap';
 import EmergencyVoteModal from '../../game/components/vote/EmergencyVoteModal';
+import FinalVoteModal from '../../game/components/vote/FinalVoteModal';
 
 const MainForest = () => {
   const { 
@@ -94,6 +95,13 @@ const MainForest = () => {
           <GameLayout {...gameLayoutProps} />
           {gameState.isVoting && gameState.isEmergencyVote && (
             <EmergencyVoteModal
+              isOpen={gameState.isVoting && !gameState.isDead}
+              players={players.filter(p => !gameState.killedPlayers.includes(p.nickName))}
+              roomId={roomId}
+            />
+          )}
+          {gameState.isVoting && !gameState.isEmergencyVote && (
+            <FinalVoteModal
               isOpen={gameState.isVoting && !gameState.isDead}
               players={players.filter(p => !gameState.killedPlayers.includes(p.nickName))}
               roomId={roomId}

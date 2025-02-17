@@ -1,9 +1,12 @@
 import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
 
 const GameTimer = () => {
-  const { gameState, setGameState } = useGame();
+  const { gameState, setGameState,cancelAction, moveForest } = useGame();
+  const navigate = useNavigate();
+  const { roomId } = useParams();
 
   useEffect(() => {
     let timerInterval;
@@ -15,11 +18,13 @@ const GameTimer = () => {
           
           // 게임 시간 종료시 최종 투표 시작
           if (newTimer === 0) {
+            cancelAction();
+            moveForest(1);
+            navigate(`/game/${roomId}/main`); 
             return {
               ...prev,
               timer: 0,
               isVoting: true,
-              voteType: 'final',
               votes: {}
             };
           }

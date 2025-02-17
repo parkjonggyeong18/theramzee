@@ -7,6 +7,7 @@ public class ForestResponse {
     private Boolean emergencyPossible;
     private Integer totalAcorns;
     private Integer totalVote;
+    private Integer totalLastVote;
     private String evilSquirrelNickname;
     private GameServiceImpl.MissionData mission1;
     private GameServiceImpl.MissionData mission2;

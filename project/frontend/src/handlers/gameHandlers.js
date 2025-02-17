@@ -2,7 +2,7 @@ import { useCallback, useEffect } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGame } from '../contexts/GameContext';
 
-export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, endVote) => {
+export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, endVote, voteReset) => {
   const nickName = sessionStorage.getItem('nickName');
   const navigate = useNavigate();
 
@@ -272,17 +272,18 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             
             if (initializedData.totalVote === 6-updates.killedPlayers.length) {
               const result = endVote(newVotedPlayers);
+
               if (result === null) return;
 
               // 나쁜 다람쥐 색출 유무
               if (result === updates.evilSquirrelNickname) {
-                navigate(`/game/${roomId}/main`);
-                updates.isGameOver = true;
-                updates.winner = 'good';
-                updates.gameOverReason = 'emergency';
-                updates.timerRunning = false;
-                updates.isStarted = false;
-              }
+                  navigate(`/game/${roomId}/main`);
+                  updates.isGameOver = true;
+                  updates.winner = 'good';
+                  updates.gameOverReason = 'emergency';
+                  updates.timerRunning = false;
+                  updates.isStarted = false;
+                } 
 
               const newKilledPlayers = [...prev.killedPlayers, result];
               updates.killedPlayers = newKilledPlayers;
@@ -290,6 +291,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               updates.isEmergencyVote = false;
               updates.votingInProgress = false;
               updates.totalVote = 0;
+              updates.votedPlayers = [];
               updates.isPaused = false;
               for (const player of newVotedPlayers) {
                 updates[player] = 0;
@@ -322,6 +324,59 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     [setGameState]
   );
 
+  const handleLastVoteResponse = useCallback(
+    (message) => {
+      try {
+        if (message.success) {
+          const initializedData = message.data;
+          console.log("투표 성공:", initializedData);
+
+          setGameState((prev) => {
+            const newVotedPlayers = [...prev.votedPlayers, initializedData.nickname];
+
+            const updates = {
+              ...prev,
+              [initializedData.nickname]: initializedData.voteNum,
+              votedPlayers: newVotedPlayers,
+              totalVote: initializedData.totalVote
+            };
+            
+            if (initializedData.totalVote === 6-updates.killedPlayers.length) {
+              const result = endVote(newVotedPlayers);
+
+              // 나쁜 다람쥐 색출 유무
+              if (result === updates.evilSquirrelNickname) {
+                  navigate(`/game/${roomId}/main`);
+                  updates.isGameOver = true;
+                  updates.winner = 'good';
+                  updates.gameOverReason = 'time';
+                  updates.timerRunning = false;
+                  updates.isStarted = false;
+                } else {
+                navigate(`/game/${roomId}/main`);
+                updates.isGameOver = true;
+                updates.winner = 'bad';
+                updates.gameOverReason = 'time';
+                updates.timerRunning = false;
+                updates.isStarted = false;
+                }
+                for (const player of newVotedPlayers) {
+                  updates[player] = 0;
+                }
+            }
+            return updates;
+          }); 
+          
+        } else {
+          console.error("투표 실패:", message.errorCode);
+        }
+      } catch (error) {
+        console.error("투표 응답 처리 중 에러:", error);
+      }
+    },
+    [setGameState]
+  );
+
   return {
     handleGameStartResponse,
     handleMoveResponse,
@@ -331,6 +386,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     handleCompleteMissionResponse,
     handleOutResponse,
     handleEmergencyResponse,
-    handleVoteResponse
+    handleVoteResponse,
+    handleLastVoteResponse
   };
 };

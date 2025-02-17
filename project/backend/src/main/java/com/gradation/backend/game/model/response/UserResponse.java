@@ -11,5 +11,6 @@ public class UserResponse {
     private String forestToken;
     private int forestNum;
     private int vote;
+    private int lastVote;
     private boolean isEvilSquirrel;
 }

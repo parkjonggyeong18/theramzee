@@ -80,3 +80,12 @@ export const sendVote = async (roomId, nickname) => {
     throw error;
   }
 };
+
+export const sendLastVote = async (roomId, nickname) => {
+  try {
+    await sendMessage(`/app/game/${roomId}/last-vote`, { roomId, nickname });
+  } catch (error) {
+    console.error('Failed to send vote:', error);
+    throw error;
+  }
+};

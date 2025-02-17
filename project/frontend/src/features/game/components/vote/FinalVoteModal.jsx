@@ -1,27 +1,24 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Z_INDEX } from '../../../../constants/zIndex';
+import { useGame } from '../../../../contexts/GameContext';
+import { sendLastVote } from '../../../../api/gameService';
 
-const FinalVoteModal = ({ isOpen, onClose, players, onVote }) => {
-  const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [votes, setVotes] = useState({});
-  const currentPlayer = sessionStorage.getItem('nickName');
+const FinalVoteModal = ({ isOpen, players, roomId }) => {
+  const { gameState } = useGame();
+  const [isVoteCompleted, setIsVoteCompleted] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleVote = (nickname) => {
-    if (selectedPlayer === nickname) {
-      setSelectedPlayer(null);
-      const newVotes = { ...votes };
-      delete newVotes[nickname];
-      setVotes(newVotes);
-    } else {
-      setSelectedPlayer(nickname);
-      setVotes({
-        ...votes,
-        [nickname]: (votes[nickname] || 0) + 1
-      });
-    }
+  const clkVote = (roomId, nickName) => {
+    // 이미 투표가 완료된 경우 클릭 방지
+    if (isVoteCompleted) return;
+
+    // 투표 처리
+    sendLastVote(roomId, nickName)
+
+    // 투표 완료 상태로 변경
+    setIsVoteCompleted(true);
   };
 
   return (
@@ -29,7 +26,6 @@ const FinalVoteModal = ({ isOpen, onClose, players, onVote }) => {
       <ModalContainer>
         <Header>
           <Title>최종 투표</Title>
-          <CloseButton onClick={onClose}>✕</CloseButton>
         </Header>
 
         <AlertBox>
@@ -41,34 +37,16 @@ const FinalVoteModal = ({ isOpen, onClose, players, onVote }) => {
           {players.map((player) => (
             <PlayerCard
               key={player.nickName}
-              $isSelected={selectedPlayer === player.nickName}
-              $isDisabled={player.nickName === currentPlayer}
-              onClick={() => player.nickName !== currentPlayer && handleVote(player.nickName)}
+              $isDisabled={isVoteCompleted}
+              onClick={() => clkVote(roomId, player.nickName)}
             >
               <PlayerInfo>
                 <PlayerName>{player.nickName}</PlayerName>
-                <VoteCount>{votes[player.nickName] || 0} 표</VoteCount>
+                <VoteCount>{gameState[player.nickName] || 0}</VoteCount>
               </PlayerInfo>
             </PlayerCard>
           ))}
         </PlayerGrid>
-
-        <ButtonGroup>
-          <CancelButton onClick={onClose}>
-            취소
-          </CancelButton>
-          <VoteButton
-            onClick={() => {
-              if (selectedPlayer) {
-                onVote(selectedPlayer);
-                onClose();
-              }
-            }}
-            disabled={!selectedPlayer}
-          >
-            투표하기
-          </VoteButton>
-        </ButtonGroup>
       </ModalContainer>
     </Overlay>
   );
@@ -77,7 +55,7 @@ const FinalVoteModal = ({ isOpen, onClose, players, onVote }) => {
 const Overlay = styled.div`
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.75);
+  background-color: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -105,20 +83,6 @@ const Title = styled.h2`
   font-family: 'JejuHallasan';
   color: #333;
   margin: 0;
-`;
-
-const CloseButton = styled.button`
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  color: #666;
-  cursor: pointer;
-  padding: 4px;
-  transition: color 0.2s;
-
-  &:hover {
-    color: #333;
-  }
 `;
 
 const AlertBox = styled.div`
@@ -173,49 +137,6 @@ const VoteCount = styled.span`
   font-family: 'JejuHallasan';
   font-size: 0.9rem;
   color: #666;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-`;
-
-const BaseButton = styled.button`
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-family: 'JejuHallasan';
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const CancelButton = styled(BaseButton)`
-  background-color: #f0f0f0;
-  color: #666;
-
-  &:hover {
-    background-color: #e0e0e0;
-  }
-`;
-
-const VoteButton = styled(BaseButton)`
-  background-color: #4a90e2;
-  color: white;
-
-  &:hover:not(:disabled) {
-    background-color: #357abd;
-  }
-
-  &:disabled {
-    background-color: #cccccc;
-  }
 `;
 
 export default FinalVoteModal;

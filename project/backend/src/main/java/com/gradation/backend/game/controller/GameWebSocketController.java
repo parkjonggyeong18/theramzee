@@ -153,12 +153,27 @@ public class GameWebSocketController {
         return BaseResponse.success("미션 완료", result);
     }
 
+    /**
+     * 투표 처리
+     * 긴급 투표 때 호출됩니다.
+     */
     @MessageMapping("/game/{roomId}/vote")
     @SendTo("/topic/game/{roomId}/vote")
     public BaseResponse<VoteResponse> handleVote(@Payload VoteRequest request) {
         VoteResponse result = gameService.vote(request.getRoomId(), request.getNickname());
         return BaseResponse.success("투표 완료", result);
     }
+
+    /**
+     * 최종 투표 처리
+     * 최종 투표 때 호출됩니다.
+     */
+    @MessageMapping("/game/{roomId}/last-vote")
+    @SendTo("/topic/game/{roomId}/last-vote")
+    public BaseResponse<VoteResponse> handleLastVote(@Payload VoteRequest request) {
+        VoteResponse result = gameService.lastVote(request.getRoomId(), request.getNickname());
+        return BaseResponse.success("투표 완료", result);
+    }
 }
 
-//    public forestUserResponse getForestUserMap()
+

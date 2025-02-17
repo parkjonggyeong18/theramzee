@@ -159,7 +159,7 @@ export const GameProvider = ({ children }) => {
 
   // 게임 종료 처리
   const checkGameOver = useCallback(() => {
-    if (gameState.totalAcorns >= 1) {
+    if (gameState.totalAcorns >= 10) {
       console.log("게임 종료");
       setGameState(prev => ({
         ...prev,
@@ -396,7 +396,6 @@ export const GameProvider = ({ children }) => {
     startChargeFatigue,
     startEmergencyVote,
     recordVote,
-    endVote,
   };
 
   return (

@@ -74,11 +74,7 @@ const MainForestButtons = () => {
           {isStorageActive && <ProgressBar />}
         </StorageButton>
       )}
-
-      {/* 모달 컴포넌트를 분리하여 렌더링 */}
-      <EmergencyVoteModal
-        players={players}
-      />
+      
     </ButtonContainer>
   );
 };

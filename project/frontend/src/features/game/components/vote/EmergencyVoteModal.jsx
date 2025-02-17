@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { Z_INDEX } from '../../../../constants/zIndex';
 import { useGame } from '../../../../contexts/GameContext';

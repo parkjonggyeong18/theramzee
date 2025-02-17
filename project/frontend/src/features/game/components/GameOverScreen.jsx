@@ -33,7 +33,7 @@ const GameOverScreen = () => {
       timerRunning: false,    // 타이머 실행 상태
       evilSquirrel: null, // true | false
       forestToken: null,  // 숲 토큰
-      forestNum: 1, // 현재 숲 번호 (초기는 메인 숲숲)
+      forestNum: 1, // 현재 숲 번호 (초기는 메인 숲)
 
       // 게임 리소스
       totalAcorns: 0, // 저장된 도토리
