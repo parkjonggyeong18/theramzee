@@ -55,8 +55,7 @@ const GameRoom = () => {
 
 
   useEffect(() => {
-  setIsDescriptionVisible(true);
-
+    
     setRoomId(roomId);
     if (!roomId) {
       console.error("⚠️ roomId is missing.");
