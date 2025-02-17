@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { sendEmailVerification, verifyEmailCode } from '../../../api/email';
 
 const RegisterForm = ({ onRegister, loading }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     name: '',
@@ -167,8 +169,10 @@ const RegisterForm = ({ onRegister, loading }) => {
           {emailTimer > 0 && <Timer>{emailTimer}s</Timer>}
         </EmailContainer>
       )}
-
+        <ButtonGroup>
       <Button type="submit" disabled={loading}>{loading ? '가입 중...' : '가입하기'}</Button>
+      <LoginButton onClick={() => navigate('/')}>뒤로가기</LoginButton>
+      </ButtonGroup>
     </FormContainer>
   );
 };
@@ -231,5 +235,14 @@ const ErrorText = styled.p`
   font-size: 0.8rem;
   margin-bottom: 0.5rem;
 `;
+const ButtonGroup=styled.div`display
+:flex;
+justify-content:flex-end;
+gap:.5rem;`;
+const LoginButton=styled.button`
+background:black;
+color:white;
+border-radius:.5rem;
+cursor:pointer;`;
 
 export default RegisterForm;

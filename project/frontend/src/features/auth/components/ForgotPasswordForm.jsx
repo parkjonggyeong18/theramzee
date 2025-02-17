@@ -85,8 +85,8 @@ const ForgotPassword = () => {
             </>
           )}
           <ButtonGroup>
-            <SubmitButton type="submit">SUBMIT</SubmitButton>
-            <LoginButton onClick={() => navigate('/')}>LOG IN</LoginButton>
+            <SubmitButton type="submit">찾기</SubmitButton>
+            <LoginButton onClick={() => navigate('/')}>뒤로가기</LoginButton>
           </ButtonGroup>
         </form>
 
