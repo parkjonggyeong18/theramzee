@@ -20,9 +20,10 @@ import GameTimer from './components/GameTimer';
 import StatePanel from './components/StatePanel';
 import MainForestButtons from './components/MainForestButtons';
 import MiniMap from './components/MiniMap';
+import { useAuth } from '../../contexts/AuthContext'; // 추가
 
 const GameRoom = () => {
-  
+    const { handleLogout } = useAuth();
   const navigate = useNavigate();
   const [showRoleReveal, setShowRoleReveal] = useState(false);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
@@ -56,8 +57,7 @@ const GameRoom = () => {
 
 
   useEffect(() => {
-  setIsDescriptionVisible(true);
-
+    setIsDescriptionVisible(true);
     setRoomId(roomId);
     if (!roomId) {
       console.error("⚠️ roomId is missing.");
@@ -76,7 +76,6 @@ const GameRoom = () => {
 
         await connectSocket();
         setIsConnected(true);
-
         setTimeout(() => {
           subscribeToTopic(`/topic/game/${roomId}/start`, (response) => {
             handlers.handleGameStartResponse(response);
@@ -98,10 +97,10 @@ const GameRoom = () => {
 
     connectAndSubscribe();
 
-    const handleBeforeUnload = (e) => {
-      e.preventDefault();
-      e.returnValue = ''; 
+    const handleBeforeUnload = (event) => { 
+      handleLogout();
       handleExit();
+      
     };
   
     // 뒤로가기 처리
@@ -115,6 +114,7 @@ const GameRoom = () => {
       leaveRoom(roomId);
       leaveSession();
       initPreview();
+    
     };
   
     window.addEventListener('beforeunload', handleBeforeUnload);
