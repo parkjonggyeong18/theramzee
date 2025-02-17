@@ -6,6 +6,7 @@ import { useOpenVidu } from '../../../contexts/OpenViduContext';
 import { backgroundImages,characterImages } from '../../../assets/images';
 import GameLayout from '../components/common/GameLayout';
 
+
 // components import
 import VideoGrid from '../components/VideoGrid';
 import MyVideo from '../components/MyVideo';
@@ -15,6 +16,7 @@ import MiniMap from '../components/MiniMap';
 import MissionButton from '../components/MissionButton';
 import FireGame from '../components/missions/FireGame';
 import ArrowPuzzleGame from '../components/missions/ArrowPuzzleGame';
+import FireEscapeGame from '../components/missions/FireEscapeGame'
 
 const DryForest = () => {
   const { gameState, players, completeMission } = useGame();
@@ -127,7 +129,10 @@ const rightFilterCam = filteredSubscribers.slice(3, 7);
         />
       </MissionButtonWrapper>
       <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-        <MissionButton isDisabled />
+      <MissionButton 
+          onClick={() => handleMissionClick('escape')}
+          completed={isMissionCompleted('escape')}
+        />
       </MissionButtonWrapper>
     </MissionButtons>
     ),
@@ -144,6 +149,14 @@ const rightFilterCam = filteredSubscribers.slice(3, 7);
         />
       ) : currentMission === 'arrow' ? (
         <ArrowPuzzleGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
+      ) : currentMission === 'escape' ? (
+        <FireEscapeGame
           onComplete={handleMissionComplete}
           onClose={() => {
             setShowMiniGame(false);

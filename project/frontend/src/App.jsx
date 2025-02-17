@@ -7,7 +7,7 @@ import AppRoutes from './routes/AppRoutes';
 import VolumeControl from './features/audio/VolumeControl';
 import { VolumeProvider } from './contexts/VolumeContext';
 import { FriendProvider } from './contexts/FriendContext';
-import GlobalStyle from './styles/GlobalStyle'; // GlobalStyle 추가
+
 
 const App = () => (
   <>
