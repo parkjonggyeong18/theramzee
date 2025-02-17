@@ -76,6 +76,22 @@ const RoomPage = () => {
     fetchFriendRequests();
   };
 
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      handleLogout(); // 로그아웃 처리
+    };
+    const handlePopState = () => {
+      handleLogout(); // 뒤로가기 시 로그아웃 실행
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [handleLogout]);
+
   return (
     <PageContainer>
       <BackgroundImage />
