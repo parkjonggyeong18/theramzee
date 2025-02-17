@@ -6,7 +6,6 @@ const ChatMessage = ({ message, isOwn }) => {
     <MessageContainer $isOwn={isOwn}>
       <MessageBubble $isOwn={isOwn}>
         <SenderName $isOwn={isOwn}>
-          {isOwn ? '나' : message.sender}
         </SenderName>
         <MessageContent>{message.content}</MessageContent>
       </MessageBubble>

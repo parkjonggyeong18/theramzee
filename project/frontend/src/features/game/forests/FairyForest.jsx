@@ -15,6 +15,8 @@ import MiniMap from '../components/MiniMap';
 import MissionButton from '../components/MissionButton';
 import FlowerGame from '../components/missions/FlowerGame';
 import FishingGame from '../components/missions/FishingGame';
+import FairyGame from'../components/missions/FairyCatchingGame';
+import FairyCatchingGame from '../components/missions/FairyCatchingGame';
 
 
 const FairyForest = () => {
@@ -129,7 +131,10 @@ const FairyForest = () => {
         />
       </MissionButtonWrapper>
       <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-        <MissionButton isDisabled />
+      <MissionButton 
+          onClick={() => handleMissionClick('fairy')}
+          completed={isMissionCompleted('fairy')}
+        />
       </MissionButtonWrapper>
     </MissionButtons>
     ),
@@ -152,7 +157,15 @@ const FairyForest = () => {
             setCurrentMission(null);
           }}
         />
-      ) : null
+      ) : currentMission === 'fairy' ? (
+        <FairyCatchingGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
+      ) :null
     ),
     
     // 기타

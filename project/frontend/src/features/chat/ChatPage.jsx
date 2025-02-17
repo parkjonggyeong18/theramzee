@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import styled from 'styled-components';
 import { connectSocket, subscribeToTopic, sendMessage } from '../../api/stomp';
 import { apiRequest } from '../../api/apiService';
@@ -10,58 +10,57 @@ import ChatInput from './components/ChatInput';
 const ChatPage = ({ receiver, isOpen, onClose }) => {
   const { fetchUnreadCounts, isActiveChatRoom } = useContext(FriendContext);
   const [messages, setMessages] = useState([]);
-
+  const subscriptionRef = useRef(null);
+  
   useEffect(() => {
     if (!isOpen || !receiver) return;
 
     const username = sessionStorage.getItem("username");
     const nickname = sessionStorage.getItem("nickName");
 
-    console.log('Chat initialization:', { username, nickname, receiver });
-
-    if (!username || !nickname) {
-      console.error('로그인된 사용자가 없습니다.');
-      return;
-    }
-
     const loadChatHistory = async () => {
-      try {
-        const response = await apiRequest(
-          `/api/v1/chat/history?sender=${nickname}&receiver=${receiver}`,
-          'GET'
-        );
-        console.log('Chat history response:', response);
-        if (Array.isArray(response.data)) {
-          setMessages(response.data);
-        } else if (response.data && Array.isArray(response.data.messages)) {
-          setMessages(response.data.messages);
+        try {
+            const response = await apiRequest(
+                `/api/v1/chat/history?sender=${nickname}&receiver=${receiver}`,
+                'GET'
+            );
+            if (Array.isArray(response.data)) {
+                setMessages(response.data);
+            } else if (response.data && Array.isArray(response.data.messages)) {
+                setMessages(response.data.messages);
+            }
+        } catch (error) {
+            console.error('채팅 기록 로드 실패:', error);
+            setMessages([]);
         }
-      } catch (error) {
-        console.error('채팅 기록 로드 실패:', error);
-        setMessages([]);
-      }
     };
 
     const setupWebSocket = async () => {
       try {
         await connectSocket();
-        // 자신의 username으로 메시지 수신을 위한 구독
-        const myTopic = `/topic/messages/${username}`;
+        const myTopic = `/topic/messages/${username}/${receiver}`;
         console.log('Subscribing to my topic:', myTopic);
         
-        subscribeToTopic(myTopic, (message) => {
+        // 이전 구독이 있다면 해제
+        if (subscriptionRef.current) {
+          subscriptionRef.current.unsubscribe();
+        }
+        
+        // 새로운 구독 설정
+        const subscription = subscribeToTopic(myTopic, (message) => {
           console.log('Received message:', message);
-          setMessages(prev => {
-            // // 중복 메시지 방지
-            // const isDuplicate = prev.some(m => 
-            //   m.sender === message.sender && 
-            //   m.content === message.content && 
-            //   m.timestamp === message.timestamp
-            // );
-            // if (isDuplicate) return prev;
-            return [...prev, message];
-          });
+          const isCurrentChat = (
+            (message.sender === receiver && message.receiver === username) ||
+            (message.sender === username && message.receiver === receiver)
+          );
+          
+          if (isCurrentChat) {
+            setMessages(prev => [...prev, message]);
+          }
         });
+
+        // 구독 객체 저장
+        subscriptionRef.current = subscription;
       } catch (error) {
         console.error('WebSocket 연결 실패:', error);
       }
@@ -69,7 +68,15 @@ const ChatPage = ({ receiver, isOpen, onClose }) => {
 
     loadChatHistory();
     setupWebSocket();
-    // markAsRead();
+
+    // Cleanup 함수
+    return () => {
+      if (subscriptionRef.current) {
+        subscriptionRef.current.unsubscribe();
+        subscriptionRef.current = null;
+      }
+    };
+
   }, [isOpen, receiver]);
 
   // // 창 포커스 시 읽음 처리

@@ -17,6 +17,7 @@ import MiniMap from '../components/MiniMap';
 import EmergencyVoteModal from '../../game/components/vote/EmergencyVoteModal';
 import FinalVoteModal from '../../game/components/vote/FinalVoteModal';
 
+
 const MainForest = () => {
   const { 
     gameState, 

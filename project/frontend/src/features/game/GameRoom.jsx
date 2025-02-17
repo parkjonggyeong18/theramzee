@@ -11,7 +11,8 @@ import { leaveRoom } from '../../api/room';
 // 공통 레이아웃 import
 import GameLayout from './components/common/GameLayout';
 import RoleReveal from './components/RoleReveal';
-
+import buttonBgImage from'../../assets/images/object/plat.png'
+import buttonBgImage2 from'../../assets/images/object/dia.png'
 // components import
 import VideoGrid from './components/VideoGrid';
 import MyVideo from './components/MyVideo';
@@ -19,9 +20,10 @@ import GameTimer from './components/GameTimer';
 import StatePanel from './components/StatePanel';
 import MainForestButtons from './components/MainForestButtons';
 import MiniMap from './components/MiniMap';
+import { useAuth } from '../../contexts/AuthContext'; // 추가
 
 const GameRoom = () => {
-  
+    const { handleLogout } = useAuth();
   const navigate = useNavigate();
   const [showRoleReveal, setShowRoleReveal] = useState(false);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
@@ -59,8 +61,7 @@ const GameRoom = () => {
 
 
   useEffect(() => {
-  setIsDescriptionVisible(true);
-
+    setIsDescriptionVisible(true);
     setRoomId(roomId);
     if (!roomId) {
       console.error("⚠️ roomId is missing.");
@@ -79,7 +80,6 @@ const GameRoom = () => {
 
         await connectSocket();
         setIsConnected(true);
-
         setTimeout(() => {
           subscribeToTopic(`/topic/game/${roomId}/start`, (response) => {
             handlers.handleGameStartResponse(response);
@@ -102,10 +102,10 @@ const GameRoom = () => {
 
     connectAndSubscribe();
 
-    const handleBeforeUnload = (e) => {
-      e.preventDefault();
-      e.returnValue = ''; 
+    const handleBeforeUnload = (event) => { 
+      handleLogout();
       handleExit();
+      
     };
   
     // 뒤로가기 처리
@@ -119,6 +119,7 @@ const GameRoom = () => {
       leaveRoom(roomId);
       leaveSession();
       initPreview();
+    
     };
   
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -159,7 +160,7 @@ const GameRoom = () => {
           onClick={clkStart} 
           disabled={roomHost !== "true"}
         >
-          GAME START
+          게임 시작
         </StartButton>
         <ExitButton onClick={clkExit}>나가기</ExitButton>
       </ButtonContainer>  
@@ -193,37 +194,45 @@ const ButtonContainer = styled.div`
 `;
 
 const StartButton = styled.button`
-  padding: 10px 20px;
-  background-color: #90EE90;
+  padding: 15px 30px;
+  background-image: url(${buttonBgImage});
+  background-size: 100% 100%;  // 버튼 크기에 맞게 이미지 조절
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: transparent;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 1.2rem;
-  font-family: 'JejuHallasan';
+  font-size: 1.5rem;
+  font-family: 'NeoDunggeunmoPro-Regular', sans-serif;
+  min-width: 200px;          // 최소 너비 설정
+  min-height: 70px;          // 최소 높이 설정
+  color: white;              // 텍스트 색상
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);  // 텍스트 가독성
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease;
 
   &:hover {
-    background-color: #98FB98;
+    transform: scale(1.05);  // 호버 시 약간 확대
   }
 
   &:disabled {
-    background-color: #d3d3d3;
+    opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  &:active {
+    transform: scale(0.95);  // 클릭 시 약간 축소
   }
 `;
 
-
-const ExitButton = styled.button`
-  padding: 10px 20px;
-  background-color: #FF4444;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1.2rem;
-  font-family: 'JejuHallasan';
-
+const ExitButton = styled(StartButton)`
+  // StartButton의 스타일을 상속받고, 호버 색상만 변경
+  background-image: url(${buttonBgImage2});
   &:hover {
-    background-color: #FF6666;
+    transform: scale(1.05);
   }
 `;
 

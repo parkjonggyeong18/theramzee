@@ -76,6 +76,22 @@ const RoomPage = () => {
     fetchFriendRequests();
   };
 
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      handleLogout(); // 로그아웃 처리
+    };
+    const handlePopState = () => {
+      handleLogout(); // 뒤로가기 시 로그아웃 실행
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [handleLogout]);
+
   return (
     <PageContainer>
       <BackgroundImage />
@@ -201,6 +217,7 @@ const PageContainer = styled.div`
   min-height: 100vh;
   width: 100vw;
   display: flex;
+  
   flex-direction: column;
   align-items: center;
   position: relative;
@@ -235,6 +252,7 @@ const Title = styled.h1`
   font-size: 3rem;
   font-weight: bold;
   color: white;
+  
   text-shadow: 
     0 0 10px #00ff00,
     0 0 20px #00ff00,
