@@ -33,6 +33,8 @@ export const GameProvider = ({ children }) => {
     isEmergencyVote: false,
     currentVotes: {},
     votingInProgress: false, 
+    totalVote: 0,
+    votedPlayers: [],
 
     // 게임 전체 정지(추후)
     isPaused: false, // 게임 타이머 일시정지 여부
@@ -89,6 +91,10 @@ export const GameProvider = ({ children }) => {
   const [isEnergyActive, setIsEnergyActive] = useState(false);
   const timerRef = useRef(null);
 
+  // useEffect(() => {
+  //   console.log("게임 상태 변경됨:", gameState);
+  // }, [gameState]);
+
   // 최신 닉네임 리스트 가져오기 (startGame을 누를 때 실행됨)
   const getPlayers = useCallback(async () => {
     if (isConnected && roomId) {
@@ -128,18 +134,6 @@ export const GameProvider = ({ children }) => {
         // ✅ nickName 값만 추출하여 배열 형태로 변환
         const nicknameList = updatedNicknames.map(player => player.nickName);
 
-        // ✅ 각 nickname을 키로 하고 값은 0으로 설정
-        const nicknameState = nicknameList.reduce((acc, nickname) => {
-          acc[nickname] = 0;
-          return acc;
-        }, {});
-
-        // ✅ GameState 업데이트
-        setGameState(prev => ({
-          ...prev,
-          ...nicknameState,
-        }));
-
         // ✅ 게임 시작 요청
         gameService.startGame(roomId, nicknameList);
       } catch (error) {
@@ -177,23 +171,6 @@ export const GameProvider = ({ children }) => {
       }));
     }
   }, [gameState.totalAcorns]);
-  useEffect(() => {
-    if (isConnected && roomId) {
-      subscribeToTopic(`/topic/game/${roomId}/emergency`, (response) => {
-        console.log('Emergency vote message received:', response);
-        
-        if (response.success && response.data.action === 'START_EMERGENCY_VOTE') {
-          setGameState(prev => ({
-            ...prev,
-            isVoting: true,
-            isEmergencyVote: true,
-            votingInProgress: true,
-            currentVotes: {},
-          }));
-        }
-      });
-    }
-  }, [isConnected, roomId]);
 
   useEffect(() => {
     checkGameOver();
@@ -219,15 +196,13 @@ export const GameProvider = ({ children }) => {
 
   // 숲 이동 처리
   const moveForest = useCallback(async (forestNum) => {
-    const nicknameList = players.map(player => player.nickName);
-    if (isConnected && roomId && nickname && forestNum && nicknameList) {
+    if (isConnected && roomId && nickname && forestNum) {
       try {
         // ✅ 최신 nicknames 값을 받아오기
         const updatedNicknames = await getPlayers();
 
         // ✅ nickName 값만 추출하여 배열 형태로 변환
         const nicknameList = updatedNicknames.map(player => player.nickName);
-
         await gameService.moveForest(roomId, nickname, forestNum, nicknameList);
         setGameState.currentForestNum = forestNum;
       } catch (error) {
@@ -252,21 +227,12 @@ export const GameProvider = ({ children }) => {
   }, [isConnected, roomId, nickname]);
 
   // 긴급 투표 시작 처리
-  // 긴급 투표 시작
   const startEmergencyVote = useCallback(async () => {
     if (isConnected && roomId) {
       try {
         const nicknameList = players.map(player => player.nickName);
         // gameService.startEmergency 대신 startEmergencyVote 사용
         await gameService.startEmergencyVote(roomId, nicknameList);
-        
-        setGameState(prev => ({
-          ...prev,
-          isVoting: true,
-          isEmergencyVote: true,
-          votingInProgress: true,
-          currentVotes: {},
-        }));
       } catch (error) {
         console.error('Failed to start emergency vote:', error);
       }
@@ -285,16 +251,26 @@ export const GameProvider = ({ children }) => {
   }, []);
 
   // 투표 종료
-  const endVote = useCallback((result) => {
-    setGameState(prev => ({
-      ...prev,
-      isVoting: false,
-      isEmergencyVote: false,
-      votingInProgress: false,
-      currentVotes: {},
-      hasUsedEmergency: prev.isEmergencyVote ? true : prev.hasUsedEmergency,
-      // ... 다른 결과 처리 로직
-    }));
+  const endVote = useCallback((newVotedPlayers) => {
+
+    // ✅ 투표 결과 카운트
+    const voteCount = newVotedPlayers.reduce((acc, name) => {
+      acc[name] = (acc[name] || 0) + 1;
+      return acc;
+    }, {});
+
+    // ✅ 최대 득표수 찾기
+    const maxVotes = Math.max(...Object.values(voteCount));
+    
+    // ✅ 최대 득표수를 받은 닉네임 찾기
+    const topVoted = Object.keys(voteCount).filter(name => voteCount[name] === maxVotes);
+
+    // ✅ 동점자 체크 및 결과 할당
+    const result = topVoted.length === 1 ? topVoted[0] : null;
+
+    if (result === null) return;
+
+    return result;
   }, []);
 
   // 미션 완료 처리
@@ -324,8 +300,6 @@ export const GameProvider = ({ children }) => {
       });
     }
   }, [isConnected, roomId, nickname, gameState]);
-
-  // 투표 종료
   
   // 안개 숲 특수 효과 토글
   const toggleFoggyEffects = (isInFoggyForest) => {
@@ -422,7 +396,6 @@ export const GameProvider = ({ children }) => {
     startChargeFatigue,
     startEmergencyVote,
     recordVote,
-    endVote,
   };
 
   return (

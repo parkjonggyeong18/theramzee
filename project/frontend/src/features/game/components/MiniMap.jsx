@@ -7,7 +7,7 @@ import pan from '../../../assets/images/object/PAN.png'
 
 const MiniMap = () => {
  const navigate = useNavigate();
- const { gameState, moveForest, players, cancelAction  } = useGame();
+ const { gameState, moveForest, cancelAction  } = useGame();
 
  const forests = [
    { 

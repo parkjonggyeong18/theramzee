@@ -39,6 +39,10 @@ const GameRoom = () => {
     setRoomId,
     setIsConnected,
     setGameState,
+    moveForest,
+    cancelAction,
+    endVote,
+    voteReset
   } = useGame();
 
   const {
@@ -50,7 +54,7 @@ const GameRoom = () => {
 
 
   const { roomId } = useParams();  // roomId 가져오기
-  const handlers = useGameHandlers(roomId, setGameState);
+  const handlers = useGameHandlers(roomId, setGameState, moveForest, cancelAction, endVote, voteReset);
   const isSubscribed = useRef(false); // 중복 실행 방지 플래그
   const nickName = sessionStorage.getItem('nickName')
   const roomHost = sessionStorage.getItem('roomHost') || null;
@@ -89,6 +93,7 @@ const GameRoom = () => {
           subscribeToTopic(`/topic/game/${roomId}/complete-mission`, handlers.handleCompleteMissionResponse);
           subscribeToTopic(`/topic/game/${roomId}/out`, handlers.handleOutResponse);
           subscribeToTopic(`/topic/game/${roomId}/vote`, handlers.handleVoteResponse);
+          subscribeToTopic(`/topic/game/${roomId}/last-vote`, handlers.handleLastVoteResponse);
         }, 100);
       } catch (error) {
         console.error("⚠️ Failed to connect or subscribe:", error);

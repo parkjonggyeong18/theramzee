@@ -1,27 +1,33 @@
 import { useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
 import gaegeImage from'../../../assets/images/object/gaege.png'
 import diaImage from'../../../assets/images/object/PAN.png'
 
 const GameTimer = () => {
-  const { gameState, setGameState, startFinalVote } = useGame();
+  const { gameState, setGameState,cancelAction, moveForest } = useGame();
   const INITIAL_TIME = 390; // 7분 = 420초
+  const { roomId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     let timerInterval;
-
+  
     if (gameState.isStarted && !gameState.isPaused && gameState.timer > 0) {
       timerInterval = setInterval(() => {
         setGameState(prev => {
           const newTimer = prev.timer - 1;
           
           if (newTimer === 0) {
-            clearInterval(timerInterval);
-            startFinalVote();
+            cancelAction();
+            moveForest(1);
+            navigate(`/game/${roomId}/main`); 
             return {
               ...prev,
-              timer: 0
+              timer: 0,
+              isVoting: true,
+              votes: {}
             };
           }
           
@@ -32,9 +38,10 @@ const GameTimer = () => {
         });
       }, 1000);
     }
-
+  
     return () => clearInterval(timerInterval);
-  }, [gameState.isStarted, gameState.isPaused]);
+  }, [gameState.isStarted, gameState.isPaused, gameState.timer]);
+  
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
