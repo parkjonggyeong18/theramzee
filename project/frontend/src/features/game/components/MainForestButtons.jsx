@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import styled from 'styled-components';
+import {styled,createGlobalStyle} from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
 import EmergencyVoteModal from '../../../features/game/components/vote/EmergencyVoteModal';
 import * as gameService from '../../../api/gameService';  // gameService import 추가
 import { useParams } from 'react-router-dom';  // useParam
+import buttonBgImage from '../../../assets/images/object/plat.png';
+
 
 const MainForestButtons = () => {
   const { roomId } = useParams();
@@ -98,25 +100,33 @@ const MainForestButtons = () => {
 
 
 const ButtonContainer = styled.div`
-  display: flex;
-  gap: 20px;
-  z-index: 11;
-  justify-content: flex-end; /* 오른쪽 정렬 */
+ display: flex;
+ gap: 20px;
+ z-index: 11;
 `;
 
 const BaseButton = styled.button`
- padding: 20px 20px;
+  padding: 15px 30px;
   border: none;
   border-radius: 10px;
-  font-family: 'JejuHallasan';
+  font-family: 'DOSMyungjo', sans-serif;  // 'DOSMyungjo'
   font-size: 1.2rem;
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  background-color: rgba(255, 255, 255, 0); /* 배경 투명 */
-  color: rgba(0, 0, 0, 0); /* 글자 투명 */
-  border: 2px solid rgba(0, 0, 0, 0); /* 테두리 투명 */
-  transition: all 0.3s ease; /* 모든 속성 변화에 부드러운 효과 적용 */
+  background-image: url(${buttonBgImage});
+  background-color: transparent; // 배경색 투명하게
+  
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  min-width: 120px;
+  min-height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
 
   &:disabled {
     opacity: 0.5;
@@ -124,35 +134,32 @@ const BaseButton = styled.button`
   }
 
   &:hover {
-    background-color: rgba(239, 239, 13, 0.8); /* 배경색 반투명 */
-    color: rgb(255, 255, 255); /* 글자색 검정 */
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 `;
 
 const StorageButton = styled(BaseButton)`
  
-  top: -290px;  /* EnergyButton을 위에서 20px 만큼 이동 */
-  left: -280px; /* EnergyButton을 왼쪽에서 50px 만큼 이동 */
+  opacity: ${props => props.$isActive ? 0.8 : 1};
 `;
 
 const EnergyButton = styled(BaseButton)`
-  top: -70px;  /* EnergyButton을 위에서 20px 만큼 이동 */
-  left: -335px; /* EnergyButton을 왼쪽에서 50px 만큼 이동 */
+ 
+  opacity: ${props => props.$isActive ? 0.8 : 1};
 `;
 
 const EmergencyButton = styled(BaseButton)`
-  top: -260px;  /* EnergyButton을 위에서 20px 만큼 이동 */
-  left: 130px; /* EnergyButton을 왼쪽에서 50px 만큼 이동 */
- }
+  
 `;
 
 const CancelButton = styled(BaseButton)`
-  top: -60px;  /* EnergyButton을 위에서 20px 만큼 이동 */
-  left: -560px; /* EnergyButton을 왼쪽에서 50px 만큼 이동 */
-background-color: rgba(255, 255, 255, 0); /* 배경 투명 */
- color: white;
+  filter: grayscale(1);
 `;
-
 const ProgressBar = styled.div`
  position: absolute;
  bottom: 0;
