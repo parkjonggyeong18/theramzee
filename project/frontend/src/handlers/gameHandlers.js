@@ -36,35 +36,30 @@ export const useGameHandlers = (roomId, setGameState) => {
   );
 
   // 비상 상황 응답 처리
-  const handleEmergencyResponse = useCallback(
-    async (message) => {
-      try {
-        navigate(`/game/${gameState.roomId}/main`);
-        if (message.success) {
-          const initializedData = message.data.userTokens;
-          console.log("긴급 요청 성공:", initializedData);
+  const handleEmergencyResponse = (response) => {
+    const data = response.data;
+    if (data) {
+      setGameState(prev => ({
+        ...prev,
+        isVoting: true,
+        isEmergencyVote: true,
+        votingInProgress: true,
+        currentVotes: {},
+        forestNum: 1, // 모든 플레이어를 메인 숲으로 이동
+        forestUsers: data.forestUsers
+      }));
+    }
+  };
 
-          setGameState((prev) => ({
-            ...prev,
-            forestToken: initializedData[nickName],
-            foresetNum: initializedData.forestNum,
-            forestUsers: initializedData.forestUsers,
-            timerRunning: false,
-            isVoting: true, 
-            isEmergencyVote: true,
-            hasUsedEmergency: true,
-            isPaused: true,
-          }));
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
-        }
-      } catch (error) {
-        console.error("Error parsing game start response:", error);
-      }
-    },
-    [nickName, setGameState]
-  );
-
+  const handleVoteResponse = (response) => {
+    const data = response.data;
+    if (data) {
+      setGameState(prev => ({
+        ...prev,
+        currentVotes: data.votes
+      }));
+    }
+  };
   // 숲 이동 응답 처리
   const handleMoveResponse = useCallback(
     async (message) => {
@@ -261,12 +256,13 @@ export const useGameHandlers = (roomId, setGameState) => {
 
   return {
     handleGameStartResponse,
-    handleEmergencyResponse,
     handleMoveResponse,
     handleSaveAcornsResponse,
     handleChargeFatigueResponse,
     handleKillResponse,
     handleCompleteMissionResponse,
     handleOutResponse,
+    handleEmergencyResponse,
+    handleVoteResponse,
   };
 };

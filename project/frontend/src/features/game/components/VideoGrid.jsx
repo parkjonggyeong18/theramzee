@@ -17,7 +17,7 @@ const VideoGrid = (props) => {
   const totalSlots = props.totalSlots;
   
   const slots = Array.from({ length: totalSlots }, (_, i) => currentSubscribers[i] || null);
-  console.log("슬롯슬롯", slots);
+
 
   useEffect(() => {
     if (gameState.isDead && !showDeadOverlay) {
@@ -29,7 +29,7 @@ const VideoGrid = (props) => {
     slots.forEach((player) => {
       if (player?.stream?.connection?.connectionId) {
         const connectionId = player.stream.connection.connectionId;
-        console.log("구독자 이름", player.stream.connection.data);
+
         if (!videoRefs.current[connectionId]) {
           videoRefs.current[connectionId] = React.createRef();
         }

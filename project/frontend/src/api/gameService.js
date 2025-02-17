@@ -18,14 +18,7 @@ export const startGame = async (roomId, nicknames) => {
   }
 };
 
-export const startEmergency = async (roomId, nicknames) => {
-    try {
-      await sendMessage(`/app/game/${roomId}/emergency`, { roomId, nicknames });
-    } catch (error) {
-      console.error('Failed to handle emergency:', error);
-      throw error;
-    }
-  };
+
 
   export const moveForest = async (roomId, nickname, newForest, nicknames) => {
     try {
@@ -72,3 +65,33 @@ export const startEmergency = async (roomId, nicknames) => {
     }
   };
 
+//투표
+
+export const startEmergencyVote = async (roomId, nicknames) => {
+  try {
+    await sendMessage(`/app/game/${roomId}/emergency`, { 
+      roomId, 
+      nicknames,
+      action: 'START_EMERGENCY_VOTE',
+      timestamp: Date.now() 
+    });
+  } catch (error) {
+    console.error('Failed to start emergency vote:', error);
+    throw error;
+  }
+};
+
+export const sendVote = async (roomId, votedPlayer) => {
+  try {
+    // 순수 데이터 객체만 전송
+    const voteData = {
+      roomId,
+      votedPlayer,    
+    };
+
+    await sendMessage(`/app/game/${roomId}/vote`, { roomId, votedPlayer });
+  } catch (error) {
+    console.error('Failed to send vote:', error);
+    throw error;
+  }
+};

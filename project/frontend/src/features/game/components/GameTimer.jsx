@@ -1,10 +1,9 @@
-// components/game/GameTimer.jsx
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
 
 const GameTimer = () => {
-  const { gameState, setGameState, startFinalVote } = useGame();
+  const { gameState, setGameState } = useGame();
 
   useEffect(() => {
     let timerInterval;
@@ -14,13 +13,14 @@ const GameTimer = () => {
         setGameState(prev => {
           const newTimer = prev.timer - 1;
           
-          // 게임 시간 종료 (7분 = 0초)
+          // 게임 시간 종료시 최종 투표 시작
           if (newTimer === 0) {
-            clearInterval(timerInterval);
-            startFinalVote();  // GameContext의 함수 사용
             return {
               ...prev,
-              timer: 0
+              timer: 0,
+              isVoting: true,
+              voteType: 'final',
+              votes: {}
             };
           }
           
