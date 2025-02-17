@@ -17,10 +17,6 @@ const VideoGrid = (props) => {
   const totalSlots = props.totalSlots;
   
   const slots = Array.from({ length: totalSlots }, (_, i) => currentSubscribers[i] || null);
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
 
   useEffect(() => {
     if (gameState.isDead && !showDeadOverlay) {
@@ -32,10 +28,6 @@ const VideoGrid = (props) => {
     slots.forEach((player) => {
       if (player?.stream?.connection?.connectionId) {
         const connectionId = player.stream.connection.connectionId;
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
         if (!videoRefs.current[connectionId]) {
           videoRefs.current[connectionId] = React.createRef();
         }
