@@ -35,6 +35,7 @@ export const GameProvider = ({ children }) => {
     votingInProgress: false, 
     totalVote: 0,
     votedPlayers: [],
+    hasUsedEmergency: false,
 
     // 게임 전체 정지(추후)
     isPaused: false, // 게임 타이머 일시정지 여부
