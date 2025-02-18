@@ -111,8 +111,9 @@ public class ChatController {
 
         // 메시지를 상대방에게 실시간으로 전송
         messagingTemplate.convertAndSend(
-                "/topic/messages/" + receiver + "/" + sender,
+                "/topic/messages/" + receiver + "/" + users.getNickname(),
                 chatMessage
         );
+        System.out.println(receiver + ":" + users.getNickname());
     }
 }

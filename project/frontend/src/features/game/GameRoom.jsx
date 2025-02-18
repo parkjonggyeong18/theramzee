@@ -134,7 +134,7 @@ const GameRoom = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [roomId]);
+  }, [roomId, navigate]);
 
   const clkStart = () => {
     startGame();

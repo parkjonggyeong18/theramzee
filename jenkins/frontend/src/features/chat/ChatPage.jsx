@@ -39,7 +39,7 @@ const ChatPage = ({ receiver, isOpen, onClose }) => {
       try {
         await connectSocket();
         const myTopic = `/topic/messages/${username}/${receiver}`;
-        console.log('Subscribing to my topic:', myTopic);
+        
         
         // 이전 구독이 있다면 해제
         if (subscriptionRef.current) {
@@ -48,14 +48,15 @@ const ChatPage = ({ receiver, isOpen, onClose }) => {
         
         // 새로운 구독 설정
         const subscription = subscribeToTopic(myTopic, (message) => {
-          console.log('Received message:', message);
+          console.log('Subscribing to my topic:', message);
           const isCurrentChat = (
-            (message.sender === receiver && message.receiver === username) ||
-            (message.sender === username && message.receiver === receiver)
+            (message.sender = receiver && message.receiver == nickname) ||
+            (message.sender = nickname && message.receiver == receiver)
           );
           
           if (isCurrentChat) {
             setMessages(prev => [...prev, message]);
+
           }
         });
 
