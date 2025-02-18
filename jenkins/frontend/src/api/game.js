@@ -43,3 +43,14 @@ export const emergencyCall = async (roomId) => {
 export const chargeFatigue = async (roomId, userNum) => {
   return await apiRequest('/api/v1/room/game-charge', 'POST', { roomId, userNum });
 };
+
+
+//투표
+
+export const submitVote = async (roomId, voterNickname, targetNickname) => {
+  return await apiRequest('/api/v1/room/game-vote', 'POST', { 
+    roomId, 
+    voterNickname, 
+    targetNickname 
+  });
+};

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useAuth } from '../../contexts/AuthContext';
@@ -7,14 +7,15 @@ import { sendEmailVerification, verifyEmailCode } from '../../api/email';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import forestBg from "../../assets/images/backgrounds/forest-bg.gif"; 
-
+import { FriendContext } from '../../contexts/FriendContext';
 const LoginPage = () => {
   const { updateAccessToken } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isLoginMode, setIsLoginMode] = useState(true); // 로그인/회원가입 모드 전환용 상태
-
+  // 추가
+  const { setUsername } = useContext(FriendContext);
   const handleLogin = useCallback(async (username, password) => {
     setLoading(true);
     setError(null);
@@ -22,6 +23,9 @@ const LoginPage = () => {
     try {
       const response = await login(username, password);
       updateAccessToken(response.data);
+      sessionStorage.setItem('username',username);
+      // 추가
+      setUsername(username);
       navigate('/rooms');
     } catch (error) {
       console.error('로그인 실패', error);
@@ -75,6 +79,7 @@ const LoginPage = () => {
 const LoginContainer = styled.div`
   height: 100vh;
   width: 100vw;
+  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -96,6 +101,7 @@ const BackgroundImage = styled.div`
 const Title = styled.h1`
   font-size: 4rem;
   font-weight: bold;
+  
   color: white;
   margin-bottom: 2rem;
   text-shadow: 

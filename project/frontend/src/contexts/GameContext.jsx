@@ -17,7 +17,7 @@ export const GameProvider = ({ children }) => {
 
     // 게임 진행 상태
     isStarted: false, // 게임 시작 여부
-    timer: 390, // 게임 시간 (7분)
+    timer: 240, // 게임 시간 (7분)
     timerRunning: false,    // 타이머 실행 상태
     evilSquirrel: null, // true | false
     forestToken: null,  // 숲 토큰
@@ -35,6 +35,7 @@ export const GameProvider = ({ children }) => {
     votingInProgress: false, 
     totalVote: 0,
     votedPlayers: [],
+    hasUsedEmergency: false,
 
     // 게임 전체 정지(추후)
     isPaused: false, // 게임 타이머 일시정지 여부
@@ -90,6 +91,7 @@ export const GameProvider = ({ children }) => {
   const [isStorageActive, setIsStorageActive] = useState(false);
   const [isEnergyActive, setIsEnergyActive] = useState(false);
   const timerRef = useRef(null);
+  const [isActionInProgress, setIsActionInProgress] = useState(false);
 
   // useEffect(() => {
   //   console.log("게임 상태 변경됨:", gameState);
@@ -157,24 +159,24 @@ export const GameProvider = ({ children }) => {
     }
   }, [isConnected, roomId, nickname]);
 
-  // 게임 종료 처리
-  const checkGameOver = useCallback(() => {
-    if (gameState.totalAcorns >= 13) {
-      console.log("게임 종료");
-      setGameState(prev => ({
-        ...prev,
-        isGameOver: true,
-        gameOverReason: 'acorns',
-        winner: prev.evilSquirrel ? 'bad' : 'good',
-        timerRunning: false,
-        isStarted: false  // 추가
-      }));
-    }
-  }, [gameState.totalAcorns]);
+  // // 게임 종료 처리
+  // const checkGameOver = useCallback(() => {
+  //   if (gameState.totalAcorns >= 10) {
+  //     console.log("게임 종료");
+  //     setGameState(prev => ({
+  //       ...prev,
+  //       isGameOver: true,
+  //       gameOverReason: 'acorns',
+  //       winner: prev.evilSquirrel ? 'bad' : 'good',
+  //       timerRunning: false,
+  //       isStarted: false  // 추가
+  //     }));
+  //   }
+  // }, [gameState.totalAcorns]);
 
-  useEffect(() => {
-    checkGameOver();
-  }, [gameState.totalAcorns, checkGameOver]);
+  // useEffect(() => {
+  //   checkGameOver();
+  // }, [gameState.totalAcorns, checkGameOver]);
 
   // 도토리 저장 처리
   const saveUserAcorns = useCallback(async () => {
@@ -188,11 +190,6 @@ export const GameProvider = ({ children }) => {
       console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
-
-  useEffect(() => {
-    
-    checkGameOver();
-  }, [gameState.totalAcorns, checkGameOver]);
 
   // 숲 이동 처리
   const moveForest = useCallback(async (forestNum) => {
@@ -345,6 +342,7 @@ export const GameProvider = ({ children }) => {
     }
     setIsStorageActive(false);
     setIsEnergyActive(false);
+    setIsActionInProgress(false);
     timerRef.current = null;
   }, []);
 
@@ -352,9 +350,11 @@ export const GameProvider = ({ children }) => {
   const startSaveAcorns = useCallback(() => {
     if (gameState.evilSquirrel !== false && gameState.heldAcorns === 0 && isStorageActive && gameState.isDead) return;
     setIsStorageActive(true);
+    setIsActionInProgress(true);
     timerRef.current = setTimeout(() => {
       saveUserAcorns();
       setIsStorageActive(false);
+      setIsActionInProgress(false);
     }, 10000);
   }, [gameState.evilSquirrel, gameState.heldAcorns, isStorageActive, gameState.isDead, saveUserAcorns]);
 
@@ -362,9 +362,11 @@ export const GameProvider = ({ children }) => {
   const startChargeFatigue = useCallback(() => {
     if (gameState.fatigue >= 3 || isEnergyActive || gameState.isDead) return;
     setIsEnergyActive(true);
+    setIsActionInProgress(true);
     timerRef.current = setTimeout(() => {
       chargeFatigue();
       setIsEnergyActive(false);
+      setIsActionInProgress(false);
     }, gameState.evilSquirrel === false ? 5000 : 10000);
   }, [gameState.fatigue, isEnergyActive, gameState.isDead, gameState.evilSquirrel, chargeFatigue]);
 
@@ -396,6 +398,7 @@ export const GameProvider = ({ children }) => {
     startChargeFatigue,
     startEmergencyVote,
     recordVote,
+    isActionInProgress,
   };
 
   return (

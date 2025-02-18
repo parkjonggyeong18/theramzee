@@ -49,7 +49,8 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
         currentVotes: {},
         forestNum: 1, // 모든 플레이어를 메인 숲으로 이동
         forestUsers: initializedData.forestUsers,
-        isPaused: true
+        isPaused: true,
+        hasUsedEmergency: true
       }));
       cancelAction();
       moveForest(1);
@@ -97,7 +98,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
           const initializedData = message.data;
           console.log("도토리 저장 성공:", initializedData);
           
-          // 도토리가 3개 이상이면 게임 종료
+          // 도토리가 13개 이상이면 게임 종료
           if (initializedData.newTotalAcorns >= 13) {
             navigate(`/game/${roomId}/main`);
             setGameState((prev) => ({
@@ -119,7 +120,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             // 게임 진행 중
             setGameState((prev) => ({
               ...prev,
-              totalAcorns: initializedData.newTotalAcorns,
+              totalAcorns: initializedData.newTotalAcorns
             }));
             if (message.data['nickname'] === nickName) {
               setGameState((prev) => ({

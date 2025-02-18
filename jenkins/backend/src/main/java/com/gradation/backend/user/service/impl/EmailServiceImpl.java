@@ -17,8 +17,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -187,13 +186,45 @@ public class EmailServiceImpl implements EmailService {
      * @return 생성된 임시 비밀번호
      */
     private String generateTemporaryPassword() {
-        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
-        StringBuilder password = new StringBuilder();
+        // Character pools
+        String uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lowercase = "abcdefghijklmnopqrstuvwxyz";
+        String digits = "0123456789";
+        String specialChars = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
+
         Random random = new Random();
-        for (int i = 0; i < 8; i++) {
-            password.append(chars.charAt(random.nextInt(chars.length())));
+
+        // Ensure at least one character from each category
+        char upper = uppercase.charAt(random.nextInt(uppercase.length()));
+        char lower = lowercase.charAt(random.nextInt(lowercase.length()));
+        char digit = digits.charAt(random.nextInt(digits.length()));
+        char special = specialChars.charAt(random.nextInt(specialChars.length()));
+
+        // Fill the remaining length with random characters from all categories
+        String allChars = uppercase + lowercase + digits + specialChars;
+        int remainingLength = 8 - 4; // Total length - already added 4 characters
+
+        StringBuilder passwordBuilder = new StringBuilder();
+        passwordBuilder.append(upper).append(lower).append(digit).append(special);
+
+        for (int i = 0; i < remainingLength; i++) {
+            passwordBuilder.append(allChars.charAt(random.nextInt(allChars.length())));
         }
-        return password.toString();
+
+        // Shuffle the characters to ensure randomness
+        List<Character> passwordCharacters = new ArrayList<>();
+        for (char c : passwordBuilder.toString().toCharArray()) {
+            passwordCharacters.add(c);
+        }
+        Collections.shuffle(passwordCharacters);
+
+        // Convert the shuffled list back to a string
+        StringBuilder shuffledPassword = new StringBuilder();
+        for (char c : passwordCharacters) {
+            shuffledPassword.append(c);
+        }
+
+        return shuffledPassword.toString();
     }
 }
 

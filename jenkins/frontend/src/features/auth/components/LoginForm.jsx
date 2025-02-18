@@ -19,6 +19,8 @@ const LoginForm = ({ onLogin, loading }) => {
       <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
       <ButtonGroup>
         <LoginButton type="submit" disabled={loading}>{loading ? '로그인 중...' : '로그인'}</LoginButton>
+        <ForgotButton type="button" onClick={() => navigate('/forgot-password')} disabled={loading}>아이디/ 비밀번호 찾기
+        </ForgotButton>
       </ButtonGroup>
       <RegisterButton type="button" onClick={() => navigate('/register')} disabled={loading}>회원가입</RegisterButton>
     </form>
@@ -45,6 +47,7 @@ const Input = styled.input`
 
 const ButtonGroup = styled.div`
   display: flex;
+  
   justify-content: space-between;
   margin-bottom: 1rem;
 `;
@@ -79,10 +82,11 @@ const ForgotButton = styled.button`
 
 const RegisterButton = styled.button`
   width: 100%;
-  background: none;
+   background-color: #2d1810;
   border: none;
   color: white;
-  padding: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 5px;
   cursor: pointer;
   transition: color 0.2s;
 

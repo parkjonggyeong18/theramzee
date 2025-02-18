@@ -5,13 +5,13 @@ import { resetPassword, findUsername } from '../../../api/email'; // API 호출 
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
-  const [mode, setMode] = useState('id'); // 'id' or 'password'
+  const [mode, setMode] = useState('id'); // 'id' 또는 'password' 모드
   const [formData, setFormData] = useState({
-    id: '',
-    username: '',
-    email: ''
+    id: '',       // 사용자 ID
+    name: '',     // 사용자 이름
+    email: ''     // 사용자 이메일
   });
-  const [message, setMessage] = useState(''); // 결과 메시지 표시용 상태
+  const [message, setMessage] = useState(''); // 결과 메시지 상태
 
   // Form 제출 핸들러
   const handleSubmit = async (e) => {
@@ -19,15 +19,15 @@ const ForgotPassword = () => {
     try {
       if (mode === 'id') {
         // 아이디 찾기 API 호출
-        await findUsername(formData.username, formData.email); // 이름과 이메일 전달
-        setMessage('Your username has been sent to your email.');
+        await findUsername(formData.name, formData.email); // 이름과 이메일 전달
+        setMessage('입력하신 이메일로 아이디를 발송했습니다.');
       } else if (mode === 'password') {
         // 비밀번호 초기화 API 호출
-        await resetPassword(formData.username, formData.email); // 아이디와 이메일 전달
-        setMessage('A temporary password has been sent to your email.');
+        await resetPassword(formData.id, formData.email); // ID와 이메일 전달
+        setMessage('입력하신 이메일로 임시 비밀번호를 발송했습니다.');
       }
     } catch (error) {
-      setMessage(error.response?.data?.message || 'An error occurred. Please try again.');
+      setMessage(error.response?.data?.message || '오류가 발생했습니다. 다시 시도해주세요.');
     }
   };
 
@@ -42,13 +42,13 @@ const ForgotPassword = () => {
             active={mode === 'id'} 
             onClick={() => setMode('id')}
           >
-            ID
+            ID 찾기
           </TabButton>
           <TabButton 
             active={mode === 'password'} 
             onClick={() => setMode('password')}
           >
-            PASSWORD
+            비밀번호 찾기
           </TabButton>
         </TabButtons>
 
@@ -57,13 +57,13 @@ const ForgotPassword = () => {
             <>
               <Input
                 type="text"
-                placeholder="USERNAME"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                placeholder="이름"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               />
               <Input
                 type="email"
-                placeholder="E-MAIL"
+                placeholder="이메일"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
@@ -72,13 +72,13 @@ const ForgotPassword = () => {
             <>
               <Input
                 type="text"
-                placeholder="ID"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                placeholder="아이디"
+                value={formData.id}
+                onChange={(e) => setFormData({ ...formData, id: e.target.value })}
               />
               <Input
                 type="email"
-                placeholder="E-MAIL"
+                placeholder="이메일"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               />
@@ -96,6 +96,7 @@ const ForgotPassword = () => {
   );
 };
 
+// 스타일 정의
 const Container = styled.div`
   height: 100vh;
   width: 100vw;
@@ -148,4 +149,3 @@ const LoginButton=styled.button`background:black;color:white;padding:.5rem;borde
 const Message=styled.p`color:white;margin-top:.75rem;text-align:center;`;
 
 export default ForgotPassword;
-

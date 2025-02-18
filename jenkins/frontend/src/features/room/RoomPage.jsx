@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { fetchRooms, createRoom } from '../../api/room';
@@ -6,6 +6,11 @@ import RoomList from './components/RoomList';
 import CreateRoomForm from './components/CreateRoomForm';
 import forestBg from "../../assets/images/backgrounds/forest-bg.gif";
 import { useAuth } from '../../contexts/AuthContext'; // 추가
+import { FriendContext, FriendProvider } from '../../contexts/FriendContext';
+import  FriendPage  from '../../features/friend/FriendPage';
+import  ProfilePage  from '../../features/profile/ProfilePage';
+import ChatPage from '../../features/chat/ChatPage';
+import { Menu } from 'lucide-react';
 
 const RoomPage = () => {
   const { handleLogout } = useAuth();
@@ -14,6 +19,16 @@ const RoomPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { 
+    isFriendOverlayOpen, 
+    isChatOverlayOpen,
+    currentChatUser,
+    toggleFriendOverlay, 
+    closeChatOverlay,
+    fetchFriends,
+    fetchFriendRequests 
+  } = useContext(FriendContext);
+
 
   // 방 목록 불러오기 함수
   const loadRooms = async () => {
@@ -55,12 +70,34 @@ const RoomPage = () => {
     }
   };
 
+  const handleMenuClick = () => {
+    toggleFriendOverlay();
+    fetchFriends();
+    fetchFriendRequests();
+  };
+
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      handleLogout(); // 로그아웃 처리
+    };
+    const handlePopState = () => {
+      handleLogout(); // 뒤로가기 시 로그아웃 실행
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [handleLogout]);
+
   return (
     <PageContainer>
       <BackgroundImage />
       
       <ContentWrapper>
-        <Header>
+      <Header>
           <Title>THE RAMZEE</Title>
           <ButtonGroup>
             <CreateRoomButton onClick={() => setIsModalOpen(true)}>
@@ -69,6 +106,10 @@ const RoomPage = () => {
             <LogoutButton onClick={handleLogout}>
               로그아웃
             </LogoutButton>
+            <MenuButton onClick={handleMenuClick}>{}
+              <Menu size={24} />
+            </MenuButton>
+            
           </ButtonGroup>
         </Header>
 
@@ -91,6 +132,18 @@ const RoomPage = () => {
             </ModalContent>
           </ModalOverlay>
         )}
+        <FriendOverlay $isOpen={isFriendOverlayOpen}>
+          <FriendOverlayContent>
+            <CloseButton onClick={toggleFriendOverlay}>×</CloseButton>
+            <ProfilePage />
+            <FriendPage />
+          </FriendOverlayContent>
+        </FriendOverlay>
+        <ChatPage 
+          isOpen={isChatOverlayOpen}
+          receiver={currentChatUser}
+          onClose={closeChatOverlay}
+        />
       </ContentWrapper>
     </PageContainer>
   );
@@ -133,7 +186,7 @@ const RefreshButton = styled.button`
   align-items: center;
   gap: 0.5rem;
 
-  &:hover span {
+  &:hover span {npm 
     transform: scale(1.2);
     transition: transform 0.2s ease-in-out;
   }
@@ -164,6 +217,7 @@ const PageContainer = styled.div`
   min-height: 100vh;
   width: 100vw;
   display: flex;
+  
   flex-direction: column;
   align-items: center;
   position: relative;
@@ -198,6 +252,7 @@ const Title = styled.h1`
   font-size: 3rem;
   font-weight: bold;
   color: white;
+  
   text-shadow: 
     0 0 10px #00ff00,
     0 0 20px #00ff00,
@@ -276,6 +331,60 @@ const LoadingMessage = styled.div`
   text-align: center;
   padding: 2rem;
   font-size: 1.2rem;
+`;
+const MenuButton = styled.button`
+  background-color: #2d1810;
+  color: white;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #3d2218;
+  }
+`;
+
+const FriendOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 400px;
+  height: 100vh;
+  background-color: rgba(45, 24, 16, 0.95);
+  transform: translateX(${props => props.$isOpen ? '0' : '100%'});
+  transition: transform 0.3s ease-in-out;
+  z-index: 1000;
+`;
+
+const FriendOverlayContent = styled.div`
+  height: 100%;
+  padding: 2rem;
+  overflow-y: auto;
+
+  /* 스크롤바 스타일링 */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
 `;
 
 export default RoomPage;

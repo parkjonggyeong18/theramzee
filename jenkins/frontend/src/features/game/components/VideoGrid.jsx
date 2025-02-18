@@ -57,10 +57,8 @@ const VideoGrid = (props) => {
             // 현재 숲에 포함되어 있다면 오디오 활성화, 아니면 음소거
             if (gameState.forestUsers?.[gameState.forestNum]?.includes(subscriberNickname)) {
               player.subscribeToAudio(true);
-              console.log(` ${subscriberNickname} 오디오 ON`);
             } else {
               player.subscribeToAudio(false);
-              console.log(` ${subscriberNickname} 오디오 OFF`);
             }
           } catch (error) {
             console.error("오디오 제어 처리 중 오류:", error);

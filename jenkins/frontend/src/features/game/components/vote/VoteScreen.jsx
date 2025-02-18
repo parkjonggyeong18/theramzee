@@ -1,286 +1,263 @@
-import { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import { useGame } from '../../../../contexts/GameContext';
-import { Z_INDEX } from '../../../../constants/zIndex';
-import UserVideoComponent from '../../../openVidu/components/UserVideoComponent';
+// import React, { useState, useEffect, useCallback } from 'react';
+// import { useGame } from '../../../../contexts/GameContext';
+// import styled from 'styled-components';
+// import { Z_INDEX } from '../../../../constants/zIndex';
+// import * as gameService from '../../../../api/gameService';  // 이 줄 추가
 
-const VoteScreen = ({ 
-  onVoteEnd,
-  isEmergency = false  // 긴급 투표 여부
-}) => {
-  const { gameState, setGameState, players } = useGame();
-  const [selectedPlayer, setSelectedPlayer] = useState(null);
-  const [votes, setVotes] = useState({});
-  const [timer, setTimer] = useState(180);  // 3분
+// const VoteScreen = ({ isEmergency }) => {
+//   const { gameState, players, setGameState } = useGame();
+//   const [selectedPlayer, setSelectedPlayer] = useState(null);
+//   const [timeLeft, setTimeLeft] = useState(30);
+//   const currentNickname = sessionStorage.getItem('nickName');
 
-  // 타이머 포맷팅 함수
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  };
+//   // 살아있는 플레이어만 필터링
+//   const livingPlayers = players.filter(p => !gameState.killedPlayers?.includes(p.nickName));
 
-  useEffect(() => {
-    if (isEmergency) {
-      // 게임 타이머 일시 정지
-      setGameState(prev => ({
-        ...prev,
-        isPaused: true
-      }));
-    }
+//   // 투표 처리 함수
+//   const handleVote = useCallback(async (targetNickname) => {
+//     if (gameState.isDead || gameState.votes?.[currentNickname]) {
+//       console.log('🚫 투표 불가:', {
+//         isDead: gameState.isDead,
+//         alreadyVoted: Boolean(gameState.votes?.[currentNickname])
+//       });
+//       return;
+//     }
 
-    const countdown = setInterval(() => {
-      setTimer(prev => {
-        if (prev <= 1) {
-          clearInterval(countdown);
-          handleTimerEnd();
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+//     try {
+//       console.log('✅ 투표 진행:', {
+//         voter: currentNickname,
+//         target: targetNickname
+//       });
 
-    return () => {
-      clearInterval(countdown);
-      if (isEmergency) {
-        // 게임 타이머 재개
-        setGameState(prev => ({
-          ...prev,
-          isPaused: false
-        }));
-      }
-    };
-  }, []);
+//       // 로컬 상태 업데이트
+//       setSelectedPlayer(targetNickname);
+      
+//       // GameContext 상태 업데이트
+//       setGameState(prev => ({
+//         ...prev,
+//         votes: {
+//           ...prev.votes,
+//           [currentNickname]: targetNickname
+//         }
+//       }));
 
-  const handleVote = (playerId) => {
-    if (selectedPlayer || gameState.isDead) return;
-    setSelectedPlayer(playerId);
-    setVotes(prev => ({
-      ...prev,
-      [playerId]: (prev[playerId] || 0) + 1
-    }));
-  };
+//       // WebSocket으로 투표 전송
+//       await gameService.submitVoteWS(gameState.roomId, currentNickname, targetNickname);
+      
+//     } catch (error) {
+//       console.error('❌ 투표 처리 실패:', error);
+//     }
+//   }, [currentNickname, gameState.isDead, gameState.votes, gameState.roomId, setGameState]);
 
-  const handleTimerEnd = () => {
-    if (!selectedPlayer) {
-      // 시간 초과시 자동 처리
-      if (isEmergency) {
-        onVoteEnd({ 
-          continues: true,
-          message: '투표 시간이 초과되었습니다. 게임을 계속합니다.'
-        });
-      } else {
-        onVoteEnd({ 
-          winner: 'bad',
-          reason: 'VOTE_TIMEOUT',
-          message: '최종 투표 시간이 초과되었습니다. 나쁜 다람쥐의 승리입니다!'
-        });
-      }
-    } else {
-      handleVoteEnd();
-    }
-  };
+//   // 타이머 효과
+//   useEffect(() => {
+//     console.log('⏱️ 타이머 시작');
+//     const timer = setInterval(() => {
+//       setTimeLeft(prev => {
+//         console.log('현재 시간:', prev);
+//         if (prev <= 1) {
+//           console.log('⏰ 투표 시간 종료');
+//           clearInterval(timer);
+          
+//           // 투표 종료 처리
+//           const totalVotes = Object.keys(gameState.votes || {}).length;
+//           console.log('최종 투표 현황:', {
+//             총투표수: totalVotes,
+//             투표내역: gameState.votes
+//           });
 
-  const handleVoteEnd = () => {
-    // 최다 득표자 결정
-    const maxVotes = Math.max(...Object.values(votes));
-    const maxVotedPlayers = Object.entries(votes)
-      .filter(([_, count]) => count === maxVotes)
-      .map(([player]) => player);
+//           if (totalVotes > 0) {
+//             console.log('투표 결과 처리 시작');
+//             // 투표 결과 처리 로직
+//           }
+//           return 0;
+//         }
+//         return prev - 1;
+//       });
+//     }, 1000);
 
-    // 동률이 있는 경우
-    if (maxVotedPlayers.length > 1) {
-      if (isEmergency) {
-        // 긴급 투표 동률 - 게임 계속
-        onVoteEnd({ 
-          continues: true,
-          message: '투표가 동률로 종료되었습니다. 게임을 계속합니다.'
-        });
-      } else {
-        // 최종 투표 동률 - 나쁜 다람쥐 승리
-        onVoteEnd({ 
-          winner: 'bad',
-          reason: 'VOTE_TIE',
-          message: '최종 투표가 동률입니다. 나쁜 다람쥐의 승리입니다!'
-        });
-      }
-      return;
-    }
+//     return () => clearInterval(timer);
+//   }, [gameState.votes]);
 
-    // 단일 최다 득표자가 있는 경우
-    const votedPlayer = maxVotedPlayers[0];
-    const votedPlayerData = players.find(p => p.nickName === votedPlayer);
+//   console.log('현재 투표 상태:', {
+//     votes: gameState.votes,
+//     livingPlayers,
+//     selectedPlayer
+//   });
 
-    setGameState(prev => ({
-      ...prev,
-      lastVotedPlayer: votedPlayer
-    }));
+//   return (
+//     <VoteOverlay>
+//       <VoteContainer>
+//         {/* ... 기존 UI 코드 ... */}
+//         <PlayerGrid>
+//           {livingPlayers.map((player) => (
+//             <PlayerCard
+//               key={player.nickName}
+//               onClick={() => handleVote(player.nickName)}
+//               disabled={gameState.isDead || gameState.votes?.[currentNickname]}
+//               $selected={selectedPlayer === player.nickName}
+//               $selectable={!gameState.votes?.[currentNickname] && !gameState.isDead}
+//             >
+//               <PlayerName>{player.nickName}</PlayerName>
+//               <VoteCount>
+//                 {Object.values(gameState.votes || {}).filter(v => v === player.nickName).length}
+//               </VoteCount>
+//               {selectedPlayer === player.nickName && <SelectedMark>선택됨</SelectedMark>}
+//             </PlayerCard>
+//           ))}
+//         </PlayerGrid>
+        
+//         <VoteStatus>
+//           투표 현황: {Object.keys(gameState.votes || {}).length} / {livingPlayers.length}
+//         </VoteStatus>
+        
+//         {/* 디버깅용 투표 현황 표시 */}
+//         <div style={{ color: 'white', marginTop: '10px' }}>
+//           {Object.entries(gameState.votes || {}).map(([voter, target]) => (
+//             <div key={voter}>{voter} → {target}</div>
+//           ))}
+//         </div>
+//       </VoteContainer>
+//     </VoteOverlay>
+//   );
+// };
 
-    if (isEmergency) {
-      // 긴급 투표 결과 처리
-      if (votedPlayerData.evilSquirrel) {
-        // 나쁜 다람쥐가 지목됨 -> 착한 다람쥐 승리
-        onVoteEnd({
-          winner: 'good',
-          reason: 'EVIL_ELIMINATED',
-          message: '착한 다람쥐 승리! 긴급 투표로 나쁜 다람쥐를 찾아냈습니다.',
-          eliminatedPlayer: votedPlayer
-        });
-      } else {
-        // 착한 다람쥐가 지목됨 -> 게임 계속
-        onVoteEnd({
-          continues: true,
-          eliminatedPlayer: votedPlayer,
-          message: '투표로 지목된 플레이어가 제거되었습니다.'
-        });
-      }
-    } else {
-      // 최종 투표 결과 처리
-      if (votedPlayerData.evilSquirrel) {
-        // 나쁜 다람쥐가 지목됨 -> 착한 다람쥐 승리
-        onVoteEnd({
-          winner: 'good',
-          reason: 'EVIL_ELIMINATED',
-          message: '착한 다람쥐 승리! 최종 투표로 나쁜 다람쥐를 찾아냈습니다.',
-          eliminatedPlayer: votedPlayer
-        });
-      } else {
-        // 착한 다람쥐가 지목됨 -> 나쁜 다람쥐 승리
-        onVoteEnd({
-          winner: 'bad',
-          reason: 'FINAL_VOTE_KILL',
-          message: '나쁜 다람쥐 승리! 최종 투표에서 착한 다람쥐를 죽였습니다.',
-          eliminatedPlayer: votedPlayer
-        });
-      }
-    }
-  };
 
-  return (
-    <VoteContainer>
-      <VoteTitle>{isEmergency ? '긴급 투표' : '최종 투표'}</VoteTitle>
-      <Timer>{formatTime(timer)}</Timer>
+// const VoteOverlay = styled.div`
+//   position: fixed;
+//   inset: 0;
+//   background: rgba(0, 0, 0, 0.7);
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   z-index: ${Z_INDEX.OVERLAY};
+// `;
 
-      <PlayerGrid>
-        {players.map(player => {
-          const isKilled = gameState.killedPlayers.includes(player.nickName);
-          if (isKilled) return null;
+// const VoteContainer = styled.div`
+//   background: rgba(255, 255, 255, 0.1);
+//   padding: 2rem;
+//   border-radius: 1rem;
+//   backdrop-filter: blur(8px);
+//   width: 100%;
+//   max-width: 900px;
+//   margin: 0 2rem;
+// `;
 
-          return (
-            <PlayerCard
-              key={player.nickName}
-              onClick={() => handleVote(player.nickName)}
-              $selected={selectedPlayer === player.nickName}
-              disabled={selectedPlayer || gameState.isDead}
-            >
-              <VideoContainer>
-                {player.streamManager && (
-                  <UserVideoComponent streamManager={player.streamManager} />
-                )}
-              </VideoContainer>
-              <PlayerName>{player.nickName}</PlayerName>
-              {votes[player.nickName] > 0 && (
-                <VoteCount>{votes[player.nickName]}</VoteCount>
-              )}
-            </PlayerCard>
-          );
-        })}
-      </PlayerGrid>
-    </VoteContainer>
-  );
-};
+// const Header = styled.div`
+//   text-align: center;
+//   margin-bottom: 2rem;
+// `;
 
-const VoteContainer = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.9);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 40px;
-  z-index: ${Z_INDEX.OVERLAY};
-`;
+// const Title = styled.h2`
+//   color: white;
+//   font-size: 2.5rem;
+//   font-family: 'JejuHallasan';
+//   margin-bottom: 0.5rem;
+// `;
 
-const VoteTitle = styled.h2`
-  color: white;
-  font-size: 2rem;
-  font-family: 'JejuHallasan';
-  margin-bottom: 20px;
-`;
+// const Timer = styled.p`
+//   color: white;
+//   font-size: 1.5rem;
+//   font-family: 'JejuHallasan';
+// `;
 
-const Timer = styled.div`
-  color: white;
-  font-size: 3rem;
-  font-family: 'JejuHallasan';
-  margin-bottom: 40px;
-`;
+// const VoteStatus = styled.div`
+//   color: white;
+//   font-size: 1.2rem;
+//   margin-top: 0.5rem;
+//   font-family: 'JejuHallasan';
+// `;
 
-const PlayerGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  max-width: 1200px;
-  width: 100%;
-`;
+// const PlayerGrid = styled.div`
+//   display: grid;
+//   grid-template-columns: repeat(3, 1fr);
+//   gap: 1rem;
+//   margin-bottom: 1.5rem;
+// `;
 
-const PlayerCard = styled.button`
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4/3;
-  background: #333;
-  border: none;
-  border-radius: 10px;
-  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
-  opacity: ${props => props.disabled ? 0.5 : 1};
-  overflow: hidden;
+// const PlayerCard = styled.button`
+//   position: relative;
+//   padding: 1.5rem;
+//   border-radius: 0.5rem;
+//   background: ${props => props.$selected ? 'rgba(34, 197, 94, 0.5)' : 'rgba(31, 41, 55, 0.5)'};
+//   opacity: ${props => (props.$selected || props.disabled) ? 0.7 : 1};
+//   transition: all 0.2s ease;
+//   border: none;
+//   cursor: ${props => props.$selectable ? 'pointer' : 'not-allowed'};
 
-  ${props => props.$selected && `
-    border: 3px solid #FFD700;
-  `}
+//   &:hover {
+//     ${props => props.$selectable && `
+//       background: rgba(55, 65, 81, 0.5);
+//       transform: translateY(-2px);
+//     `}
+//   }
+// `;
 
-  &:hover:not(:disabled) {
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(255, 255, 255, 0.2);
-    }
-  }
-`;
+// const PlayerName = styled.h3`
+//   color: white;
+//   font-size: 1.25rem;
+//   font-family: 'JejuHallasan';
+// `;
 
-const VideoContainer = styled.div`
-  width: 100%;
-  height: 100%;
-`;
+// const VoteCount = styled.div`
+//   position: absolute;
+//   top: 0.5rem;
+//   right: 0.5rem;
+//   background: #FFD700;
+//   color: black;
+//   width: 1.5rem;
+//   height: 1.5rem;
+//   border-radius: 50%;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   font-weight: bold;
+//   font-family: 'JejuHallasan';
+// `;
 
-const PlayerName = styled.div`
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  color: white;
-  font-family: 'JejuHallasan';
-`;
+// const SelectedMark = styled.div`
+//   position: absolute;
+//   bottom: 0.5rem;
+//   right: 0.5rem;
+//   background: rgba(34, 197, 94, 0.8);
+//   color: white;
+//   padding: 0.25rem 0.5rem;
+//   border-radius: 0.25rem;
+//   font-size: 0.875rem;
+//   font-family: 'JejuHallasan';
+// `;
 
-const VoteCount = styled.div`
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: #FFD700;
-  color: black;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-`;
+// const VoteStatusGrid = styled.div`
+//   display: grid;
+//   grid-template-columns: repeat(3, 1fr);
+//   gap: 0.5rem;
+//   margin-top: 1rem;
+//   padding: 1rem;
+//   background: rgba(0, 0, 0, 0.2);
+//   border-radius: 0.5rem;
+// `;
 
-export default VoteScreen;
+// const VoteStatusItem = styled.div`
+//   color: white;
+//   font-family: 'JejuHallasan';
+//   text-align: center;
+//   padding: 0.5rem;
+// `;
+
+// const DeadMessage = styled.p`
+//   color: #FF6B6B;
+//   text-align: center;
+//   font-family: 'JejuHallasan';
+//   font-size: 1.2rem;
+//   margin-top: 1rem;
+// `;
+
+// const VoteMessage = styled.p`
+//   color: #4CAF50;
+//   text-align: center;
+//   font-family: 'JejuHallasan';
+//   font-size: 1.2rem;
+//   margin-top: 1rem;
+// `;
+
+// export default VoteScreen;

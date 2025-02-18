@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
 import * as gameService from '../api/gameService';
 import { fetchRoomById } from '../api/room';
+import { subscribeToTopic } from '../api/stomp'
 
 const GameContext = createContext();
 
@@ -16,7 +17,7 @@ export const GameProvider = ({ children }) => {
 
     // 게임 진행 상태
     isStarted: false, // 게임 시작 여부
-    timer: 420, // 게임 시간 (7분)
+    timer: 240, // 게임 시간 (7분)
     timerRunning: false,    // 타이머 실행 상태
     evilSquirrel: null, // true | false
     forestToken: null,  // 숲 토큰
@@ -28,10 +29,12 @@ export const GameProvider = ({ children }) => {
     fatigue: 0,     // 피로도 (0-3)
 
     // 투표 시스템
-    isVoting: false,          // 투표 중인지 여부
-    isEmergencyVote: false,   // 긴급 투표인지 여부
-    hasUsedEmergency: false,  // 긴급 투표 사용 여부
-    voteTimer: 180, // 투표 시간 (3분)
+    isVoting: false,
+    isEmergencyVote: false,
+    currentVotes: {},
+    votingInProgress: false, 
+    totalVote: 0,
+    votedPlayers: [],
 
     // 게임 전체 정지(추후)
     isPaused: false, // 게임 타이머 일시정지 여부
@@ -87,6 +90,10 @@ export const GameProvider = ({ children }) => {
   const [isStorageActive, setIsStorageActive] = useState(false);
   const [isEnergyActive, setIsEnergyActive] = useState(false);
   const timerRef = useRef(null);
+
+  // useEffect(() => {
+  //   console.log("게임 상태 변경됨:", gameState);
+  // }, [gameState]);
 
   // 최신 닉네임 리스트 가져오기 (startGame을 누를 때 실행됨)
   const getPlayers = useCallback(async () => {
@@ -150,20 +157,24 @@ export const GameProvider = ({ children }) => {
     }
   }, [isConnected, roomId, nickname]);
 
-  // 게임 종료 처리
-  const checkGameOver = useCallback(() => {
-    if (gameState.totalAcorns >= 1) {
-      console.log("게임 종료");
-      setGameState(prev => ({
-        ...prev,
-        isGameOver: true,
-        gameOverReason: 'acorns',
-        winner: prev.evilSquirrel ? 'bad' : 'good',
-        timerRunning: false,
-        isStarted: false  // 추가
-      }));
-    }
-  }, [gameState.totalAcorns]);
+  // // 게임 종료 처리
+  // const checkGameOver = useCallback(() => {
+  //   if (gameState.totalAcorns >= 10) {
+  //     console.log("게임 종료");
+  //     setGameState(prev => ({
+  //       ...prev,
+  //       isGameOver: true,
+  //       gameOverReason: 'acorns',
+  //       winner: prev.evilSquirrel ? 'bad' : 'good',
+  //       timerRunning: false,
+  //       isStarted: false  // 추가
+  //     }));
+  //   }
+  // }, [gameState.totalAcorns]);
+
+  // useEffect(() => {
+  //   checkGameOver();
+  // }, [gameState.totalAcorns, checkGameOver]);
 
   // 도토리 저장 처리
   const saveUserAcorns = useCallback(async () => {
@@ -178,21 +189,15 @@ export const GameProvider = ({ children }) => {
     }
   }, [isConnected, roomId, nickname]);
 
-  useEffect(() => {
-    checkGameOver();
-  }, [gameState.totalAcorns, checkGameOver]);
-
   // 숲 이동 처리
   const moveForest = useCallback(async (forestNum) => {
-    const nicknameList = players.map(player => player.nickName);
-    if (isConnected && roomId && nickname && forestNum && nicknameList) {
+    if (isConnected && roomId && nickname && forestNum) {
       try {
         // ✅ 최신 nicknames 값을 받아오기
         const updatedNicknames = await getPlayers();
 
         // ✅ nickName 값만 추출하여 배열 형태로 변환
         const nicknameList = updatedNicknames.map(player => player.nickName);
-
         await gameService.moveForest(roomId, nickname, forestNum, nicknameList);
         setGameState.currentForestNum = forestNum;
       } catch (error) {
@@ -217,19 +222,51 @@ export const GameProvider = ({ children }) => {
   }, [isConnected, roomId, nickname]);
 
   // 긴급 투표 시작 처리
-  const startEmergency = useCallback(async () => {
+  const startEmergencyVote = useCallback(async () => {
     if (isConnected && roomId) {
       try {
         const nicknameList = players.map(player => player.nickName);
-        await gameService.startEmergency(roomId, nicknameList);
-        setGameState.forestNum = 1;
+        // gameService.startEmergency 대신 startEmergencyVote 사용
+        await gameService.startEmergencyVote(roomId, nicknameList);
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
+        console.error('Failed to start emergency vote:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty');
     }
-  }, [isConnected, roomId, players]);
+}, [isConnected, roomId, players]);
+
+  // 투표 기록
+  const recordVote = useCallback((voter, votedPlayer) => {
+    setGameState(prev => ({
+      ...prev,
+      currentVotes: {
+        ...prev.currentVotes,
+        [voter]: votedPlayer
+      }
+    }));
+  }, []);
+
+  // 투표 종료
+  const endVote = useCallback((newVotedPlayers) => {
+
+    // ✅ 투표 결과 카운트
+    const voteCount = newVotedPlayers.reduce((acc, name) => {
+      acc[name] = (acc[name] || 0) + 1;
+      return acc;
+    }, {});
+
+    // ✅ 최대 득표수 찾기
+    const maxVotes = Math.max(...Object.values(voteCount));
+    
+    // ✅ 최대 득표수를 받은 닉네임 찾기
+    const topVoted = Object.keys(voteCount).filter(name => voteCount[name] === maxVotes);
+
+    // ✅ 동점자 체크 및 결과 할당
+    const result = topVoted.length === 1 ? topVoted[0] : null;
+
+    if (result === null) return;
+
+    return result;
+  }, []);
 
   // 미션 완료 처리
   const completeMission = useCallback(async (forestNum, missionNum) => {
@@ -258,45 +295,7 @@ export const GameProvider = ({ children }) => {
       });
     }
   }, [isConnected, roomId, nickname, gameState]);
-
-  // 투표 종료
-  const endVote = (result) => {
-    if (result.winner) {
-      // 게임 종료 처리
-      setGameState(prev => ({
-        ...prev,
-        isVoting: false,
-        isEmergencyVote: false,
-        timerRunning: false,
-        isGameOver: true,
-        gameOverReason: prev.isEmergencyVote ? 'emergency' : 'time',
-        winner: result.winner,
-        lastKilledPlayer: result.eliminatedPlayer,
-        killedPlayers: result.eliminatedPlayer
-          ? [...prev.killedPlayers, result.eliminatedPlayer]
-          : prev.killedPlayers
-      }));
-    } else {
-      // 투표 실패 처리 (게임 계속)
-      setGameState(prev => ({
-        ...prev,
-        isVoting: false,
-        isEmergencyVote: false,
-        timerRunning: true
-      }));
-    }
-  };
-
-  // 일반 투표 시작 함수
-  const startFinalVote = () => {
-    setGameState(prev => ({
-      ...prev,
-      isVoting: true,
-      isEmergencyVote: false,
-      timerRunning: false
-    }));
-  };
-
+  
   // 안개 숲 특수 효과 토글
   const toggleFoggyEffects = (isInFoggyForest) => {
     setGameState(prev => ({
@@ -321,7 +320,7 @@ export const GameProvider = ({ children }) => {
       isVoting: false,
       isEmergencyVote: false,
       hasUsedEmergency: false,
-      voteTimer: 180,
+      voteTimer: 20,
       isPaused: false,
       killedPlayers: [],
       isSpectating: false,
@@ -371,11 +370,9 @@ export const GameProvider = ({ children }) => {
     chargeFatigue,       // 피로도 충전
     saveUserAcorns,       // 도토리 저장
     moveForest,       // 숲 이동
-    killUser,       // 플레이어 사망 처리
-    startEmergency, // 긴급 투표 시작
+    killUser,       // 플레이어 사망 처리// 긴급 투표 시작
     completeMission, // 미션 완료
-    endVote,          // 투표 종료
-    startFinalVote,   // 일반 투표 시작
+    endVote,          // 투표 종료  // 일반 투표 시작
     toggleFoggyEffects, // 안개 숲 효과
     videoSettings,     // 비디오 설정
     setVideoSettings,   // 비디오 설정 변경
@@ -391,7 +388,9 @@ export const GameProvider = ({ children }) => {
     setIsEnergyActive,
     cancelAction,
     startSaveAcorns,
-    startChargeFatigue
+    startChargeFatigue,
+    startEmergencyVote,
+    recordVote,
   };
 
   return (
