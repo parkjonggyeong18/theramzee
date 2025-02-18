@@ -48,4 +48,5 @@ public interface RoomService {
      * @return 조회된 Room 객체
      */
     Room getRoom(Long roomId);
+    Room friendJoinRoom(Long roomId, String nickname, Integer password);
 }

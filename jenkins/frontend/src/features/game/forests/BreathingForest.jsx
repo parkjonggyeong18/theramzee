@@ -13,6 +13,9 @@ import MissionButton from '../components/MissionButton';
 import MazeGame from '../components/missions/MazeGame';
 import VineSlashGame from '../components/missions/VineSlashGame';
 import PlantGame from '../components/missions/PlantTimingGame'
+import flyhell from '../../../assets/images/object/flyhell.png'
+import weed from '../../../assets/images/object/weed.png'
+import ram from '../../../assets/images/object/ram.png'
 
 const BreathingForest = () => {
   const { gameState, players, completeMission } = useGame();
@@ -96,14 +99,32 @@ const BreathingForest = () => {
     miniMap: <MiniMap />,
     missionButtons: (
       <MissionButtons>
-        <MissionButtonWrapper style={{ top: '210px', right: '-560px' }}>
-          <MissionButton onClick={() => handleMissionClick('maze')} completed={isMissionCompleted('maze')} />
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('maze')}
+            completed={isMissionCompleted('maze')}
+          >
+            <MissionImage src={flyhell} alt="maze mission" />
+            {isMissionCompleted('maze') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
         </MissionButtonWrapper>
-        <MissionButtonWrapper style={{ top: '30px', right: '290px' }}>
-          <MissionButton onClick={() => handleMissionClick('vine')} completed={isMissionCompleted('vine')} />
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('vine')}
+            completed={isMissionCompleted('vine')}
+          >
+            <MissionImage src={weed} alt="vine mission" />
+            {isMissionCompleted('vine') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
         </MissionButtonWrapper>
-        <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-          <MissionButton onClick={() => handleMissionClick('plant')} completed={isMissionCompleted('plant')} />
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('plant')}
+            completed={isMissionCompleted('plant')}
+          >
+            <MissionImage src={ram} alt="plant mission" />
+            {isMissionCompleted('plant') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
         </MissionButtonWrapper>
       </MissionButtons>
     ),
@@ -156,6 +177,56 @@ const MissionButtons = styled.div`
 
 const MissionButtonWrapper = styled.div`
   position: absolute;
+  &:nth-child(1) {
+    top: 27vh;
+    right: -30vw;
+  }
+  &:nth-child(2) {
+    top: 7vh;
+    right: -7vw;
+  }
+  &:nth-child(3) {
+    bottom: -40vh;
+    left: -28vw;
+    transform: translateX(-50%);
+  }
+`;
+
+const StyledMissionButton = styled.button`
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+  background: transparent;
+  border: none;
+  padding: 0;
+  opacity: ${props => props.completed ? 0.5 : 1};
+  cursor: ${props => props.completed ? 'not-allowed' : 'pointer'};
+  
+  &:hover {
+    transform: ${props => props.completed ? 'none' : 'scale(1.1)'};
+  }
+`;
+
+const MissionImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+`;
+
+const CompletedOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: red;
+  font-size: 70px;
 `;
 
 export default BreathingForest;
