@@ -57,11 +57,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String username = null;
         String jwt = null;
 
-        if (request.getServletPath().startsWith("/api-docs/")) {
-            chain.doFilter(request, response);
-            return;
-        }
-
         try {
             if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
                 jwt = authorizationHeader.substring(7); // "Bearer " 이후의 토큰 값 추출
