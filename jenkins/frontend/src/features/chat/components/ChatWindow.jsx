@@ -16,7 +16,7 @@ const ChatWindow = ({ messages }) => {
           <ChatMessage
             key={idx}
             message={message}
-            isOwn={message.sender === sessionStorage.getItem('nickName')}
+            isOwn={message.sender === sessionStorage.getItem('username')}
           />
         ))}
         <div ref={messageEndRef} />
