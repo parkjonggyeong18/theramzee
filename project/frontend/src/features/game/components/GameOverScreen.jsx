@@ -88,10 +88,10 @@ const GameOverScreen = () => {
       "7_3": [false, 3], // 6번 숲 3번 미션
     }));
     setPlayers([]);
-    const roomPassword = sessionStorage.getItem('roomPassword');
-    const response = await joinRoom(roomId, roomPassword);
-    const openViduToken = response.data.token;
-    sessionStorage.setItem('openViduToken', openViduToken);
+    // const roomPassword = sessionStorage.getItem('roomPassword');
+    // const response = await joinRoom(roomId, roomPassword);
+    // const openViduToken = response.data.token;
+    // sessionStorage.setItem('openViduToken', openViduToken);
     navigate(`/room/${roomId}/game`);
   };
 
