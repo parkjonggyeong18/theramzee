@@ -29,7 +29,7 @@ const GameOverScreen = () => {
 
       // 게임 진행 상태
       isStarted: false, // 게임 시작 여부
-      timer: 420, // 게임 시간 (7분)
+      timer: 240, // 게임 시간 (7분)
       timerRunning: false,    // 타이머 실행 상태
       evilSquirrel: null, // true | false
       forestToken: null,  // 숲 토큰
@@ -88,10 +88,10 @@ const GameOverScreen = () => {
       "7_3": [false, 3], // 6번 숲 3번 미션
     }));
     setPlayers([]);
-    const roomPassword = sessionStorage.getItem('roomPassword');
-    const response = await joinRoom(roomId, roomPassword);
-    const openViduToken = response.data.token;
-    sessionStorage.setItem('openViduToken', openViduToken);
+    // const roomPassword = sessionStorage.getItem('roomPassword');
+    // const response = await joinRoom(roomId, roomPassword);
+    // const openViduToken = response.data.token;
+    // sessionStorage.setItem('openViduToken', openViduToken);
     navigate(`/room/${roomId}/game`);
   };
 
