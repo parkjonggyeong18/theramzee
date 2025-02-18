@@ -17,7 +17,7 @@ export const GameProvider = ({ children }) => {
 
     // 게임 진행 상태
     isStarted: false, // 게임 시작 여부
-    timer: 420, // 게임 시간 (7분)
+    timer: 240, // 게임 시간 (7분)
     timerRunning: false,    // 타이머 실행 상태
     evilSquirrel: null, // true | false
     forestToken: null,  // 숲 토큰
@@ -157,24 +157,24 @@ export const GameProvider = ({ children }) => {
     }
   }, [isConnected, roomId, nickname]);
 
-  // 게임 종료 처리
-  const checkGameOver = useCallback(() => {
-    if (gameState.totalAcorns >= 10) {
-      console.log("게임 종료");
-      setGameState(prev => ({
-        ...prev,
-        isGameOver: true,
-        gameOverReason: 'acorns',
-        winner: prev.evilSquirrel ? 'bad' : 'good',
-        timerRunning: false,
-        isStarted: false  // 추가
-      }));
-    }
-  }, [gameState.totalAcorns]);
+  // // 게임 종료 처리
+  // const checkGameOver = useCallback(() => {
+  //   if (gameState.totalAcorns >= 10) {
+  //     console.log("게임 종료");
+  //     setGameState(prev => ({
+  //       ...prev,
+  //       isGameOver: true,
+  //       gameOverReason: 'acorns',
+  //       winner: prev.evilSquirrel ? 'bad' : 'good',
+  //       timerRunning: false,
+  //       isStarted: false  // 추가
+  //     }));
+  //   }
+  // }, [gameState.totalAcorns]);
 
-  useEffect(() => {
-    checkGameOver();
-  }, [gameState.totalAcorns, checkGameOver]);
+  // useEffect(() => {
+  //   checkGameOver();
+  // }, [gameState.totalAcorns, checkGameOver]);
 
   // 도토리 저장 처리
   const saveUserAcorns = useCallback(async () => {
@@ -188,11 +188,6 @@ export const GameProvider = ({ children }) => {
       console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
-
-  useEffect(() => {
-    
-    checkGameOver();
-  }, [gameState.totalAcorns, checkGameOver]);
 
   // 숲 이동 처리
   const moveForest = useCallback(async (forestNum) => {
