@@ -119,9 +119,14 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             // 게임 진행 중
             setGameState((prev) => ({
               ...prev,
-              totalAcorns: initializedData.newTotalAcorns,
-              heldAcorns: 0,
+              totalAcorns: initializedData.newTotalAcorns
             }));
+            if (message.data['nickname'] === nickName) {
+              setGameState((prev) => ({
+                ...prev,
+                heldAcorns: 0
+              }));
+            }
           }
         } else {
           console.error("Game initialization failed:", message.errorCode);
