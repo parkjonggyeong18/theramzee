@@ -102,24 +102,30 @@ const GameRoom = () => {
 
     connectAndSubscribe();
 
-    const handleBeforeUnload = (event) => { 
-      handleLogout();
-      handleExit();
-      
+    const handleBeforeUnload = () => { 
+      handleExit2();
+
     };
   
     // 뒤로가기 처리
     const handlePopState = () => {
       handleExit();
+      navigate('/rooms');
     };
-  
+    
+    const handleExit2 = () => {
+      disconnectSocket();
+      leaveRoom(roomId);
+      leaveSession();
+      handleLogout();
+      initPreview();
+    }
     // 공통 종료 처리 함수
     const handleExit = () => {
       disconnectSocket();
       leaveRoom(roomId);
       leaveSession();
       initPreview();
-    
     };
   
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -128,7 +134,7 @@ const GameRoom = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [roomId]);
+  }, [roomId, navigate]);
 
   const clkStart = () => {
     startGame();
