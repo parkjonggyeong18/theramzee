@@ -1,7 +1,7 @@
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'https://ramzee.online';
+const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
 let stompClient = null;
 

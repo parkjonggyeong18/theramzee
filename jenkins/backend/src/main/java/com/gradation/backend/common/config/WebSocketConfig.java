@@ -36,12 +36,12 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // SockJS를 사용하는 WebSocket 엔드포인트 설정
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("https://ramzee.online") // CORS 허용 Origin 설정
+                .setAllowedOrigins("http://localhost:3000") // CORS 허용 Origin 설정
                 .withSockJS();
 
         // 일반 WebSocket 엔드포인트 설정
         registry.addEndpoint("/ws")
-                .setAllowedOrigins("https://ramzee.online"); // CORS 허용 Origin 설정
+                .setAllowedOrigins("http://localhost:3000"); // CORS 허용 Origin 설정
     }
 
     /**
