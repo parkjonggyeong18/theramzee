@@ -55,7 +55,7 @@ const VideoGrid = (props) => {
             const parsedData = JSON.parse(rawData);
             const subscriberNickname = parsedData.clientData;
             // 현재 숲에 포함되어 있다면 오디오 활성화, 아니면 음소거
-            console.log("오디오오오오오옹", player);
+
             console.log("gameState killedPlayer", gameState.killedPlayers);
 
             // 1) 숲에 포함되어 있는지 체크
@@ -64,16 +64,8 @@ const VideoGrid = (props) => {
             // 2) 죽은 사람인지 체크
             const isKilled = gameState.killedPlayers?.includes(subscriberNickname);
 
-            if (isInForest) {
-              if (isKilled){
-                player.subscribeToAudio(false);
-                console.log("죽은 유저 음소거", player);
-              } else{
-                player.subscribeToAudio(true);
-              }
-              // gameState.killedPlayers.forEach((killedPlayer) => {
-
-              // })
+            if (isInForest && !isKilled ) {
+              player.subscribeToAudio(true);
             } else {
               player.subscribeToAudio(false);
             }
