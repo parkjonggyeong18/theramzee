@@ -93,7 +93,7 @@ const SquirrelGame = ({ onComplete, onClose }) => {
       if (gameState.role === 'good') {
         setGameState(prev => ({
           ...prev,
-          heldAcorns: prev.heldAcorns + 3
+          heldAcorns: prev.heldAcorns + 1
         }));
       }
       setTimeout(onComplete, 1500);

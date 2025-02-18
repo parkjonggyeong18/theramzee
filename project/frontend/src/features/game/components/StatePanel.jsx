@@ -12,7 +12,7 @@ import gaegeImage from'../../../assets/images/object/gaege.png'
 
 const StatePanel = () => {
   const { gameState } = useGame();
-  const MAX_ACORNS = 10;
+  const MAX_ACORNS = 13;
 
   return (
     <StatePanelContainer>

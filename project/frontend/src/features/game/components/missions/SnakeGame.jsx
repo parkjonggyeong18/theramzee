@@ -14,7 +14,7 @@ const SnakeGame = ({ onComplete, onClose }) => {
       if (gameState.role === 'good') {
         setGameState(prev => ({
           ...prev,
-          heldAcorns: prev.heldAcorns + 3
+          heldAcorns: prev.heldAcorns + 1
         }));
       }
       onComplete();
@@ -25,6 +25,7 @@ const SnakeGame = ({ onComplete, onClose }) => {
     <GameOverlay onClick={onClose}>
       <GameContent onClick={e => e.stopPropagation()}>
         <GameTitle>뱀 죽이기</GameTitle>
+        <GameDescription>4%확률로 '뱀'이 죽습니다</GameDescription>
         <SnakeContainer>
           <SnakeSprite onClick={handleClick}>
             <img src={snake} alt="Snake" />
@@ -47,6 +48,12 @@ const GameOverlay = styled.div`
   justify-content: center;
   align-items: center;
   z-index: 1000;
+`;
+const GameDescription = styled.p`
+  text-align: center;
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 14px;
 `;
 
 const GameContent = styled.div`

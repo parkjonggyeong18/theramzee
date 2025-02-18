@@ -1,9 +1,9 @@
 // pages/forests/TwistedForest.jsx
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
 import { useOpenVidu } from '../../../contexts/OpenViduContext';
-import { backgroundImages,characterImages } from '../../../assets/images';
+import { backgroundImages, characterImages } from '../../../assets/images';
 import GameLayout from '../components/common/GameLayout';
 
 // components import
@@ -12,12 +12,12 @@ import MyVideo from '../components/MyVideo';
 import GameTimer from '../components/GameTimer';
 import StatePanel from '../components/StatePanel';
 import MiniMap from '../components/MiniMap';
-import MissionButton from '../components/MissionButton';
 import SnakeGame from '../components/missions/SnakeGame';
 import MatchingGame from '../components/missions/MatchingGame';
-import MushiroomCollectionGame from '../components/missions/MushiroomCollectionGame'
-
-
+import MushiroomCollectionGame from '../components/missions/MushiroomCollectionGame';
+import snake from '../../../assets/images/object/snake.png';
+import mushroom from '../../../assets/images/object/mushroom.png';
+import tree from '../../../assets/images/object/tree.png';
 
 const TwistedForest = () => {
   const { gameState, players, completeMission } = useGame();
@@ -28,40 +28,40 @@ const TwistedForest = () => {
   
   const showDescriptionOverlay = () => setIsDescriptionVisible(true);
   const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
-    const {
-      joinSession,
-      subscribers,
-    } = useOpenVidu();
-   
-    // 현재 사용자가 위치한 숲 번호 가져오기
-    const currentForestNum = gameState.forestNum;
-    const currentForestUser = gameState.forestUsers?.[currentForestNum]; // 배열열
   
-    const filteredSubscribers = subscribers.filter(sub => {
-      try {
-          // 🔥 JSON 데이터와 추가 문자열(`%/%닉네임`) 분리
-          const rawData = sub.stream.connection.data.split("%/%")[0]; 
-          const subData = JSON.parse(rawData); // {"clientData": "test1"}
-          const subscriberNickname = subData.clientData;
+  const {
+    joinSession,
+    subscribers,
+  } = useOpenVidu();
+   
+  // 현재 사용자가 위치한 숲 번호 가져오기
+  const currentForestNum = gameState.forestNum;
+  const currentForestUser = gameState.forestUsers?.[currentForestNum];
+  
+  const filteredSubscribers = subscribers.filter(sub => {
+    try {
+      // 🔥 JSON 데이터와 추가 문자열(`%/%닉네임`) 분리
+      const rawData = sub.stream.connection.data.split("%/%")[0]; 
+      const subData = JSON.parse(rawData); // {"clientData": "test1"}
+      const subscriberNickname = subData.clientData;
 
-          // 🔥 현재 숲에 속한 유저(`currentForestUser`)와 일치하는 경우만 필터링
-          return currentForestUser?.includes(subscriberNickname);
-      } catch (error) {
-          console.error("🚨 OpenVidu 데이터 파싱 오류:", error);
-          return false; // 파싱 실패한 경우 필터링에서 제외
-      }
+      // 🔥 현재 숲에 속한 유저(`currentForestUser`)와 일치하는 경우만 필터링
+      return currentForestUser?.includes(subscriberNickname);
+    } catch (error) {
+      console.error("🚨 OpenVidu 데이터 파싱 오류:", error);
+      return false; // 파싱 실패한 경우 필터링에서 제외
+    }
   });
 
   const leftFilterCam = filteredSubscribers.slice(0, 3);
   const rightFilterCam = filteredSubscribers.slice(3, 7);
- 
-  
   
   const isMissionCompleted = (missionId) => {
     const missionNum = missionId === 'snake' ? 1 : 
                       missionId === 'matching' ? 2 : 3;
     return gameState[`2_${missionNum}`][0]; // gameState에서 미션 완료 상태 확인
   };
+
   const handleMissionClick = (missionId) => {
     if (isMissionCompleted(missionId)) return;
     if (gameState.fatigue < 1) return;
@@ -69,7 +69,6 @@ const TwistedForest = () => {
     setCurrentMission(missionId);
     setShowMiniGame(true);
   };
-
 
   const handleMissionComplete = async () => {
     try {
@@ -83,6 +82,7 @@ const TwistedForest = () => {
       console.error('Failed to complete mission:', error);
     }
   };
+
   useEffect(() => {
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
@@ -95,6 +95,7 @@ const TwistedForest = () => {
       document.body.style.cursor = 'auto';
     };
   }, [gameState.isStarted, gameState.evilSquirrel]);
+
   const gameLayoutProps = {
     // 기본 레이아웃 요소
     leftVideoGrid: <VideoGrid players={leftFilterCam} totalSlots={3} gridPosition="left" />,
@@ -107,23 +108,32 @@ const TwistedForest = () => {
     // 미션 관련
     missionButtons: (
       <MissionButtons>
-        <MissionButtonWrapper style={{ top: '160px', right: '450px' }}>
-          <MissionButton 
+        <MissionButtonWrapper>
+          <StyledMissionButton 
             onClick={() => handleMissionClick('snake')}
             completed={isMissionCompleted('snake')}
-          />
+          >
+            <MissionImage src={snake} alt="snake mission" />
+            {isMissionCompleted('snake') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
         </MissionButtonWrapper>
-        <MissionButtonWrapper style={{ top: '185px', left: '500px' }}>
-          <MissionButton 
+        <MissionButtonWrapper>
+          <StyledMissionButton 
             onClick={() => handleMissionClick('matching')}
             completed={isMissionCompleted('matching')}
-          />
+          >
+            <MissionImage src={tree} alt="matching mission" />
+            {isMissionCompleted('matching') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
         </MissionButtonWrapper>
-        <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-          <MissionButton 
+        <MissionButtonWrapper>
+          <StyledMissionButton 
             onClick={() => handleMissionClick('mushroom')}
             completed={isMissionCompleted('mushroom')}
-          />
+          >
+            <MissionImage src={mushroom} alt="mushroom mission" />
+            {isMissionCompleted('mushroom') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
         </MissionButtonWrapper>
       </MissionButtons>
     ),
@@ -157,7 +167,6 @@ const TwistedForest = () => {
       ) : null
     ),
     
-    
     // 기타
     isGameStarted: gameState.isStarted,
     background: backgroundImages.twistedForest,
@@ -167,8 +176,6 @@ const TwistedForest = () => {
     isDescriptionVisible,
     onShowDescription: showDescriptionOverlay,
     onHideDescription: hideDescriptionOverlay,
-
-    
   };
 
   return <GameLayout {...gameLayoutProps} />;
@@ -179,11 +186,61 @@ const MissionButtons = styled.div`
   position: relative;
   justify-content: center;
   width: 100%;
-  height: 100px; // 버튼 컨테이너의 높이 조정
+  height: 100px;
 `;
 
 const MissionButtonWrapper = styled.div`
   position: absolute;
+  &:nth-child(1) {
+    top: 7vh;
+    right: 15vw;
+  }
+  &:nth-child(2) {
+    top: 33vh;
+    left: -78vh;
+  }
+  &:nth-child(3) {
+    bottom: -30vh;
+    left: 68vh;
+    transform: translateX(-50%);
+  }
+`;
+
+const StyledMissionButton = styled.button`
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+   background: transparent; // 추가
+  border: none; // 추가
+  padding: 0; // 추가
+  opacity: ${props => props.completed ? 0.5 : 1};
+  cursor: ${props => props.completed ? 'not-allowed' : 'pointer'};
+  
+  &:hover {
+    transform: ${props => props.completed ? 'none' : 'scale(1.1)'};
+  }
+`;
+
+const MissionImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+`;
+
+const CompletedOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: red;
+  font-size: 70px;
 `;
 
 export default TwistedForest;
