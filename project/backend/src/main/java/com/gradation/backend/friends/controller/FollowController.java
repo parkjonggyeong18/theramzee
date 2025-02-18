@@ -71,7 +71,8 @@ public class FollowController {
             // 친구가 속한 방의 비밀번호 가져와서 참가하기
             Room room = roomService.getRoom(roomId);
             System.out.println("room = " + room);
-            Room joinedRoom = roomService.joinRoom(roomId, currentUser.getNickname(), room.getPassword());
+
+            Room joinedRoom = roomService.friendJoinRoom(roomId, currentUser.getNickname(), room.getPassword());
 
             // 오픈비두 세션 토큰 발급
             String sessionId = String.valueOf(roomId) + "-1";
