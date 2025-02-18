@@ -268,7 +268,7 @@ const CompletedOverlay = styled.div`
   justify-content: center;
   border-radius: 50%;
   color: red;
-  font-size: 70px;
+  font-size: 69px;
 `;
 
 export default DryForest;
