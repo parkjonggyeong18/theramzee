@@ -40,6 +40,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailsServiceImpl userDetailsService;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
     /**
      * SecurityConfig 생성자.
      *
@@ -49,10 +50,12 @@ public class SecurityConfig {
         this.userDetailsService = userDetailsService;
         this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
     }
+
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenUtil jwtTokenUtil) {
         return new JwtAuthenticationFilter(jwtTokenUtil, userDetailsService);
     }
+
     /**
      * AuthenticationManager Bean 정의.
      *
@@ -84,14 +87,14 @@ public class SecurityConfig {
      * SecurityFilterChain Bean 정의.
      * HTTP 보안 설정 및 JWT 인증 필터 추가를 담당합니다.
      *
-     * @param http HttpSecurity 객체로 보안 설정을 구성합니다.
+     * @param http                    HttpSecurity 객체로 보안 설정을 구성합니다.
      * @param jwtAuthenticationFilter JWT 기반 인증을 처리하는 필터
      * @return SecurityFilterChain 객체
      * @throws Exception 예외가 발생할 경우
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter, CorsConfigurationSource corsConfigurationSource) throws Exception {
-        http    .exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint) )
+        http.exceptionHandling(exception -> exception.authenticationEntryPoint(customAuthenticationEntryPoint))
                 // CSRF 보호 비활성화 (JWT는 CSRF 토큰이 필요하지 않음)
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
@@ -99,8 +102,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // URL 접근 권한 설정
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/email/**","/api/v1/**").permitAll()
-                        .requestMatchers("https://ramzee.online/api/v1/**","/api/v1/**", "/swagger-ui/**", "/v3/api-docs/**","/api-docs/**","/ws/**", "/user/**","/swagger-ui.html","/game-socket","/wss/**").permitAll() // 인증 없이 접근 가능 경로
+                        .requestMatchers("https://ramzee.online/api/v1/**", "/api/v1/email/**", "/api/v1/**", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/ws/**", "/user/**", "/swagger-ui.html", "/game-socket", "/wss/**").permitAll() // 인증 없이 접근 가능 경로
                         .anyRequest().authenticated() // 나머지 요청은 인증 필요
                 )
                 // JWT 인증 필터를 UsernamePasswordAuthenticationFilter 앞에 추가

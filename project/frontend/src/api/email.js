@@ -6,13 +6,13 @@ export const resetPassword = async (email) => {
 };
 
 // 아이디 찾기
-export const findUsername = async (email) => {
-  return await apiRequest('/api/v1/email/find-username', 'POST', { email }, false);
+export const findUsername = async (name, email) => {
+  return await apiRequest('/api/v1/email/find-username', 'POST', { name, email }, false);
 };
 
 // 이메일 인증번호 전송
-export const sendEmailVerification = async (email) => {
-  return await apiRequest('/api/v1/email/email-send', 'POST', { email }, false);
+export const sendEmailVerification = async (username ,email) => {
+  return await apiRequest('/api/v1/email/email-send', 'POST', { username,email }, false);
 };
 
 // 이메일 인증번호 검증
