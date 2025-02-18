@@ -17,6 +17,9 @@ import MissionButton from '../components/MissionButton';
 import FireGame from '../components/missions/FireGame';
 import ArrowPuzzleGame from '../components/missions/ArrowPuzzleGame';
 import FireEscapeGame from '../components/missions/FireEscapeGame'
+import arrow from '../../../assets/images/object/arrow.png'
+import fire from '../../../assets/images/object/fire.png'
+import escape from '../../../assets/images/object/arcon.png'
 
 const DryForest = () => {
   const { gameState, players, completeMission } = useGame();
@@ -116,26 +119,35 @@ const rightFilterCam = filteredSubscribers.slice(3, 7);
     // 미션 관련
     missionButtons: (
       <MissionButtons>
-      <MissionButtonWrapper style={{ top: '0px',right: '220px' }}>
-        <MissionButton 
-          onClick={() => handleMissionClick('arrow')}
-          completed={isMissionCompleted('arrow')}
-        />
-      </MissionButtonWrapper>
-      <MissionButtonWrapper style={{ top: '220px', right: '-50px' }}>
-        <MissionButton 
-          onClick={() => handleMissionClick('fire')}
-          completed={isMissionCompleted('fire')}
-        />
-      </MissionButtonWrapper>
-      <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-      <MissionButton 
-          onClick={() => handleMissionClick('escape')}
-          completed={isMissionCompleted('escape')}
-        />
-      </MissionButtonWrapper>
-    </MissionButtons>
-    ),
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('arrow')}
+            completed={isMissionCompleted('arrow')}
+          >
+            <MissionImage src={arrow} alt="arrow mission" />
+            {isMissionCompleted('arrow') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
+        </MissionButtonWrapper>
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('fire')}
+            completed={isMissionCompleted('fire')}
+          >
+            <MissionImage src={fire} alt="fire mission" />
+            {isMissionCompleted('fire') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
+        </MissionButtonWrapper>
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('escape')}
+            completed={isMissionCompleted('escape')}
+          >
+            <MissionImage src={escape} alt="escape mission" />
+            {isMissionCompleted('escape') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
+        </MissionButtonWrapper>
+      </MissionButtons>
+    ),  
     
     // 미니게임 오버레이
     miniGameOverlay: showMiniGame && (
@@ -202,11 +214,61 @@ const MissionButtons = styled.div`
   position: relative;
   justify-content: center;
   width: 100%;
-  height: 100px; // 버튼 컨테이너의 높이 조정
+  height: 100px;
 `;
 
 const MissionButtonWrapper = styled.div`
   position: absolute;
+  &:nth-child(1) {
+    top: -8vh;
+    right: -15vw;
+  }
+  &:nth-child(2) {
+    top: 0vh;
+    left: -78vh;
+  }
+  &:nth-child(3) {
+    bottom: -30vh;
+    left: 68vh;
+    transform: translateX(-50%);
+  }
+`;
+
+const StyledMissionButton = styled.button`
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+  background: transparent;
+  border: none;
+  padding: 0;
+  opacity: ${props => props.completed ? 0.5 : 1};
+  cursor: ${props => props.completed ? 'not-allowed' : 'pointer'};
+  
+  &:hover {
+    transform: ${props => props.completed ? 'none' : 'scale(1.1)'};
+  }
+`;
+
+const MissionImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+`;
+
+const CompletedOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: red;
+  font-size: 70px;
 `;
 
 export default DryForest;

@@ -98,7 +98,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
           console.log("도토리 저장 성공:", initializedData);
           
           // 도토리가 3개 이상이면 게임 종료
-          if (initializedData.newTotalAcorns >= 10) {
+          if (initializedData.newTotalAcorns >= 13) {
             navigate(`/game/${roomId}/main`);
             setGameState((prev) => ({
               ...prev,
@@ -120,8 +120,13 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             setGameState((prev) => ({
               ...prev,
               totalAcorns: initializedData.newTotalAcorns,
-              heldAcorns: 0,
             }));
+            if (message.data['nickname'] === nickName) {
+              setGameState((prev) => ({
+                ...prev,
+                heldAcorns: 0
+              }));
+            }
           }
         } else {
           console.error("Game initialization failed:", message.errorCode);

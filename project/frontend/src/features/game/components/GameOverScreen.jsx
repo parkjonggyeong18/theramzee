@@ -29,7 +29,7 @@ const GameOverScreen = () => {
 
       // 게임 진행 상태
       isStarted: false, // 게임 시작 여부
-      timer: 420, // 게임 시간 (7분)
+      timer: 390, // 게임 시간 (7분)
       timerRunning: false,    // 타이머 실행 상태
       evilSquirrel: null, // true | false
       forestToken: null,  // 숲 토큰
