@@ -18,6 +18,7 @@ const OpenViduPage = () => {
 
   const { roomId } = useParams();
   const navigate = useNavigate();
+  const sessionId = `${roomId}-1`;
   const nickname = sessionStorage.getItem('nickName') || 'Guest';
   const token = sessionStorage.getItem('openViduToken');
 
@@ -33,36 +34,36 @@ const OpenViduPage = () => {
   // 미리보기 화면
   if (isPreview) {
     return (
-        <PreviewContainer>
-          <Header>
-            <Title>RAMZEE 미리보기</Title>
-          </Header>
-          <VideoWrapper>
-            {previewPublisher ? (
-                <UserVideoComponent streamManager={previewPublisher} />
-            ) : (
-                <Placeholder>카메라가 활성화되지 않았습니다</Placeholder>
-            )}
-          </VideoWrapper>
-          <ButtonGroup>
-            <EnterButton onClick={enterGame}>게임에 입장하기</EnterButton>
-          </ButtonGroup>
-        </PreviewContainer>
+      <PreviewContainer>
+        <Header>
+          <Title>RAMZEE 미리보기</Title>
+        </Header>
+        <VideoWrapper>
+          {previewPublisher ? (
+            <UserVideoComponent streamManager={previewPublisher} />
+          ) : (
+            <Placeholder>카메라가 활성화되지 않았습니다</Placeholder>
+          )}
+        </VideoWrapper>
+        <ButtonGroup>
+          <EnterButton onClick={enterGame}>게임에 입장하기</EnterButton>
+        </ButtonGroup>
+      </PreviewContainer>
     );
   }
 
   // 세션 화면
   return (
-      <SessionContainer>
-        <Header>
-          <Title>다람쥐 월드: {roomId}</Title>
-        </Header>
-        <VideoGrid>
-          {[...(mainStreamManager ? [mainStreamManager] : []), ...subscribers].map((stream, idx) => (
-              <UserVideoComponent key={idx} streamManager={stream} />
-          ))}
-        </VideoGrid>
-      </SessionContainer>
+    <SessionContainer>
+      <Header>
+        <Title>다람쥐 월드: {roomId}</Title>
+      </Header>
+      <VideoGrid>
+        {[...(mainStreamManager ? [mainStreamManager] : []), ...subscribers].map((stream, idx) => (
+          <UserVideoComponent key={idx} streamManager={stream} />
+        ))}
+      </VideoGrid>
+    </SessionContainer>
   );
 };
 

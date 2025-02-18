@@ -27,7 +27,7 @@ const CreateRoomForm = ({ onRoomCreated }) => {
     <FormContainer onSubmit={handleSubmit}>
       <Input
         type="text"
-        placeholder="방 이름 입력"
+        placeholder="방 이름 입력"  
         value={roomTitle}
         onChange={(e) => setRoomTitle(e.target.value)}
         disabled={isCreating}

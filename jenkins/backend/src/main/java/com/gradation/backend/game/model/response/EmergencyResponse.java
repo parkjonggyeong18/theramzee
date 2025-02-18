@@ -10,5 +10,4 @@ import java.util.Map;
 @Data
 public class EmergencyResponse {
     Map<Integer, List<String>> forestUsers;
-    private Map<String, String> userTokens;
 }

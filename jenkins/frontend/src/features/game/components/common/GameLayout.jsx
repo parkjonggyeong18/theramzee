@@ -1,9 +1,11 @@
+// GameLayout.jsx
 import styled from 'styled-components';
 import { Z_INDEX } from '../../../../constants/zIndex';
 import DescriptionOverlay from './DescriptionOverlay';
+import EmergencyVoteModal from '../vote/EmergencyVoteModal';
+import FinalVoteModal from '../vote/FinalVoteModal';
 
 const GameLayout = ({
-  // 기존 props
   leftVideoGrid,
   rightVideoGrid,
   gameTimer,
@@ -16,12 +18,16 @@ const GameLayout = ({
   mainForestButtons,
   missionButtons,
   miniGameOverlay,
-  voteScreen,
-  // 설명서 관련 props
+  // Vote related props
+  isVoting,
+  isEmergencyVote,
+  onVote,
+  onCloseVote,
+  players,
+  // Description related props
   isDescriptionVisible,
   onShowDescription,
   onHideDescription,
-  // 추가: 전환 애니메이션 등 persistent하게 표시할 children
   children,
 }) => {
   return (
@@ -56,9 +62,26 @@ const GameLayout = ({
       </BottomSection>
 
       {miniGameOverlay}
-      {voteScreen}
 
-      {/* 전환 애니메이션 및 기타 persistent 요소를 children으로 전달 */}
+      {/* Vote Modals */}
+      {isVoting && isEmergencyVote && (
+        <EmergencyVoteModal
+          isOpen={true}
+          onClose={onCloseVote}
+          players={players}
+          onVote={onVote}
+        />
+      )}
+
+      {isVoting && !isEmergencyVote && (
+        <FinalVoteModal
+          isOpen={true}
+          onClose={onCloseVote}
+          players={players}
+          onVote={onVote}
+        />
+      )}
+
       {children}
 
       <DescriptionOverlay

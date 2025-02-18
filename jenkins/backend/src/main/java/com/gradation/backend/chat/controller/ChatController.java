@@ -111,7 +111,7 @@ public class ChatController {
 
         // 메시지를 상대방에게 실시간으로 전송
         messagingTemplate.convertAndSend(
-                "/topic/messages/" + receiver,
+                "/topic/messages/" + receiver + "/" + sender,
                 chatMessage
         );
     }

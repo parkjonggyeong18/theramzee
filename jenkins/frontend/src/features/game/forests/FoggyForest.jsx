@@ -15,7 +15,8 @@ import MiniMap from '../components/MiniMap';
 import MissionButton from '../components/MissionButton';
 import HiddenDoorGame from '../components/missions/HiddenDoorGame';
 import ShadowGame from '../components/missions/ShadowGame';
-
+import SEGame from '../components/missions/ShadowEscapeGame'
+import ShadowEscapeGame from '../components/missions/ShadowEscapeGame';
 
 
 const FoggyForest = () => {
@@ -130,7 +131,8 @@ const FoggyForest = () => {
         />
       </MissionButtonWrapper>
       <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-        <MissionButton isDisabled />
+        <MissionButton onClick={() => handleMissionClick('se')}
+          completed={isMissionCompleted('se')} />
       </MissionButtonWrapper>
     </MissionButtons>
     ),
@@ -153,7 +155,15 @@ const FoggyForest = () => {
             setCurrentMission(null);
           }}
         />
-      ) : null
+      ) : currentMission === 'se' ? (
+        <ShadowEscapeGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
+      ) :null
     ),
     
     // 기타
@@ -176,6 +186,23 @@ const FoggyForest = () => {
   );
 };
 
+const FogWrapper = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
+`;
+
+const BlurOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  backdrop-filter: blur(5px);
+  z-index: 1;
+`;
+
 const TransitionOverlay = styled.div`
   position: fixed;
   top: 0;
@@ -192,7 +219,8 @@ const MissionButtons = styled.div`
   position: relative;
   justify-content: center;
   width: 100%;
-  height: 100px; // 버튼 컨테이너의 높이 조정
+  height: 100px;
+  z-index: 2;
 `;
 
 const MissionButtonWrapper = styled.div`

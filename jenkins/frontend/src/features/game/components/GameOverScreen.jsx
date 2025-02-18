@@ -33,7 +33,7 @@ const GameOverScreen = () => {
       timerRunning: false,    // 타이머 실행 상태
       evilSquirrel: null, // true | false
       forestToken: null,  // 숲 토큰
-      forestNum: 1, // 현재 숲 번호 (초기는 메인 숲숲)
+      forestNum: 1, // 현재 숲 번호 (초기는 메인 숲)
 
       // 게임 리소스
       totalAcorns: 0, // 저장된 도토리
@@ -44,7 +44,9 @@ const GameOverScreen = () => {
       isVoting: false,          // 투표 중인지 여부
       isEmergencyVote: false,   // 긴급 투표인지 여부
       hasUsedEmergency: false,  // 긴급 투표 사용 여부
-      voteTimer: 180, // 투표 시간 (3분)
+      voteTimer: 20, // 투표 시간 (3분)
+      totalVote: 0,
+      votedPlayers: [],
       
       // 게임 전체 정지(추후)
       isPaused: false, // 게임 타이머 일시정지 여부
@@ -101,13 +103,13 @@ const GameOverScreen = () => {
     }
   
     if (gameState.gameOverReason === 'emergency') {
-      return gameState.lastKilledPlayer === gameState.evilSquirrel
+      return gameState.winner === "good"
         ? "나쁜 다람쥐를 찾아냈습니다!\n착한 다람쥐 승리!"
         : "착한 다람쥐를 죽였습니다!\n나쁜 다람쥐 승리!";
     }
   
     if (gameState.gameOverReason === 'time') {
-      return gameState.lastKilledPlayer === gameState.evilSquirrel
+      return gameState.winner === "good"
         ? "시간 종료! 나쁜 다람쥐를 찾아냈습니다!\n착한 다람쥐 승리!"
         : "시간 종료! 나쁜 다람쥐를 찾지 못했습니다!\n나쁜 다람쥐 승리!";
     }

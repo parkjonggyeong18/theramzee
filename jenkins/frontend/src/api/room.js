@@ -19,3 +19,7 @@ export const joinRoom = async (roomId, password="") => {
 export const fetchRoomById = async (roomId) => {
   return await apiRequest(`/api/v1/rooms/${roomId}`, 'GET');
 };
+
+export const followFriend = async (friendNickname) => {
+  return await apiRequest('/api/v1/rooms/follow', 'POST', { friendNickname });
+};
