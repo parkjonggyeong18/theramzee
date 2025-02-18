@@ -15,7 +15,7 @@ import MiniMap from '../components/MiniMap';
 import MissionButton from '../components/MissionButton';
 import HackingGame from '../components/missions/HackingGame';
 import BrightnessGame from '../components/missions/BrightnessGame';
-
+import CircuitGame from '../components/missions/CircuitConnectionGame'
 
 
 const TimeForest = () => {
@@ -118,7 +118,9 @@ const TimeForest = () => {
         />
       </MissionButtonWrapper>
       <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-        <MissionButton isDisabled />
+        <MissionButton   
+          onClick={() => handleMissionClick('circuit')}
+          completed={isMissionCompleted('circuit')} />
       </MissionButtonWrapper>
     </MissionButtons>
     ),
@@ -141,7 +143,15 @@ const TimeForest = () => {
             setCurrentMission(null);
           }}
         />
-      ) : null
+      ) :  currentMission === 'circuit' ? (
+        <CircuitGame
+          onComplete={handleMissionComplete}
+          onClose={() => {
+            setShowMiniGame(false);
+            setCurrentMission(null);
+          }}
+        />
+      ):null
     ),
     
     // 기타

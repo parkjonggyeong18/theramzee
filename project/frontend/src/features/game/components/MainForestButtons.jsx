@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState,useEffect } from 'react';
 import {styled,createGlobalStyle} from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
 import EmergencyVoteModal from '../../../features/game/components/vote/EmergencyVoteModal';
@@ -17,9 +17,11 @@ const MainForestButtons = () => {
     cancelAction, 
     isStorageActive, 
     isEnergyActive,
-    setGameState,players  
+    setGameState,
+    players,
+    startEmergencyVote
   } = useGame();
-  const [isVoteModalOpen, setIsVoteModalOpen] = useState(false);
+
   const clkSave = () => {
     startSaveAcorns();
   };
@@ -31,25 +33,29 @@ const MainForestButtons = () => {
   const clkEmergency = async () => {
     if (gameState.isDead || gameState.hasUsedEmergency) return;
     
-    try {
-      const nicknameList = players.map(player => player.nickName);
-      await gameService.startEmergencyVote(roomId, nicknameList);
+    try { 
+      startEmergencyVote();
+      gameState.hasUsedEmergency = true;
     } catch (error) {
       console.error('Failed to start emergency vote:', error);
     }
   };
-  
-  const handleVote = (selectedPlayer) => {
-    setGameState(prev => ({
-      ...prev,
-      isVoting: true,
-      voteType: 'emergency',
-      votes: {}
-    }));
-    
-    startEmergency();
-    setIsVoteModalOpen(false);
-  };
+
+  useEffect(() => {
+    // 폰트 미리 로드
+    const font = new FontFace(
+      'NeoDunggeunmoPro-Regular',
+      `url('/fonts/NeoDunggeunmoPro-Regular.ttf')`,
+      { display: 'swap' }
+    );
+
+    // 폰트 로드 및 적용
+    font.load().then((loadedFont) => {
+      document.fonts.add(loadedFont);
+    }).catch((error) => {
+      console.error('폰트 로드 실패:', error);
+    });
+  }, []);
 
   return (
     <ButtonContainer>
@@ -86,31 +92,33 @@ const MainForestButtons = () => {
           {isStorageActive && <ProgressBar />}
         </StorageButton>
       )}
-
-      {/* 모달 컴포넌트를 분리하여 렌더링 */}
-      <EmergencyVoteModal
-        isOpen={isVoteModalOpen}
-        onClose={() => setIsVoteModalOpen(false)}
-        players={players}
-        onVote={handleVote}
-      />
+      
     </ButtonContainer>
   );
 };
 
 
 const ButtonContainer = styled.div`
- display: flex;
- gap: 20px;
- z-index: 11;
+  display: flex;
+  gap: 20px;
+  z-index: 11;
+
+  @font-face {
+    font-family: 'NeoDunggeunmoPro-Regular';
+    src: url('/fonts/NeoDunggeunmoPro-Regular.ttf') format('truetype');
+    font-display: swap;
+    font-weight: normal;
+    font-style: normal;
+  }
 `;
+
 
 const BaseButton = styled.button`
   padding: 15px 30px;
   border: none;
   border-radius: 10px;
-  font-family: 'DOSMyungjo', sans-serif;  // 'DOSMyungjo'
-  font-size: 1.2rem;
+    font-family: 'NeoDunggeunmoPro-Regular', sans-serif;  
+  font-size: 1.7rem;
   cursor: pointer;
   position: relative;
   overflow: hidden;
@@ -120,8 +128,8 @@ const BaseButton = styled.button`
   background-size: 100% 100%;
   background-repeat: no-repeat;
   background-position: center;
-  min-width: 120px;
-  min-height: 50px;
+  min-width: 150px;
+  min-height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;

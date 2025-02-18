@@ -1,115 +1,131 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../../contexts/AuthContext';
-import { getFriendsList, getFriendRequests, sendFriendRequest, acceptFriendRequest, deleteFriend } from '../../api/friend';
+import React from 'react';
+import styled from 'styled-components';
 import FriendList from './components/FriendList';
-import FriendRequestList from './components/FriendRequestList';
-import { Client } from '@stomp/stompjs';
+import FriendRequest from './components/FriendRequest';
 
 const FriendPage = () => {
-  const { accessToken } = useAuth();
-  const [friends, setFriends] = useState([]);
-  const [requests, setRequests] = useState([]);
-  const [newFriend, setNewFriend] = useState('');
-
-  useEffect(() => {
-    if (!accessToken) return;
-
-    const fetchData = async () => {
-      try {
-        const [friendsList, friendRequests] = await Promise.all([
-          getFriendsList(accessToken),
-          getFriendRequests(accessToken),
-        ]);
-        setFriends(friendsList);
-        setRequests(friendRequests);
-      } catch (error) {
-        console.error('데이터 불러오기 실패', error);
-      }
-    };
-
-    fetchData();
-  }, [accessToken]);
-
-  useEffect(() => {
-    if (!accessToken) return;
-
-    const stompClient = new Client({
-      brokerURL: 'wss://ramzee.online/ws',
-      connectHeaders: { Authorization: `Bearer ${accessToken}` },
-      onConnect: () => {
-        console.log('Connected to WebSocket');
-        stompClient.subscribe('/topic/friend-requests', (message) => {
-          setRequests((prevRequests) => [...prevRequests, JSON.parse(message.body)]);
-        });
-        stompClient.subscribe('/topic/friend-accepts', (message) => {
-          setFriends((prevFriends) => [...prevFriends, JSON.parse(message.body)]);
-        });
-      },
-      onStompError: (frame) => {
-        console.error('Broker reported error:', frame.headers['message']);
-      },
-    });
-
-    stompClient.activate();
-
-    return () => {
-      stompClient.deactivate();
-    };
-  }, [accessToken]);
-
-  const handleAddFriend = useCallback(async () => {
-    if (!newFriend.trim()) return;
-
-    try {
-      await sendFriendRequest(accessToken, newFriend);
-      setNewFriend('');
-      const updatedRequests = await getFriendRequests(accessToken);
-      setRequests(updatedRequests);
-    } catch (error) {
-      console.error('친구 요청 실패', error);
-    }
-  }, [newFriend, accessToken]);
-
-  const handleAcceptRequest = useCallback(async (senderNickname) => {
-    try {
-      await acceptFriendRequest(accessToken, senderNickname);
-      const [updatedFriends, updatedRequests] = await Promise.all([
-        getFriendsList(accessToken),
-        getFriendRequests(accessToken),
-      ]);
-      setFriends(updatedFriends);
-      setRequests(updatedRequests);
-    } catch (error) {
-      console.error('친구 요청 수락 실패', error);
-    }
-  }, [accessToken]);
-
-  const handleDeleteFriend = useCallback(async (friendNickname) => {
-    try {
-      await deleteFriend(accessToken, friendNickname);
-      const updatedFriends = await getFriendsList(accessToken);
-      setFriends(updatedFriends);
-    } catch (error) {
-      console.error('친구 삭제 실패', error);
-    }
-  }, [accessToken]);
-
   return (
-    <div>
-      <h1>Friends</h1>
-      <div>
-        <input
-          type="text"
-          value={newFriend}
-          onChange={(e) => setNewFriend(e.target.value)}
-          placeholder="Enter friend's nickname"
-        />
-        <button onClick={handleAddFriend}>Add Friend</button>
-      </div>
-      <FriendList friends={friends} onDeleteFriend={handleDeleteFriend} />
-      <FriendRequestList requests={requests} onAcceptRequest={handleAcceptRequest} />
-    </div>
+    <FriendPageContainer>
+      <Header>
+        <Title>친구 목록</Title>
+      </Header>
+      
+      <ContentSection>
+        {/* 친구 목록 섹션 */}
+        <Section>
+          <FriendList />
+        </Section>
+
+        {/* 친구 요청 섹션 */}
+        <Section>
+          <FriendRequest />
+        </Section>
+      </ContentSection>
+    </FriendPageContainer>
   );
 };
+
+const FriendPageContainer = styled.div`
+  height: 100%;
+  background-color: rgba(45, 24, 16, 0.95);
+  color: white;
+  display: flex;
+  flex-direction: column;
+`;
+
+const Header = styled.div`
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+`;
+
+const Title = styled.h1`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: white;
+  margin: 0;
+`;
+
+const ContentSection = styled.div`
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+
+  /* 스크롤바 스타일링 */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+`;
+
+const Section = styled.div`
+  margin-bottom: 2rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+
+  h1 {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+  }
+
+  input {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    padding: 0.5rem;
+    color: white;
+    width: 100%;
+    margin-bottom: 1rem;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  button {
+    background-color: #4a3228;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #5a4238;
+    }
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      padding: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+  }
+`;
 
 export default FriendPage;

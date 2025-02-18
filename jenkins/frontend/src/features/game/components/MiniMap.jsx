@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
 import { backgroundImages } from '../../../assets/images';
+import pan from '../../../assets/images/object/PAN.png'
 
 const MiniMap = () => {
  const navigate = useNavigate();
- const { gameState, moveForest, players, cancelAction  } = useGame();
+ const { gameState, moveForest, cancelAction  } = useGame();
 
  const forests = [
    { 
@@ -88,21 +89,29 @@ const clkMainForest = () => {
 };
 
 const MapContainer = styled.div`
- width: 150px;
- height: 150px;
-  background-color:rgba(240, 240, 240, 0.34); // 회색 배경 추가
-  padding: 10px; // 내부 여백 추가
-  border-radius: 10px; // 모서리 둥글게 처리
+  width: 150px;
+  height: 150px;
+  background-image: url(${pan});
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  background-position: center;
+  padding: 10px;
+  border-radius: 10px;
+  
+  // 추가적인 스타일링이 필요하다면:
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const ForestGrid = styled.div`
- position: relative;
- width: 100%;
- height: 100%;
- display: grid;
- grid-template-columns: repeat(3, 1fr);
- grid-template-rows: repeat(3, 1fr);
- gap: 5px;
+  position: relative;
+  width: 90%;    // 팬 이미지 안에 맞추기 위해 크기 조절
+  height: 90%;   // 팬 이미지 안에 맞추기 위해 크기 조절
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 5px;
 `;
 
 const ForestButton = styled.button`
@@ -139,6 +148,7 @@ const ForestButton = styled.button`
    left: 50%;
    transform: translateX(-50%);
    background: rgba(0, 0, 0, 0.8);
+   font-family: 'NeoDunggeunmoPro-Regular', sans-serif; 
    color: white;
    padding: 5px;
    border-radius: 5px;

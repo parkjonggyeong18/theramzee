@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class VoteResponse {
     private String nickname;
     private int voteNum;
+    private int totalVote;
 }

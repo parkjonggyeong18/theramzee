@@ -123,6 +123,8 @@ public class GameServiceImpl implements GameService {
             userData.setFatigue(0);
             userData.setForestToken(token);
             userData.setForestNum(1);
+            userData.setVote(0);
+            userData.setLastVote(0);
             userData.setEvilSquirrel(nickname.equals(evilSquirrelNickname));
 
             // Redis Hash로 저장
@@ -140,6 +142,9 @@ public class GameServiceImpl implements GameService {
             if (forestNum == 1) {
                 forestData.setEmergencyPossible(true);
                 forestData.setTotalAcorns(0);
+                forestData.setTotalVote(0);
+                forestData.setTotalLastVote(0);
+                forestData.setEvilSquirrelNickname(evilSquirrelNickname);
             } else {
                 forestData.setMission1(new MissionData(false, 1));
                 forestData.setMission2(new MissionData(false, 1));
@@ -198,20 +203,11 @@ public class GameServiceImpl implements GameService {
         String roomKey = "ROOM:" + roomId;
         String forestKey = roomKey + ":FOREST:1";
 
-        String sessionId = roomId + "-1";
-        Map<String, String> userTokens = new HashMap<>();
-
         for (String nickname : nicknames) {
             String userKey = roomKey + ":USER:" + nickname;
 
             if (nickname != null) {
-                //forestToken을 roomId-1세션으로 설정
-                String token = openViduService.generateToken(sessionId, nickname);
-                redisUtil.hset(userKey, "forestToken", token);
                 redisUtil.hset(userKey, "forestNum", 1);
-
-                // 닉네임과 토큰을 맵에 저장
-                userTokens.put(nickname, token);
             }
         }
 
@@ -220,7 +216,6 @@ public class GameServiceImpl implements GameService {
 
         // EmergencyResponse 객체 생성 및 반환
         EmergencyResponse response = new EmergencyResponse();
-        response.setUserTokens(userTokens);
 
         Map<Integer, List<String>> forestUsers = getForestUserMap(roomId, nicknames);
         response.setForestUsers(forestUsers);
@@ -473,6 +468,47 @@ public class GameServiceImpl implements GameService {
 
         // 6. CompleteMissionResponse 객체 생성 및 반환
         return new CompleteMissionResponse(nickname, forestNum, missionNum, reward, newAcorns);
+    }
+
+    /**
+     * 각 유저에 대한 투표 결과 처리
+     *
+     * @param roomId
+     * @param nickname
+     * @return VoteResponse 객체
+     */
+    public VoteResponse vote(int roomId, String nickname) {
+        String roomKey = "ROOM:" + roomId;
+        String userKey = roomKey + ":USER:" + nickname;
+        String forestKey = roomKey + ":FOREST:1";
+
+        Object voteNumObj = redisUtil.hget(userKey, "vote");
+        int voteNum = (Integer) voteNumObj + 1;
+
+        Object totalVoteObj = redisUtil.hget(forestKey, "totalVote");
+        int totalVote = (Integer) totalVoteObj + 1;
+
+        redisUtil.hset(userKey, "vote", voteNum);
+        redisUtil.hset(forestKey, "totalVote", totalVote);
+
+        return new VoteResponse(nickname, voteNum, totalVote);
+    }
+
+    public VoteResponse lastVote (int roomId, String nickname) {
+        String roomKey = "ROOM:" + roomId;
+        String userKey = roomKey + ":USER:" + nickname;
+        String forestKey = roomKey + ":FOREST:1";
+
+        Object voteNumObj = redisUtil.hget(userKey, "lastVote");
+        int voteNum = (Integer) voteNumObj + 1;
+
+        Object totalVoteObj = redisUtil.hget(forestKey, "totalLastVote");
+        int totalVote = (Integer) totalVoteObj + 1;
+
+        redisUtil.hset(userKey, "lastVote", voteNum);
+        redisUtil.hset(forestKey, "totalLastVote", totalVote);
+
+        return new VoteResponse(nickname, voteNum, totalVote);
     }
 
 }

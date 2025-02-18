@@ -79,6 +79,7 @@ const LoginPage = () => {
 const LoginContainer = styled.div`
   height: 100vh;
   width: 100vw;
+  
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -100,6 +101,7 @@ const BackgroundImage = styled.div`
 const Title = styled.h1`
   font-size: 4rem;
   font-weight: bold;
+  
   color: white;
   margin-bottom: 2rem;
   text-shadow: 
