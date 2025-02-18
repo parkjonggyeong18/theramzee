@@ -1,7 +1,7 @@
 import { apiRequest } from './apiService';
 
 // 비밀번호 초기화
-export const resetPassword = async (username,email) => {
+export const resetPassword = async (username, email) => {
   return await apiRequest('/api/v1/email/reset-password', 'POST', {username, email }, false);
 };
 

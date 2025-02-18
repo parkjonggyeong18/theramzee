@@ -19,7 +19,8 @@ const MainForestButtons = () => {
     isEnergyActive,
     setGameState,
     players,
-    startEmergencyVote
+    startEmergencyVote,
+    isActionInProgress,
   } = useGame();
 
   const clkSave = () => {
@@ -61,7 +62,7 @@ const MainForestButtons = () => {
     <ButtonContainer>
       <EnergyButton 
         onClick={clkFatigue}
-        disabled={isEnergyActive || gameState.fatigue >= 3}
+        disabled={isEnergyActive || gameState.fatigue >= 3 || isActionInProgress}
         $isActive={isEnergyActive}
         $evilSquirrel={gameState.evilSquirrel}
       >
@@ -71,7 +72,7 @@ const MainForestButtons = () => {
 
       <EmergencyButton 
         onClick={clkEmergency}
-        disabled={gameState.hasUsedEmergency}
+        disabled={gameState.hasUsedEmergency || isActionInProgress}
       >
         긴급
       </EmergencyButton>
@@ -85,7 +86,7 @@ const MainForestButtons = () => {
       {gameState.evilSquirrel === false && (
         <StorageButton 
           onClick={clkSave}
-          disabled={isStorageActive || gameState.heldAcorns === 0}
+          disabled={isStorageActive || gameState.heldAcorns === 0 || isActionInProgress}
           $isActive={isStorageActive}
         >
           {isStorageActive ? '저장중...' : '창고'}

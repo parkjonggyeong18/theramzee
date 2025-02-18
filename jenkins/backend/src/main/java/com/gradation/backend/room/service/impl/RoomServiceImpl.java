@@ -78,9 +78,9 @@ public class RoomServiceImpl implements RoomService {
         if (room.getUsers().size() > 6) {
             throw new RuntimeException("방 인원이 다 찼습니다!");
         }
-        if (room.getUsers().stream().anyMatch(u -> u.getName().equals(user.getName()))) {
-            throw new IllegalArgumentException("이미 방에 참가한 유저입니다!");
-        }
+//        if (room.getUsers().stream().anyMatch(u -> u.getName().equals(user.getName()))) {
+//            throw new IllegalArgumentException("이미 방에 참가한 유저입니다!");
+//        }
         // 참여자 추가
         room.addUser(user);
 
@@ -142,4 +142,34 @@ public class RoomServiceImpl implements RoomService {
                 .orElseThrow(() -> new RuntimeException("Room not found. id=" + roomId));
 
     }
+    @Transactional
+    public Room friendJoinRoom(Long roomId, String nickname, Integer password) {
+        // 참여자 유저 조회
+        User user = userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new RuntimeException("참여자를 찾을 수 없습니다."));
+
+
+        // 방 조회 (fetch join)
+        Room room = roomRepository.findByIdWithUsers(roomId)
+                .orElseThrow(() -> new RuntimeException("참여하려는 방을 찾을 수 없습니다."));
+
+
+        //비번방일 경우 비밀번호 검증
+        if (room.getPassword() != null && !password.equals(room.getPassword())) {
+            throw new IllegalArgumentException("비밀번호 오류!");
+        }
+
+        // 방 인원이 이미 6명일 경우 참가 불가
+        if (room.getUsers().size() > 6) {
+            throw new RuntimeException("방 인원이 다 찼습니다!");
+        }
+        if (room.getUsers().stream().anyMatch(u -> u.getName().equals(user.getName()))) {
+            return room;
+        }
+        // 참여자 추가
+        room.addUser(user);
+
+        return room;
+    }
+
 }

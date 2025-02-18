@@ -63,7 +63,7 @@ const RoomListItem = ({ room }) => {
       <RoomInfo>
         <RoomDetails>
           <DetailItem>방장: {room.hostNickName}</DetailItem>
-          <DetailItem>참가자: {room.currentParticipantCount}/6</DetailItem>
+          <DetailItem>참가자: {room.currentParticipantCount > 6 ? 6 : room.currentParticipantCount}/6</DetailItem>
         </RoomDetails>
       </RoomInfo>
       
