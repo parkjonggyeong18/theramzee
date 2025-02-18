@@ -75,12 +75,12 @@ public class RoomServiceImpl implements RoomService {
         }
 
         // 방 인원이 이미 6명일 경우 참가 불가
-        if (room.getUsers().size() < 6) {
+        if (room.getUsers().size() > 6) {
             throw new RuntimeException("방 인원이 다 찼습니다!");
         }
-        if (room.getUsers().stream().anyMatch(u -> u.getName().equals(user.getName()))) {
-            throw new IllegalArgumentException("이미 방에 참가한 유저입니다!");
-        }
+//        if (room.getUsers().stream().anyMatch(u -> u.getName().equals(user.getName()))) {
+//            throw new IllegalArgumentException("이미 방에 참가한 유저입니다!");
+//        }
         // 참여자 추가
         room.addUser(user);
 
