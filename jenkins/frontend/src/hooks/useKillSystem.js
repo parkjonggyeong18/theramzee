@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useGame } from '../contexts/GameContext';
 
 export const useKillSystem = () => {
@@ -6,7 +6,6 @@ export const useKillSystem = () => {
   const [killingPlayer, setKillingPlayer] = useState(null);
   const [dragStart, setDragStart] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-  const isKillingRef = useRef(false);
 
   // 드래그 시작 핸들러
   const handleDragStart = (e, playerId) => {
@@ -48,8 +47,6 @@ export const useKillSystem = () => {
 
   // 킬 애니메이션 시작
   const startKillAnimation = async (victimId) => {
-    if (isKillingRef.current) return; // 이미 킬 진행 중이면 중단
-    isKillingRef.current = true;
     setKillingPlayer(victimId);
     
     // 3초 동안 GIF 애니메이션 재생
@@ -58,7 +55,6 @@ export const useKillSystem = () => {
     // 플레이어 죽음 처리
     killUser(victimId);
     setKillingPlayer(null);
-    isKillingRef.current = false;
   };
 
   // 드래그 이벤트 정리
@@ -77,7 +73,7 @@ export const useKillSystem = () => {
   return {
     killingPlayer,
     handleDragStart,
-    isKillable: gameState.evilSquirrel === true && gameState.fatigue >= 3 && !isKillingRef.current,
+    isKillable: gameState.evilSquirrel === true && gameState.fatigue >= 3,
     isDragging
   };
 };

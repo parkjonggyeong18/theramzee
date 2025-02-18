@@ -35,7 +35,6 @@ export const GameProvider = ({ children }) => {
     votingInProgress: false, 
     totalVote: 0,
     votedPlayers: [],
-    hasUsedEmergency: false,
 
     // 게임 전체 정지(추후)
     isPaused: false, // 게임 타이머 일시정지 여부
@@ -91,7 +90,6 @@ export const GameProvider = ({ children }) => {
   const [isStorageActive, setIsStorageActive] = useState(false);
   const [isEnergyActive, setIsEnergyActive] = useState(false);
   const timerRef = useRef(null);
-  const [isActionInProgress, setIsActionInProgress] = useState(false);
 
   // useEffect(() => {
   //   console.log("게임 상태 변경됨:", gameState);
@@ -342,7 +340,6 @@ export const GameProvider = ({ children }) => {
     }
     setIsStorageActive(false);
     setIsEnergyActive(false);
-    setIsActionInProgress(false);
     timerRef.current = null;
   }, []);
 
@@ -350,11 +347,9 @@ export const GameProvider = ({ children }) => {
   const startSaveAcorns = useCallback(() => {
     if (gameState.evilSquirrel !== false && gameState.heldAcorns === 0 && isStorageActive && gameState.isDead) return;
     setIsStorageActive(true);
-    setIsActionInProgress(true);
     timerRef.current = setTimeout(() => {
       saveUserAcorns();
       setIsStorageActive(false);
-      setIsActionInProgress(false);
     }, 10000);
   }, [gameState.evilSquirrel, gameState.heldAcorns, isStorageActive, gameState.isDead, saveUserAcorns]);
 
@@ -362,11 +357,9 @@ export const GameProvider = ({ children }) => {
   const startChargeFatigue = useCallback(() => {
     if (gameState.fatigue >= 3 || isEnergyActive || gameState.isDead) return;
     setIsEnergyActive(true);
-    setIsActionInProgress(true);
     timerRef.current = setTimeout(() => {
       chargeFatigue();
       setIsEnergyActive(false);
-      setIsActionInProgress(false);
     }, gameState.evilSquirrel === false ? 5000 : 10000);
   }, [gameState.fatigue, isEnergyActive, gameState.isDead, gameState.evilSquirrel, chargeFatigue]);
 
@@ -398,7 +391,6 @@ export const GameProvider = ({ children }) => {
     startChargeFatigue,
     startEmergencyVote,
     recordVote,
-    isActionInProgress,
   };
 
   return (

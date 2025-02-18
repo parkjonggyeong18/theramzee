@@ -74,7 +74,7 @@ public class FollowController {
             Room joinedRoom = roomService.joinRoom(roomId, currentUser.getNickname(), room.getPassword());
 
             // 오픈비두 세션 토큰 발급
-            String sessionId = roomId + "-1";
+            String sessionId = String.valueOf(roomId) + "-1";
             System.out.println("sessionId = " + sessionId);
             String token = openViduService.generateToken(sessionId, currentUser.getNickname());
             response.setToken(token);

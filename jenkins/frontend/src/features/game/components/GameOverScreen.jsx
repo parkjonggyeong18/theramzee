@@ -20,73 +20,72 @@ const GameOverScreen = () => {
     await disconnectSocket();
     setGameState((prev) => ({
       ...prev,
-    // 유저 정보
-    userNum: null,
-    nickName: null,
+      // 유저 정보
+      userNum: null,
+      nickName: null,
 
-    // 숲 별 유저 정보
-    forestUsers: null,
+      // 숲 별 유저 정보
+      forestUsers: null,
 
-    // 게임 진행 상태
-    isStarted: false, // 게임 시작 여부
-    timer: 240, // 게임 시간 (7분)
-    timerRunning: false,    // 타이머 실행 상태
-    evilSquirrel: null, // true | false
-    forestToken: null,  // 숲 토큰
-    forestNum: 1, // 현재 숲 번호 (초기는 메인 숲숲)
+      // 게임 진행 상태
+      isStarted: false, // 게임 시작 여부
+      timer: 240, // 게임 시간 (7분)
+      timerRunning: false,    // 타이머 실행 상태
+      evilSquirrel: null, // true | false
+      forestToken: null,  // 숲 토큰
+      forestNum: 1, // 현재 숲 번호 (초기는 메인 숲)
 
-    // 게임 리소스
-    totalAcorns: 0, // 저장된 도토리
-    heldAcorns: 0,  // 보유 중인 도토리
-    fatigue: 0,     // 피로도 (0-3)
+      // 게임 리소스
+      totalAcorns: 0, // 저장된 도토리
+      heldAcorns: 0,  // 보유 중인 도토리
+      fatigue: 0,     // 피로도 (0-3)
 
-    // 투표 시스템
-    isVoting: false,
-    isEmergencyVote: false,
-    currentVotes: {},
-    votingInProgress: false, 
-    totalVote: 0,
-    votedPlayers: [],
-    hasUsedEmergency: false,
+      // 투표 시스템
+      isVoting: false,          // 투표 중인지 여부
+      isEmergencyVote: false,   // 긴급 투표인지 여부
+      hasUsedEmergency: false,  // 긴급 투표 사용 여부
+      voteTimer: 20, // 투표 시간 (3분)
+      totalVote: 0,
+      votedPlayers: [],
+      
+      // 게임 전체 정지(추후)
+      isPaused: false, // 게임 타이머 일시정지 여부
 
-    // 게임 전체 정지(추후)
-    isPaused: false, // 게임 타이머 일시정지 여부
+      // 플레이어 상태
+      killedPlayers: [], // 죽은 플레이어들의 ID 배열
+      isSpectating: false, // 관전자 모드
+      isDead: false, // 죽음 상태
+      killingAnimation: false, // 킬 애니메이션 재생 중 여부
 
-    // 플레이어 상태
-    killedPlayers: [], // 죽은 플레이어들의 ID 배열
-    isSpectating: false, // 관전자 모드
-    isDead: false, // 죽음 상태
-    killingAnimation: false, // 킬 애니메이션 재생 중 여부
-
-    // UI 상태
-    forceVideosOff: false,    // 안개 숲 캠 강제 OFF
-    foggyVoiceEffect: false,  // 안개 숲 음성 변조
-    miniMapEnabled: false,  // 미니맵 활성화 상태 (게임 시작 후 true)
-    // 종료 상태
-    isGameOver: false,           // 게임 종료 여부
-    gameOverReason: null,        // 'acorns' | 'emergency' | 'time'
-    winner: null,                // 'good' | 'bad'
-    lastKilledPlayer: null,      // 마지막으로 죽은 플레이어
-    //미션 상태
-
-    "2_1": [false, 1], // 2번 숲 1번 미션
-    "2_2": [false, 2], // 2번 숲 2번 미션
-    "2_3": [false, 3], // 2번 숲 3번 미션
-    "3_1": [false, 1], // 3번 숲 1번 미션
-    "3_2": [false, 2], // 3번 숲 2번 미션
-    "3_3": [false, 3], // 3번 숲 3번 미션
-    "4_1": [false, 1], // 4번 숲 1번 미션
-    "4_2": [false, 2], // 4번 숲 2번 미션
-    "4_3": [false, 3], // 4번 숲 3번 미션
-    "5_1": [false, 1], // 5번 숲 1번 미션
-    "5_2": [false, 2], // 5번 숲 2번 미션
-    "5_3": [false, 3], // 5번 숲 3번 미션
-    "6_1": [false, 1], // 6번 숲 1번 미션
-    "6_2": [false, 2], // 6번 숲 2번 미션
-    "6_3": [false, 3], // 6번 숲 3번 미션
-    "7_1": [false, 1], // 6번 숲 1번 미션
-    "7_2": [false, 2], // 6번 숲 2번 미션
-    "7_3": [false, 3], // 6번 숲 3번 미션
+      // UI 상태
+      forceVideosOff: false,    // 안개 숲 캠 강제 OFF
+      foggyVoiceEffect: false,  // 안개 숲 음성 변조
+      miniMapEnabled: false,  // 미니맵 활성화 상태 (게임 시작 후 true)
+      // 종료 상태
+      isGameOver: false,           // 게임 종료 여부
+      gameOverReason: null,        // 'acorns' | 'emergency' | 'time'
+      winner: null,                // 'good' | 'bad'
+      lastKilledPlayer: null,      // 마지막으로 죽은 플레이어
+      //미션 상태
+      
+      "2_1": [false, 1], // 2번 숲 1번 미션
+      "2_2": [false, 2], // 2번 숲 2번 미션
+      "2_3": [false, 3], // 2번 숲 3번 미션
+      "3_1": [false, 1], // 3번 숲 1번 미션
+      "3_2": [false, 2], // 3번 숲 2번 미션
+      "3_3": [false, 3], // 3번 숲 3번 미션
+      "4_1": [false, 1], // 4번 숲 1번 미션
+      "4_2": [false, 2], // 4번 숲 2번 미션
+      "4_3": [false, 3], // 4번 숲 3번 미션
+      "5_1": [false, 1], // 5번 숲 1번 미션
+      "5_2": [false, 2], // 5번 숲 2번 미션
+      "5_3": [false, 3], // 5번 숲 3번 미션
+      "6_1": [false, 1], // 6번 숲 1번 미션
+      "6_2": [false, 2], // 6번 숲 2번 미션
+      "6_3": [false, 3], // 6번 숲 3번 미션
+      "7_1": [false, 1], // 6번 숲 1번 미션
+      "7_2": [false, 2], // 6번 숲 2번 미션
+      "7_3": [false, 3], // 6번 숲 3번 미션
     }));
     setPlayers([]);
     // const roomPassword = sessionStorage.getItem('roomPassword');

@@ -134,7 +134,7 @@ const GameRoom = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [roomId, navigate]);
+  }, [roomId]);
 
   const clkStart = () => {
     startGame();
@@ -241,5 +241,4 @@ const ExitButton = styled(StartButton)`
     transform: scale(1.05);
   }
 `;
-
 export default GameRoom;
