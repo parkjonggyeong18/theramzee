@@ -43,10 +43,6 @@ export const OpenViduProvider = ({ children }) => {
 
       setPreviewPublisher(previewPub);
 
-      // 미리보기가 필요하면 dispose 코드는 제거하거나 조건을 달아주세요.
-      // previewPub.stream.disposeWebRtcPeer();
-      // previewPub.stream.disposeMediaStream();
-
     } catch (error) {
       console.error('Preview init error:', error);
     }
