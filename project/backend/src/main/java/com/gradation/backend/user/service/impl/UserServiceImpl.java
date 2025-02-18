@@ -144,6 +144,9 @@ public class UserServiceImpl implements UserService {
         redisUtil.setex(userDetails.getUsername() + ":refresh", refreshToken, jwtTokenUtil.getRefreshTokenExpiration(), TimeUnit.MILLISECONDS);
 
         User existingUser = userRepository.findByUsername(request.getUsername()).orElseThrow(() -> new UserNotFoundException("User not found"));
+        if(existingUser.getUserStatus()){
+            throw new IllegalArgumentException("이미 로그인된 사용자입니다.");
+        }
         existingUser.setUserStatus(true); // 상태 업데이트
         userRepository.save(existingUser);
 
