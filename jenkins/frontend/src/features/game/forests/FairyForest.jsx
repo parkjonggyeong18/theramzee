@@ -17,8 +17,9 @@ import FlowerGame from '../components/missions/FlowerGame';
 import FishingGame from '../components/missions/FishingGame';
 import FairyGame from'../components/missions/FairyCatchingGame';
 import FairyCatchingGame from '../components/missions/FairyCatchingGame';
-
-
+import flower from '../../../assets/images/object/fairy.png'
+import fish from '../../../assets/images/object/fish.png'
+import fairy from '../../../assets/images/object/fairy2.png'
 const FairyForest = () => {
   const { gameState, players, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
@@ -118,25 +119,34 @@ const FairyForest = () => {
     // 미션 관련
     missionButtons: (
       <MissionButtons>
-      <MissionButtonWrapper style={{ top: '-80px',right: '470px' }}>
-        <MissionButton 
-          onClick={() => handleMissionClick('flower')}
-          completed={isMissionCompleted('flower')}
-        />
-      </MissionButtonWrapper>
-      <MissionButtonWrapper style={{ top: '300px', right: '30px' }}>
-        <MissionButton 
-          onClick={() => handleMissionClick('fishing')}
-          completed={isMissionCompleted('fising')}
-        />
-      </MissionButtonWrapper>
-      <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-      <MissionButton 
-          onClick={() => handleMissionClick('fairy')}
-          completed={isMissionCompleted('fairy')}
-        />
-      </MissionButtonWrapper>
-    </MissionButtons>
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('flower')}
+            completed={isMissionCompleted('flower')}
+          >
+            <MissionImage src={flower} alt="flower mission" />
+            {isMissionCompleted('flower') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
+        </MissionButtonWrapper>
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('fishing')}
+            completed={isMissionCompleted('fishing')}
+          >
+            <MissionImage src={fish} alt="fishing mission" />
+            {isMissionCompleted('fishing') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
+        </MissionButtonWrapper>
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('fairy')}
+            completed={isMissionCompleted('fairy')}
+          >
+            <MissionImage src={fairy} alt="fairy mission" />
+            {isMissionCompleted('fairy') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
+        </MissionButtonWrapper>
+      </MissionButtons>
     ),
     
     // 미니게임 오버레이
@@ -204,11 +214,61 @@ const MissionButtons = styled.div`
   position: relative;
   justify-content: center;
   width: 100%;
-  height: 100px; // 버튼 컨테이너의 높이 조정
+  height: 100px;
 `;
 
 const MissionButtonWrapper = styled.div`
   position: absolute;
+  &:nth-child(1) {
+    top: -12vh;
+    right: 20vw;
+  }
+  &:nth-child(2) {
+    top: 27vh;
+    right: 4vw;
+  }
+  &:nth-child(3) {
+    bottom: 5vh;
+    left: 80vh;
+    transform: translateX(-50%);
+  }
+`;
+
+const StyledMissionButton = styled.button`
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+  background: transparent;
+  border: none;
+  padding: 0;
+  opacity: ${props => props.completed ? 0.5 : 1};
+  cursor: ${props => props.completed ? 'not-allowed' : 'pointer'};
+  
+  &:hover {
+    transform: ${props => props.completed ? 'none' : 'scale(1.1)'};
+  }
+`;
+
+const MissionImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+`;
+
+const CompletedOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: red;
+  font-size: 70px;
 `;
 
 export default FairyForest;

@@ -16,6 +16,9 @@ import MissionButton from '../components/MissionButton';
 import HackingGame from '../components/missions/HackingGame';
 import BrightnessGame from '../components/missions/BrightnessGame';
 import CircuitGame from '../components/missions/CircuitConnectionGame'
+import hack from '../../../assets/images/object/HACK.png'
+import bri from '../../../assets/images/object/BRI.png'
+import line from '../../../assets/images/object/line.png'
 
 
 const TimeForest = () => {
@@ -105,24 +108,34 @@ const TimeForest = () => {
     // 미션 관련
     missionButtons: (
       <MissionButtons>
-      <MissionButtonWrapper style={{ top: '-50px',right: '560px' }}>
-        <MissionButton 
-          onClick={() => handleMissionClick('hacking')}
-          completed={isMissionCompleted('hacking')}
-        />
-      </MissionButtonWrapper>
-      <MissionButtonWrapper style={{ top: '230px', right: '-50px' }}>
-        <MissionButton 
-          onClick={() => handleMissionClick('bright')}
-          completed={isMissionCompleted('bright')}
-        />
-      </MissionButtonWrapper>
-      <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-        <MissionButton   
-          onClick={() => handleMissionClick('circuit')}
-          completed={isMissionCompleted('circuit')} />
-      </MissionButtonWrapper>
-    </MissionButtons>
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('hacking')}
+            completed={isMissionCompleted('hacking')}
+          >
+            <MissionImage src={hack} alt="hacking mission" />
+            {isMissionCompleted('hacking') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
+        </MissionButtonWrapper>
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('bright')}
+            completed={isMissionCompleted('bright')}
+          >
+            <MissionImage src={bri} alt="brightness mission" />
+            {isMissionCompleted('bright') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
+        </MissionButtonWrapper>
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('circuit')}
+            completed={isMissionCompleted('circuit')}
+          >
+            <MissionImage src={line} alt="circuit mission" />
+            {isMissionCompleted('circuit') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
+        </MissionButtonWrapper>
+      </MissionButtons>
     ),
     
     // 미니게임 오버레이
@@ -172,11 +185,61 @@ const MissionButtons = styled.div`
   position: relative;
   justify-content: center;
   width: 100%;
-  height: 100px; // 버튼 컨테이너의 높이 조정
+  height: 100px;
 `;
 
 const MissionButtonWrapper = styled.div`
   position: absolute;
+  &:nth-child(1) {
+    top: 15vh;
+    right: 35vw;
+  }
+  &:nth-child(2) {
+    top: 0vh;
+    right: -4.5vw;
+  }
+  &:nth-child(3) {
+    bottom: -10vh;
+    left: 30vw;
+    transform: translateX(-50%);
+  }
+`;
+
+const StyledMissionButton = styled.button`
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+  background: transparent;
+  border: none;
+  padding: 0;
+  opacity: ${props => props.completed ? 0.5 : 1};
+  cursor: ${props => props.completed ? 'not-allowed' : 'pointer'};
+  
+  &:hover {
+    transform: ${props => props.completed ? 'none' : 'scale(1.1)'};
+  }
+`;
+
+const MissionImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+`;
+
+const CompletedOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: red;
+  font-size: 70px;
 `;
 
 

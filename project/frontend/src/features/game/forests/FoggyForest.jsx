@@ -17,6 +17,9 @@ import HiddenDoorGame from '../components/missions/HiddenDoorGame';
 import ShadowGame from '../components/missions/ShadowGame';
 import SEGame from '../components/missions/ShadowEscapeGame'
 import ShadowEscapeGame from '../components/missions/ShadowEscapeGame';
+import door from '../../../assets/images/object/door.png'
+import arcondumy from '../../../assets/images/object/arcondumy.png'
+import rock from '../../../assets/images/object/rock.png'
 
 
 const FoggyForest = () => {
@@ -118,23 +121,34 @@ const FoggyForest = () => {
     // 미션 관련
     missionButtons: (
       <MissionButtons>
-      <MissionButtonWrapper style={{ top: '-40px',right: '-340px' }}>
-        <MissionButton 
-          onClick={() => handleMissionClick('door')}
-          completed={isMissionCompleted('door')}
-        />
-      </MissionButtonWrapper>
-      <MissionButtonWrapper style={{ top: '70px', right: '540px' }}>
-        <MissionButton 
-          onClick={() => handleMissionClick('shadow')}
-          completed={isMissionCompleted('shadow')}
-        />
-      </MissionButtonWrapper>
-      <MissionButtonWrapper style={{ bottom: '20px', left: '50%', transform: 'translateX(-50%)' }}>
-        <MissionButton onClick={() => handleMissionClick('se')}
-          completed={isMissionCompleted('se')} />
-      </MissionButtonWrapper>
-    </MissionButtons>
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('door')}
+            completed={isMissionCompleted('door')}
+          >
+            <MissionImage src={door} alt="door mission" />
+            {isMissionCompleted('door') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
+        </MissionButtonWrapper>
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('shadow')}
+            completed={isMissionCompleted('shadow')}
+          >
+            <MissionImage src={arcondumy} alt="shadow mission" />
+            {isMissionCompleted('shadow') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
+        </MissionButtonWrapper>
+        <MissionButtonWrapper>
+          <StyledMissionButton 
+            onClick={() => handleMissionClick('se')}
+            completed={isMissionCompleted('se')}
+          >
+            <MissionImage src={rock} alt="shadow escape mission" />
+            {isMissionCompleted('se') && <CompletedOverlay>✓</CompletedOverlay>}
+          </StyledMissionButton>
+        </MissionButtonWrapper>
+      </MissionButtons>
     ),
     
     // 미니게임 오버레이
@@ -186,22 +200,6 @@ const FoggyForest = () => {
   );
 };
 
-const FogWrapper = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-`;
-
-const BlurOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  backdrop-filter: blur(5px);
-  z-index: 1;
-`;
 
 const TransitionOverlay = styled.div`
   position: fixed;
@@ -225,8 +223,57 @@ const MissionButtons = styled.div`
 
 const MissionButtonWrapper = styled.div`
   position: absolute;
+  &:nth-child(1) {
+    top: -10vh;
+    right: -22vw;
+  }
+  &:nth-child(2) {
+    top: 17vh;
+    right: 27vw;
+  }
+  &:nth-child(3) {
+    bottom: -22vh;
+    left: 30vw;
+    transform: translateX(-50%);
+  }
 `;
 
+const StyledMissionButton = styled.button`
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+  background: transparent;
+  border: none;
+  padding: 0;
+  opacity: ${props => props.completed ? 0.5 : 1};
+  cursor: ${props => props.completed ? 'not-allowed' : 'pointer'};
+  
+  &:hover {
+    transform: ${props => props.completed ? 'none' : 'scale(1.1)'};
+  }
+`;
+
+const MissionImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+`;
+
+const CompletedOverlay = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: red;
+  font-size: 70px;
+`;
 
 
 export default FoggyForest;
