@@ -18,6 +18,8 @@ const RockThrowingGame = ({ onComplete, onClose }) => {
   const [gameOver, setGameOver] = useState(false);
   const gameAreaRef = useRef(null);
   const frameRef = useRef(null);
+  const [hasCompleted, setHasCompleted] = useState(false);
+  const completedRef = useRef(false);
 
   useEffect(() => {
     spawnTargets();
@@ -92,17 +94,18 @@ const RockThrowingGame = ({ onComplete, onClose }) => {
             });
 
             // 모든 표적을 맞췄는지 확인
-            if (hitCount === 3 && !gameOver) {
+            if (hitCount === 3 && !gameOver && !completedRef.current) {
+              completedRef.current = true; // ref를 통해 완료 상태 표시
               setGameOver(true);
+              setHasCompleted(true);
               if (gameState.role === 'good') {
                 setGameState(prev => ({
                   ...prev,
                   heldAcorns: prev.heldAcorns + 3
                 }));
               }
-              setTimeout(onComplete, 1500);
+              onComplete(); // setTimeout 제거
             }
-
             return newTargets;
           });
 
