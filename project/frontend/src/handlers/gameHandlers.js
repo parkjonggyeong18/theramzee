@@ -174,7 +174,8 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             // 기본 업데이트 객체
             const updates = {
               ...prev,
-              killedPlayers: newKilledPlayers
+              killedPlayers: newKilledPlayers,
+              killerNickname: initializedData['killerNickname']
             };
   
             // 킬러/희생자 관련 업데이트
