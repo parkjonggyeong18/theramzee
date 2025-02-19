@@ -4,7 +4,7 @@ import { Z_INDEX } from '../../../../constants/zIndex';
 import { useGame } from '../../../../contexts/GameContext';
 import { sendLastVote } from '../../../../api/gameService';
 
-const FinalVoteModal = ({ isOpen, players, roomId }) => {
+const FinalVoteModal = ({ isOpen, players, roomId, lastTimeLeft }) => {
   const { gameState } = useGame();
   const [isVoteCompleted, setIsVoteCompleted] = useState(false);
 
@@ -26,6 +26,7 @@ const FinalVoteModal = ({ isOpen, players, roomId }) => {
       <ModalContainer>
         <Header>
           <Title>최종 투표</Title>
+          <Timer>{lastTimeLeft}초</Timer>
         </Header>
 
         <AlertBox>
@@ -137,6 +138,13 @@ const VoteCount = styled.span`
   font-family: 'JejuHallasan';
   font-size: 0.9rem;
   color: #666;
+`;
+
+const Timer = styled.div`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e74c3c;
+  font-family: 'NeoDunggeunmoPro-Regular', sans-serif;
 `;
 
 export default FinalVoteModal;
