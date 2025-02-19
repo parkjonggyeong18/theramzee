@@ -1,4 +1,3 @@
-// LoginForm.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
@@ -15,20 +14,51 @@ const LoginForm = ({ onLogin, loading }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
-      <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+      {/* 아이디 입력 필드 */}
+      <Input
+        type="text"
+        value={username}
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="아이디" // 추가된 placeholder
+        required
+      />
+
+      {/* 비밀번호 입력 필드 */}
+      <Input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="비밀번호" // 추가된 placeholder
+        required
+      />
+
+      {/* 버튼 그룹 */}
       <ButtonGroup>
-        <LoginButton type="submit" disabled={loading}>{loading ? '로그인 중...' : '로그인'}</LoginButton>
-        <ForgotButton type="button" onClick={() => navigate('/forgot-password')} disabled={loading}>아이디/ 비밀번호 찾기
+        <LoginButton type="submit" disabled={loading}>
+          {loading ? '로그인 중...' : '로그인'}
+        </LoginButton>
+        <ForgotButton
+          type="button"
+          onClick={() => navigate('/forgot-password')}
+          disabled={loading}
+        >
+          아이디/ 비밀번호 찾기
         </ForgotButton>
       </ButtonGroup>
-      <RegisterButton type="button" onClick={() => navigate('/register')} disabled={loading}>회원가입</RegisterButton>
+
+      {/* 회원가입 버튼 */}
+      <RegisterButton
+        type="button"
+        onClick={() => navigate('/register')}
+        disabled={loading}
+      >
+        회원가입
+      </RegisterButton>
     </form>
   );
 };
 
-
-
+// 스타일 정의
 const Input = styled.input`
   width: 93.5%;
   padding: 0.75rem;
@@ -47,7 +77,6 @@ const Input = styled.input`
 
 const ButtonGroup = styled.div`
   display: flex;
-  
   justify-content: space-between;
   margin-bottom: 1rem;
 `;
@@ -83,15 +112,16 @@ const ForgotButton = styled.button`
 const RegisterButton = styled.button`
   width: 100%;
    background-color: #2d1810;
-  border: none;
-  color: white;
-  padding: 0.5rem 1.5rem;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: color 0.2s;
+   border: none;
+   color: white;
+   padding: 0.5rem 1.5rem;
+   border-radius: 5px;
+   cursor: pointer;
+   transition: color 0.2s;
 
+   
   &:hover {
-    color: #90EE90;
+    background-color: #3d2218;
   }
 `;
 
