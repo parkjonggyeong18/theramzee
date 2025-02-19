@@ -10,4 +10,5 @@ public class RoomInitializationResponse {
     Map<Integer, List<String>> forestUsers;
     private Map<String, UserResponse> users;
     private Map<String, ForestResponse> forests;
+    private Long serverTime;
 }
