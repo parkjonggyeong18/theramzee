@@ -1,4 +1,3 @@
-// pages/forests/FairyForest.jsx
 import { useState,useEffect } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
@@ -12,23 +11,20 @@ import MyVideo from '../components/MyVideo';
 import GameTimer from '../components/GameTimer';
 import StatePanel from '../components/StatePanel';
 import MiniMap from '../components/MiniMap';
-import MissionButton from '../components/MissionButton';
 import FlowerGame from '../components/missions/FlowerGame';
 import FishingGame from '../components/missions/FishingGame';
-import FairyGame from'../components/missions/FairyCatchingGame';
 import FairyCatchingGame from '../components/missions/FairyCatchingGame';
 import flower from '../../../assets/images/object/fairy.png'
 import fish from '../../../assets/images/object/fish.png'
 import fairy from '../../../assets/images/object/fairy2.png'
 import { leaveRoom } from '../../../api/room';
-import { connectSocket, disconnectSocket } from '../../../api/stomp';
+import { disconnectSocket } from '../../../api/stomp';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
 const FairyForest = () => {
-  const { gameState, players, completeMission } = useGame();
+  const { gameState, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [currentMission, setCurrentMission] = useState(null);
-  const [completedMissions, setCompletedMissions] = useState([]);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
   const [isForestTransitioning, setIsForestTransitioning] = useState(false);
   
@@ -37,9 +33,8 @@ const FairyForest = () => {
   
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const { handleLogout, handleLogout2 } = useAuth();
+  const { handleLogout2 } = useAuth();
   const {
-    joinSession,
     subscribers,
     leaveSession,
     initPreview
@@ -69,7 +64,6 @@ const FairyForest = () => {
           // 🔥 현재 숲에 속한 유저(`currentForestUser`)와 일치하는 경우만 필터링
           return currentForestUser.includes(subscriberNickname);
       } catch (error) {
-          console.error("🚨 OpenVidu 데이터 파싱 오류:", error);
           return false; // 파싱 실패한 경우 필터링에서 제외
       }
   });
@@ -77,7 +71,6 @@ const FairyForest = () => {
   const leftFilterCam = filteredSubscribers.slice(0, 3);
   const rightFilterCam = filteredSubscribers.slice(3, 7);
  
-  
   const isMissionCompleted = (missionId) => {
     const missionNum = missionId === 'flower' ? 1 : 
                       missionId === 'fishing' ? 2 : 3;
@@ -129,6 +122,7 @@ const FairyForest = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [gameState.isStarted, gameState.evilSquirrel,roomId, navigate]);
+  
   const gameLayoutProps = {
     // 기본 레이아웃 요소
     leftVideoGrid: <VideoGrid players={leftFilterCam} totalSlots={3} gridPosition="left" />,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Z_INDEX } from '../../../../constants/zIndex';
 import { useGame } from '../../../../contexts/GameContext';
@@ -10,6 +10,7 @@ const EmergencyVoteModal = ({ isOpen, players, roomId, timeLeft }) => {
 
   if (!isOpen) return null;
 
+  // 투표 
   const clkVote = (roomId, nickName) => {
     // 이미 투표가 완료된 경우 클릭 방지
     if (isVoteCompleted) return;
