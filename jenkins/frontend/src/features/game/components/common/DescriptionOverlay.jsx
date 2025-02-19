@@ -18,9 +18,9 @@ const DescriptionOverlay = ({ isVisible, onClose }) => {
           <div>
             <SectionTitle>착한 다람쥐</SectionTitle>
             <Description>
-              착한 다람쥐는 팀을 도와 임무를 완수해야 합니다. 협력하여 목표를 달성하세요!
-              <br />미니게임을 통해 도토리를 획득하고 창고에 채워 승리를 이끌어 주세요.
-              <br />투표를 통해 나쁜 다람쥐를 색출해 승리를 이끌어 주세요.
+              팀원들과 협력해 맵 곳곳의 미니게임을 클리어하며 도토리를 수집하세요!
+              <br />에너지를 모아 미니게임을 통해 도토리를 창고에 가득 채우면 승리합니다.
+              <br />의심되는 상대를 투표로 지목해 나쁜 다람쥐를 찾아내주세요.
             </Description>
           </div>
         </Section>
@@ -32,8 +32,9 @@ const DescriptionOverlay = ({ isVisible, onClose }) => {
             <SectionTitle>나쁜 다람쥐</SectionTitle>
             <Description>
               나쁜 다람쥐는 착한 다람쥐를 방해하며 승리를 쟁취해야 합니다.
-              <br />에너지를 3 채워 킬을 통해 착한 다람쥐를 모두 제거하세요.
-              <br />두 번의 투표에서 모두 지목되지 않고 살아남아야 승리합니다.
+              <br />에너지를 모두 모아 캠 화면을 끌어내려 착한 다람쥐를 모두 제거하세요.
+              <br />미니게임을 방해하고 투표에서 의심받지 않도록 주의하세요.
+              <br />두 차례의 투표에서 살아남거나 착한 다람쥐를 모두 제거하면 승리합니다.
             </Description>
           </div>
         </Section>
@@ -44,8 +45,8 @@ const DescriptionOverlay = ({ isVisible, onClose }) => {
           <div>
             <SectionTitle>투표</SectionTitle>
             <Description>
-              중간 투표와 최종 투표를 통해 나쁜 다람쥐를 색출하세요.
-              <br />최종 투표에서 나쁜 다람쥐를 찾지 못하면 착한 다람쥐는 패배합니다.
+              긴급 투표 또는 최종 투표를 통해 나쁜 다람쥐를 색출하세요.
+              <br />최종 투표에서 나쁜 다람쥐를 찾지 못한다면 착한 다람쥐는 패배합니다.
             </Description>
           </div>
         </Section>
