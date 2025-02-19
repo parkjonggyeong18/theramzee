@@ -68,8 +68,8 @@ const RegisterForm = ({ onRegister, loading }) => {
       return;
     }
     try {
-      await sendEmailVerification(formData.email);
       setIsEmailSent(true);
+      await sendEmailVerification(formData.email);
       setEmailTimer(180);
       setErrors((prev) => ({ ...prev, email: '' }));
     } catch (error) {
@@ -286,7 +286,7 @@ const EmailButton = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
-
+  margin-top: -0.5rem;
   &:hover {
     background-color: #98FB98;
   }
