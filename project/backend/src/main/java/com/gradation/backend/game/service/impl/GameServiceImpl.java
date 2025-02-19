@@ -120,6 +120,7 @@ public class GameServiceImpl implements GameService {
             userData.setNickname(nickname);
             userData.setAlive(true);
             userData.setAcorns(0);
+            userData.setSaveAcorns(0);
             userData.setFatigue(0);
             userData.setForestToken(token);
             userData.setForestNum(1);
@@ -283,23 +284,37 @@ public class GameServiceImpl implements GameService {
         return forestUsers;
     }
 
-//    /**
-//     * 특정 유저의 acorns 값을 조회
-//     *
-//     * @param roomId: 해당 방의 Id
-//     * @param userNum: 유저 번호 (1-6)
-//     * @return 유저의 acorns 값
-//     */
-//    public int getUserAcorns(int roomId, int userNum) {
-//        String roomKey = "ROOM:" + roomId;
-//        String userKey = roomKey + ":USER:" + userNum;
-//
-//        // 유저의 acorns 값 가져오기
-//        Object acornsObj = redisUtil.hget(userKey, "acorns");
-//
-//        // acorns 값을 정수로 변환하여 반환
-//        return (Integer) acornsObj;
-//    }
+    /**
+     * 결과 처리
+     *
+     * @param roomId: 해당 방의 Id
+     * @param nicknames: 유저 nickname리스트
+     * @return 유저의 acorns 값
+     */
+    public ResultResponse result(int roomId, List<String> nicknames) {
+        System.out.println("nicknames = " + nicknames);
+        String roomKey = "ROOM:" + roomId;
+        Map<String, Integer> resultsData = new HashMap<>();
+
+        for (String nickname: nicknames) {
+            String userKey = roomKey + ":USER:" + nickname;
+            Object isEvilSquirrelObj = redisUtil.hget(userKey, "isEvilSquirrel");
+            Object saveAcornsObj = redisUtil.hget(userKey, "saveAcorns");
+
+            boolean isEvilSquirrel = (boolean) isEvilSquirrelObj;
+            int saveAcorns = (Integer) saveAcornsObj;
+
+            if (isEvilSquirrel) {
+                resultsData.put(nickname, -1);
+            } else {
+                resultsData.put(nickname, saveAcorns);
+            }
+        }
+        ResultResponse response = new ResultResponse();
+        response.setResults(resultsData);
+
+        return response;
+    }
 
     /**
      * 특정 유저의 acorns값을 공용 저장소에 저장
@@ -316,6 +331,11 @@ public class GameServiceImpl implements GameService {
 
         // 유저의 현재 acorns 값 가져오기
         Integer currentAcorns = (Integer) redisUtil.hget(userKey, "acorns");
+
+        // 유저가 저장한 acorns 값 저장하기
+        Integer currentSaveAcorns = (Integer) redisUtil.hget(userKey, "saveAcorns") ;
+        int newSaveAcorns = currentSaveAcorns + currentAcorns;
+        redisUtil.hset(userKey, "saveAcorns", newSaveAcorns);
 
         // 유저의 acorns를 0으로 초기화
         redisUtil.hset(userKey, "acorns", 0);

@@ -21,7 +21,7 @@ export const GameProvider = ({ children }) => {
     timerRunning: false,    // 타이머 실행 상태
     evilSquirrel: null, // true | false
     forestToken: null,  // 숲 토큰
-    forestNum: 1, // 현재 숲 번호 (초기는 메인 숲숲)
+    forestNum: 1, // 현재 숲 번호 (초기는 메인 숲)
 
     // 게임 리소스
     totalAcorns: 0, // 저장된 도토리
@@ -190,6 +190,24 @@ export const GameProvider = ({ children }) => {
       console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
+
+  // 결과 조회 처리
+  const result = useCallback(async () => {
+    if (isConnected && roomId) {
+      try {
+        // ✅ 최신 nicknames 값을 받아오기
+        const updatedNicknames = await getPlayers();
+
+        // ✅ nickName 값만 추출하여 배열 형태로 변환
+        const nicknameList = updatedNicknames.map(player => player.nickName);
+        await gameService.result(roomId, nicknameList);
+      } catch (error) {
+        console.error('Failed to get user fatigue:', error);
+      }
+    } else {
+      console.error('WebSocket is not connected or required fields are empty');
+    }
+  }, [isConnected, roomId]);
 
   // 숲 이동 처리
   const moveForest = useCallback(async (forestNum) => {
@@ -376,6 +394,7 @@ export const GameProvider = ({ children }) => {
     startGame,        // 게임 시작
     chargeFatigue,       // 피로도 충전
     saveUserAcorns,       // 도토리 저장
+    result,           // 결과 조회
     moveForest,       // 숲 이동
     killUser,       // 플레이어 사망 처리// 긴급 투표 시작
     completeMission, // 미션 완료

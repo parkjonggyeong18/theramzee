@@ -23,6 +23,9 @@ public interface GameService {
     EmergencyResponse emergency(int roomId, List<String> nicknames, String voter) throws OpenViduJavaClientException, OpenViduHttpException;
 
     MoveForestResponse moveForest(int roomId, String nickname, int newForest, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException;
+
+    ResultResponse result(int roomId, List<String> nicknames);
+
     /**
      * 특정 유저의 도토리를 공용 저장소에 저장하고 초기화
      *

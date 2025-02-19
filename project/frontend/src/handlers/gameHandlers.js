@@ -140,6 +140,29 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     [setGameState, nickName, navigate, roomId]
   );
 
+    // 결과 조회 처리
+    const handleResultResponse = useCallback(
+      (message) => {
+        try {
+          if (message.success) {
+            const initializedData = message.data.results;
+            console.log("결과 조회 성공", initializedData)
+
+            setGameState((prev) => ({
+              ...prev,
+              results: initializedData
+            }));
+          } else {
+            console.error("Game initialization failed:", message.errorCode);
+          }
+        } catch (error) {
+          console.error("Error parsing game start response:", error);
+        }
+      },
+      [setGameState, nickName]
+  );
+  
+
   // 피로도 충전 응답 처리
   const handleChargeFatigueResponse = useCallback(
     (message) => {
@@ -278,7 +301,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               totalVote: initializedData.totalVote
             };
             
-            if (initializedData.totalVote === 6-updates.killedPlayers.length) {
+            if (initializedData.totalVote === 3) {
               const result = endVote(newVotedPlayers);
 
               if (result === null) return;
@@ -389,6 +412,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     handleGameStartResponse,
     handleMoveResponse,
     handleSaveAcornsResponse,
+    handleResultResponse,
     handleChargeFatigueResponse,
     handleKillResponse,
     handleCompleteMissionResponse,
