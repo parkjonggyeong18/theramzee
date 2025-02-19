@@ -49,7 +49,8 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
         currentVotes: {},
         forestNum: 1, // 모든 플레이어를 메인 숲으로 이동
         forestUsers: initializedData.forestUsers,
-        isPaused: true
+        isPaused: true,
+        hasUsedEmergency: true
       }));
       cancelAction();
       moveForest(1);

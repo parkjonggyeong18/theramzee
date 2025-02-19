@@ -41,7 +41,7 @@ public class GameApiController {
     @PostMapping("/game-emergency")
     @Operation(summary = "긴급 소집", description = "모든 유저 숲1로 이동 & 긴급 불가능으로 변경")
     public ResponseEntity<BaseResponse<EmergencyResponse>> emergency(@RequestBody GameEmergencyRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-        EmergencyResponse emergencyPossible = gameService.emergency(request.getRoomId(), request.getNicknames());
+        EmergencyResponse emergencyPossible = gameService.emergency(request.getRoomId(), request.getNicknames(),  request.getVoter());
         return ResponseEntity.ok(BaseResponse.success("긴급 소집 성공", emergencyPossible));
     }
 

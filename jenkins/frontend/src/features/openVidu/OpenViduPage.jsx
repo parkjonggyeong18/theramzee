@@ -1,10 +1,13 @@
-import React from 'react';
+import React , {useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import UserVideoComponent from './components/UserVideoComponent';
 import { useOpenVidu } from '../../contexts/OpenViduContext';
-
+import { useAuth } from '../../contexts/AuthContext'; 
+import { leaveRoom } from '../../api/room';
+import { connectSocket, disconnectSocket } from '../../api/stomp';
 const OpenViduPage = () => {
+   const { handleLogout } = useAuth();
   const {
     session,
     mainStreamManager,
@@ -14,6 +17,7 @@ const OpenViduPage = () => {
     joinSession,
     leaveSession,
     setIsPreview,
+    initPreview,
   } = useOpenVidu();
 
   const { roomId } = useParams();
@@ -30,6 +34,42 @@ const OpenViduPage = () => {
     setIsPreview(false);
     navigate(`/room/${roomId}/game`);
   };
+useEffect(() => {
+    
+
+    const handleBeforeUnload = () => { 
+      handleExit2();
+
+    };
+  
+    // 뒤로가기 처리
+    const handlePopState = () => {
+      handleExit();
+      navigate('/rooms');
+    };
+    
+    const handleExit2 = () => {
+      disconnectSocket();
+      leaveRoom(roomId);
+      leaveSession();
+      handleLogout();
+      initPreview();
+    }
+    // 공통 종료 처리 함수
+    const handleExit = () => {
+      disconnectSocket();
+      leaveRoom(roomId);
+      leaveSession();
+      initPreview();
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [roomId, navigate]);
 
   // 미리보기 화면
   if (isPreview) {

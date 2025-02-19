@@ -331,4 +331,31 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByNickname(nickname).orElseThrow(() -> new UserNotFoundException("User not found"));
         return user;
     }
+
+    @Override
+    @Transactional
+    public void updateUserStatusToOnline(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        user.setUserStatus(true); // Set status to online
+        userRepository.save(user);
+    }
+
+    @Override
+    public void notifyFriendsAboutStatusChange(String username, boolean isOnline) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        List<User> friends = friendsRepository.findFriendsByUser(user, FriendStatus.ACCEPTED);
+        String statusMessage = isOnline ? "온라인" : "오프라인";
+
+        List<FriendResponse> friendResponses = friends.stream()
+                .map(friend -> new FriendResponse(friend.getNickname(), statusMessage))
+                .collect(Collectors.toList());
+
+        for (User friend : friends) {
+            messagingTemplate.convertAndSend("/topic/friends/" + friend.getUsername(), friendResponses);
+        }
+    }
 }

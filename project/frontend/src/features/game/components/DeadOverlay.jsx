@@ -2,9 +2,13 @@ import { useEffect, useState } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { Z_INDEX } from '../../../constants/zIndex';
 import { animationImages } from '../../../assets/images';
+import { useGame } from '../../../contexts/GameContext';
 
 const DeadOverlay = ({ playerName }) => {
   const [showDeadScreen, setShowDeadScreen] = useState(false);
+  const { 
+    gameState
+  } = useGame();
 
   useEffect(() => {
     // Kill 애니메이션이 끝난 후(3초) DeadScreen 표시
@@ -27,7 +31,7 @@ const DeadOverlay = ({ playerName }) => {
           <SkullIcon>💀</SkullIcon>
           <DeadText>Knockdown</DeadText>
           <PlayerName>{playerName}</PlayerName>
-          <DeadMessage>나쁜 다람쥐에게 폭행당했습니다.</DeadMessage>
+          <DeadMessage>{gameState.killerNickname}에게 폭행당했습니다.</DeadMessage>
           <SpectatorMessage>눈 앞이 캄캄해집니다.</SpectatorMessage>
         </Content>
       )}

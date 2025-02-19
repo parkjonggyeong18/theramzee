@@ -38,4 +38,6 @@ public interface UserService {
     User getUserByUserName(String username);
 
     User getUserByUserNickname(String nickname);
+    void notifyFriendsAboutStatusChange(String username, boolean isOnline);
+    void updateUserStatusToOnline(String username);
 }
