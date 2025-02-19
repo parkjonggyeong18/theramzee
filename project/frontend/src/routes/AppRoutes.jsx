@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import {  Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LoginPage from '../features/auth/LoginPage';
 import UserPage from '../features/user/UserPage';
 import RoomPage from '../features/room/RoomPage';
@@ -15,12 +15,28 @@ import TimeForest from '../features/game/forests/TimeForest';
 import RegisterPage from '../features/auth/RegisterPage';
 import BackgroundMusic from '../features/audio/BackgroundMusic';
 import ForgotPassword from '../features/auth/components/ForgotPasswordForm';
-
-
+import { useAuth } from '../contexts/AuthContext';
+import {relog} from '../api/auth';
 const AppRoutes = () => {
+  const location = useLocation(); // 현재 경로를 가져오는 React Router 훅
+
+  useEffect(() => {
+    const callApiOnRouteChange = async () => {
+      // 로그인, 비밀번호 찾기, 회원가입 페이지에서는 세션 초기화
+      if (["/login", "/forgot-password", "/register"].includes(location.pathname)) {
+        sessionStorage.clear();
+      } else {
+          await relog();
+        
+      }
+    };
+
+    callApiOnRouteChange();
+  }, [location, relog]);
+
   return (
-    <BrowserRouter>
-       <BackgroundMusic />
+    <>
+      <BackgroundMusic />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
@@ -38,7 +54,7 @@ const AppRoutes = () => {
         <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
-    </BrowserRouter>
+      </>
   );
 };
 

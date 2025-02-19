@@ -11,9 +11,10 @@ import  FriendPage  from '../../features/friend/FriendPage';
 import  ProfilePage  from '../../features/profile/ProfilePage';
 import ChatPage from '../../features/chat/ChatPage';
 import { Menu } from 'lucide-react';
+import { Z_INDEX } from '../../constants/zIndex';
 
 const RoomPage = () => {
-  const { handleLogout } = useAuth();
+  const { handleLogout, handleLogout2 } = useAuth();
   const [rooms, setRooms] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -78,7 +79,7 @@ const RoomPage = () => {
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      handleLogout(); // 로그아웃 처리
+      handleLogout2();
     };
     const handlePopState = () => {
       handleLogout(); // 뒤로가기 시 로그아웃 실행
@@ -90,7 +91,7 @@ const RoomPage = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [handleLogout]);
+  }, [handleLogout, handleLogout2]);
 
   return (
     <PageContainer>

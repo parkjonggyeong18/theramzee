@@ -20,6 +20,10 @@ import hack from '../../../assets/images/object/HACK.png'
 import bri from '../../../assets/images/object/BRI.png'
 import line from '../../../assets/images/object/line.png'
 
+import { leaveRoom } from '../../../api/room';
+import { connectSocket, disconnectSocket } from '../../../api/stomp';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const TimeForest = () => {
   const { gameState, players, completeMission } = useGame();
@@ -30,9 +34,14 @@ const TimeForest = () => {
   
   const showDescriptionOverlay = () => setIsDescriptionVisible(true);
   const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
+  const navigate = useNavigate();
+  const { roomId } = useParams();
+  const { handleLogout, handleLogout2 } = useAuth();
     const {
       joinSession,
       subscribers,
+      leaveSession,
+      initPreview
     } = useOpenVidu();
    
     // 현재 사용자가 위치한 숲 번호 가져오기
@@ -85,6 +94,17 @@ const TimeForest = () => {
     }
   };
   useEffect(() => {
+    const handleBeforeUnload = () => { 
+          handleExit2();
+    
+        };
+            const handleExit2 = () => {
+              disconnectSocket();
+              leaveRoom(roomId);
+              leaveSession();
+              initPreview();
+              handleLogout2();
+            }
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
       document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;
@@ -92,10 +112,13 @@ const TimeForest = () => {
       document.body.style.cursor = 'auto';
     }
 
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
       document.body.style.cursor = 'auto';
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [gameState.isStarted, gameState.evilSquirrel]);
+  }, [gameState.isStarted, gameState.evilSquirrel,roomId, navigate]);
   const gameLayoutProps = {
     // 기본 레이아웃 요소
     leftVideoGrid: <VideoGrid players={leftFilterCam} totalSlots={3} gridPosition="left" />,

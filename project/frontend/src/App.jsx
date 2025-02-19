@@ -7,7 +7,7 @@ import AppRoutes from './routes/AppRoutes';
 import VolumeControl from './features/audio/VolumeControl';
 import { VolumeProvider } from './contexts/VolumeContext';
 import { FriendProvider } from './contexts/FriendContext';
-
+import { BrowserRouter} from 'react-router-dom';
 
 const App = () => (
   <>
@@ -19,7 +19,9 @@ const App = () => (
           <FriendProvider>
             <GameProvider>
               <OpenViduProvider>  {/* OpenViduProvider 추가 */}
-                <AppRoutes></AppRoutes>
+              <BrowserRouter>
+      <AppRoutes />
+    </BrowserRouter>
               </OpenViduProvider>
             </GameProvider>
           </FriendProvider>
