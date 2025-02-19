@@ -67,15 +67,18 @@ const RegisterForm = ({ onRegister, loading }) => {
       setErrors((prev) => ({ ...prev, email: '올바른 이메일을 입력해주세요' }));
       return;
     }
-    setIsEmailSent(true);
     try {
       await sendEmailVerification(formData.email);
-      
+      setIsEmailSent(true);
       setEmailTimer(180);
       setErrors((prev) => ({ ...prev, email: '' }));
     } catch (error) {
       setIsEmailSent(false);
-      setErrors((prev) => ({ ...prev, email: '인증번호 전송 실패: ' + error.message }));
+      if (error.response?.status === 400) {
+        setErrors((prev) => ({ ...prev, email: '이미 가입된 이메일입니다' }));
+      } else {
+        setErrors((prev) => ({ ...prev, email: '인증번호 전송 실패: ' + error.message }));
+      }
     }
   };
 
@@ -131,50 +134,114 @@ const RegisterForm = ({ onRegister, loading }) => {
 
   return (
     <FormContainer onSubmit={handleSubmit}>
-      <Title>회원가입</Title>
+  <Title>회원가입</Title>
 
-      {Object.values(errors).map((err, index) => (
-        <ErrorText key={index}>{err}</ErrorText>
-      ))}
+  {/* 아이디 입력 */}
+  <InputWrapper>
+    <Input
+      name="username"
+      placeholder="아이디"
+      value={formData.username}
+      onChange={handleInputChange}
+      hasError={!!errors.username} // 오류 여부 전달
+    />
+    {errors.username && <ErrorText>{errors.username}</ErrorText>}
+  </InputWrapper>
 
-      <Input name="username" placeholder="아이디" value={formData.username}
-        onChange={handleInputChange} />
-      
-      <Input name="password" type="password" placeholder="비밀번호" value={formData.password}
-        onChange={handleInputChange} />
+  {/* 비밀번호 입력 */}
+  <InputWrapper>
+    <Input
+      name="password"
+      type="password"
+      placeholder="비밀번호"
+      value={formData.password}
+      onChange={handleInputChange}
+      hasError={!!errors.password} // 오류 여부 전달
+    />
+    {errors.password && <ErrorText>{errors.password}</ErrorText>}
+  </InputWrapper>
 
-      <Input name="confirmPassword" type="password" placeholder="비밀번호 확인" value={formData.confirmPassword}
-        onChange={handleInputChange} />
+  {/* 비밀번호 확인 */}
+  <InputWrapper>
+    <Input
+      name="confirmPassword"
+      type="password"
+      placeholder="비밀번호 확인"
+      value={formData.confirmPassword}
+      onChange={handleInputChange}
+      hasError={!!errors.confirmPassword} // 오류 여부 전달
+    />
+    {errors.confirmPassword && <ErrorText>{errors.confirmPassword}</ErrorText>}
+  </InputWrapper>
 
-      <Input name="name" placeholder="이름" value={formData.name}
-        onChange={handleInputChange} />
+  {/* 이름 입력 */}
+  <InputWrapper>
+    <Input
+      name="name"
+      placeholder="이름"
+      value={formData.name}
+      onChange={handleInputChange}
+      hasError={!!errors.name} // 오류 여부 전달
+    />
+    {errors.name && <ErrorText>{errors.name}</ErrorText>}
+  </InputWrapper>
 
-      <Input name="nickname" placeholder="닉네임" value={formData.nickname}
-        onChange={handleInputChange} />
+  {/* 닉네임 입력 */}
+  <InputWrapper>
+    <Input
+      name="nickname"
+      placeholder="닉네임"
+      value={formData.nickname}
+      onChange={handleInputChange}
+      hasError={!!errors.nickname} // 오류 여부 전달
+    />
+    {errors.nickname && <ErrorText>{errors.nickname}</ErrorText>}
+  </InputWrapper>
 
+  {/* 이메일 입력 */}
+  <EmailContainer>
+    <Input
+      name="email"
+      type="email"
+      placeholder="이메일"
+      value={formData.email}
+      disabled={isEmailVerified}
+      onChange={handleInputChange}
+      hasError={!!errors.email} // 오류 여부 전달
+    />
+    <EmailButton type="button" onClick={handleEmailSend} disabled={isEmailVerified || isEmailSent}>
+      {isEmailSent ? '재전송' : '인증번호 전송'}
+    </EmailButton>
+  </EmailContainer>
+  {errors.email && <ErrorText>{errors.email}</ErrorText>}
+
+  {/* 이메일 인증번호 입력 */}
+  {isEmailSent && (
+    <>
       <EmailContainer>
-        <Input name="email" type="email" placeholder="이메일" value={formData.email} disabled={isEmailVerified}
-          onChange={handleInputChange} />
-        <EmailButton type="button" onClick={handleEmailSend} disabled={isEmailVerified || isEmailSent}>
-          {isEmailSent ? '재전송' : '인증번호 전송'}
+        <Input
+          name="emailCode"
+          placeholder="인증번호 입력"
+          value={formData.emailCode}
+          disabled={isEmailVerified}
+          onChange={handleInputChange}
+          hasError={!!errors.emailCode} // 오류 여부 전달
+        />
+        <EmailButton type="button" onClick={handleEmailVerify} disabled={isEmailVerified}>
+          확인
         </EmailButton>
+        {emailTimer > 0 && <Timer>{emailTimer}s</Timer>}
       </EmailContainer>
+      {errors.emailCode && <ErrorText>{errors.emailCode}</ErrorText>}
+    </>
+  )}
 
-      {isEmailSent && (
-        <EmailContainer>
-          <Input name="emailCode" placeholder="인증번호 입력" value={formData.emailCode} disabled={isEmailVerified}
-            onChange={handleInputChange} />
-          <EmailButton type="button" onClick={handleEmailVerify} disabled={isEmailVerified}>
-            확인
-          </EmailButton>
-          {emailTimer > 0 && <Timer>{emailTimer}s</Timer>}
-        </EmailContainer>
-      )}
-        <ButtonGroup>
-      <Button type="submit" disabled={loading}>{loading ? '가입 중...' : '가입하기'}</Button>
-      <LoginButton onClick={() => navigate('/')}>뒤로가기</LoginButton>
-      </ButtonGroup>
-    </FormContainer>
+  {/* 버튼 그룹 */}
+  <ButtonGroup>
+    <Button type="submit" disabled={loading}>{loading ? '가입 중...' : '가입하기'}</Button>
+    <LoginButton type="button" onClick={() => navigate('/')}>뒤로가기</LoginButton>
+  </ButtonGroup>
+</FormContainer>
   );
 };
 
@@ -193,27 +260,36 @@ const Title = styled.h2`
 `;
 
 const Input = styled.input`
-  width: 100%;
+  width: 94%; /* 모든 입력창의 너비를 100%로 통일 */
   padding: 0.75rem;
-  margin-bottom: 0.5rem;
-  border: none;
+  margin-bottom: ${(props) => (props.hasError ? '0.25rem' : '0.5rem')}; /* 에러 메시지 공간 확보 */
+  border: ${(props) => (props.hasError ? '2px solid red' : '1px solid #ccc')}; /* 에러 시 빨간 테두리 */
   border-radius: 5px;
   font-size: 1rem;
+
+  &:focus {
+    outline: none;
+    border-color: ${(props) => (props.hasError ? 'red' : '#90ee90')}; /* 포커스 시 색상 변경 */
+  }
 `;
 
 const EmailContainer = styled.div`
   display: flex;
   gap: 8px;
-  margin-bottom: 0.5rem;
+  align-items: center; /* 수직 중앙 정렬 */
 `;
 
 const EmailButton = styled.button`
   background-color: #90EE90;
   color: black;
-  padding: 0.5rem 1rem;
+  padding: 0.3rem 1rem ;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+
+  &:hover {
+    background-color: #98FB98;
+  }
 `;
 
 const Timer = styled.span`
@@ -234,16 +310,39 @@ const Button = styled.button`
 const ErrorText = styled.p`
   color: red;
   font-size: 0.8rem;
-  margin-bottom: 0.5rem;
+  margin-top: -0.25rem;
 `;
-const ButtonGroup=styled.div`display
+const ButtonGroup=styled.div`
+display
 :flex;
 justify-content:flex-end;
+  margin-top: 0.5rem;
 gap:.5rem;`;
-const LoginButton=styled.button`
-background:black;
-color:white;
-border-radius:.5rem;
-cursor:pointer;`;
 
+const LoginButton = styled.button`
+  background-color: #2d1810;
+  color: white;
+  padding: 0.5rem;
+  width: 100px; /* 버튼 너비 고정 */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-align: center; /* 텍스트 가운데 정렬 */
+  
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #3d2218;
+  }
+
+  &:active {
+    background-color: #1e0f08;
+  }
+`;
+
+
+const InputWrapper = styled.div`
+  margin-bottom: ${(props) => (props.hasError ? '1rem' : '0.5rem')};
+`;
 export default RegisterForm;

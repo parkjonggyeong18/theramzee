@@ -4,7 +4,7 @@ import { Z_INDEX } from '../../../../constants/zIndex';
 import { useGame } from '../../../../contexts/GameContext';
 import { sendVote } from '../../../../api/gameService';
 
-const EmergencyVoteModal = ({ isOpen, players, roomId }) => {
+const EmergencyVoteModal = ({ isOpen, players, roomId, timeLeft }) => {
   const { gameState } = useGame();
   const [isVoteCompleted, setIsVoteCompleted] = useState(false);
 
@@ -27,6 +27,7 @@ const EmergencyVoteModal = ({ isOpen, players, roomId }) => {
       <ModalContainer>
         <Header>
           <Title>{gameState.voter}의 긴급 투표</Title>
+          <Timer>{timeLeft}초</Timer>
         </Header>
 
         <AlertBox>
@@ -138,6 +139,56 @@ const VoteCount = styled.span`
   font-family: 'NeoDunggeunmoPro-Regular', sans-serif; 
   font-size: 0.9rem;
   color: #666;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+`;
+
+const BaseButton = styled.button`
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-family: 'NeoDunggeunmoPro-Regular', sans-serif; 
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`;
+
+const CancelButton = styled(BaseButton)`
+  background-color: #f0f0f0;
+  color: #666;
+
+  &:hover {
+    background-color: #e0e0e0;
+  }
+`;
+
+const VoteButton = styled(BaseButton)`
+  background-color: #4a90e2;
+  color: white;
+
+  &:hover:not(:disabled) {
+    background-color: #357abd;
+  }
+
+  &:disabled {
+    background-color: #cccccc;
+  }
+`;
+
+const Timer = styled.div`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e74c3c;
+  font-family: 'NeoDunggeunmoPro-Regular', sans-serif;
 `;
 
 export default EmergencyVoteModal;

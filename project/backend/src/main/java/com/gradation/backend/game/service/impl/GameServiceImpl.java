@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -165,6 +166,9 @@ public class GameServiceImpl implements GameService {
         Map<Integer, List<String>> forestUsers = getForestUserMap(roomId, nicknames);
         responseDto.setForestUsers(forestUsers);
 
+        Long serverTime = Instant.now().toEpochMilli();
+        responseDto.setServerTime(serverTime);
+
         return responseDto;
     }
 
@@ -221,6 +225,9 @@ public class GameServiceImpl implements GameService {
         Map<Integer, List<String>> forestUsers = getForestUserMap(roomId, nicknames);
         response.setForestUsers(forestUsers);
         response.setVoter(voter);
+
+        Long serverTime = Instant.now().toEpochMilli();
+        response.setServerTime(serverTime);
 
         return response;
     }
@@ -512,7 +519,9 @@ public class GameServiceImpl implements GameService {
         redisUtil.hset(userKey, "vote", voteNum);
         redisUtil.hset(forestKey, "totalVote", totalVote);
 
-        return new VoteResponse(nickname, voteNum, totalVote);
+        Long serverTime = Instant.now().toEpochMilli();
+
+        return new VoteResponse(nickname, voteNum, totalVote, serverTime);
     }
 
     public VoteResponse lastVote (int roomId, String nickname) {
@@ -529,7 +538,9 @@ public class GameServiceImpl implements GameService {
         redisUtil.hset(userKey, "lastVote", voteNum);
         redisUtil.hset(forestKey, "totalLastVote", totalVote);
 
-        return new VoteResponse(nickname, voteNum, totalVote);
+        Long serverTime = Instant.now().toEpochMilli();
+
+        return new VoteResponse(nickname, voteNum, totalVote, serverTime);
     }
 
 }

@@ -30,7 +30,12 @@ const GameOverScreen = () => {
 
     // 게임 진행 상태
     isStarted: false, // 게임 시작 여부
-    timer: 240, // 게임 시간 (7분)
+
+    //게임 시간
+    initServerTime: null, // 서버시간 (게임 시작 시간)
+    serverTime: null, // 서버 시간 (현재 시간)
+    timer: 240, // 게임 시간 (4분)
+    
     evilSquirrel: null, // true | false
     forestToken: null,  // 숲 토큰
     forestNum: 1, // 현재 숲 번호 (초기는 메인 숲숲)

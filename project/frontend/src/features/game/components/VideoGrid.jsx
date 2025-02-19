@@ -54,19 +54,14 @@ const VideoGrid = (props) => {
             const rawData = player.stream.connection.data.split("%/%")[0];
             const parsedData = JSON.parse(rawData);
             const subscriberNickname = parsedData.clientData;
-
             // 1) 숲에 포함되어 있는지 체크
             const isInForest = gameState.forestUsers?.[gameState.forestNum]?.includes(subscriberNickname);
 
             // 2) 죽은 사람인지 체크
             const isKilled = gameState.killedPlayers?.includes(subscriberNickname);
-
-            if (isInForest) {
-              if (isKilled){
-                player.subscribeToAudio(false);
-              } else{
-                player.subscribeToAudio(true);
-              }
+  
+            if (isInForest && !isKilled) {
+              player.subscribeToAudio(true);
             } else {
               player.subscribeToAudio(false);
             }

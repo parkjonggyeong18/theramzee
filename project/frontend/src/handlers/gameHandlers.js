@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
+import { subscribeToTopic } from '../api/stomp'
 
 export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, endVote) => {
   const nickName = sessionStorage.getItem('nickName');
@@ -10,6 +11,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     (message) => {
       try {
         if (message.success) {
+          subscribeToTopic(`/topic/server-time`, handleTimeSyncResponse);
           const initializedData = message.data;
           const userKey = `ROOM:${roomId}:USER:${nickName}`;
           const forestKey = `ROOM:${roomId}:FOREST:1`;
@@ -20,7 +22,9 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             evilSquirrel: initializedData.users[userKey].evilSquirrel,
             forestToken: initializedData.users[userKey].forestToken,
             forestUsers: initializedData.forestUsers,
-            evilSquirrelNickname: initializedData.forests[forestKey].evilSquirrelNickname
+            evilSquirrelNickname: initializedData.forests[forestKey].evilSquirrelNickname,
+            initServerTime: initializedData.serverTime,
+            serverTime: initializedData.serverTime,
           }));
         } else {
           console.error("Game initialization failed:", message.errorCode);
@@ -45,7 +49,9 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
         forestUsers: initializedData.forestUsers,
         isPaused: true,
         hasUsedEmergency: true,
-        voter: initializedData.voter
+        voter: initializedData.voter,
+        serverTime: initializedData.serverTime,
+        timer: 300 - Math.floor((initializedData.serverTime - prev.initServerTime)/1000),
       }));
       cancelAction();
       moveForest(1);
@@ -371,6 +377,9 @@ const handleMoveResponse = useCallback(
                 for (const player of newVotedPlayers) {
                   updates[player] = 0;
                 }
+              for (const player of newVotedPlayers) {
+                updates[player] = 0;
+              }
             }
             return updates;
           }); 
@@ -385,6 +394,37 @@ const handleMoveResponse = useCallback(
     [setGameState]
   );
 
+  // 서버시간 동기화
+  const handleTimeSyncResponse = useCallback(
+    (message) => {
+      try {
+      if (message) {
+        console.log("메시지 : ", message)
+        const initializedData = message['serverTime'];
+        console.log("서버 시간 응답:", initializedData);
+        
+        setGameState((prev) => {
+          
+          const totalGameTime = prev.hasUsedEmergency ? 300 : 240;
+          const now = initializedData;
+          // 기본 업데이트 객체
+          const updates = {
+            ...prev,
+            serverTime : now,
+            timer: totalGameTime - Math.floor((now - prev.initServerTime)/1000)
+          };
+          console.log("바뀐 시간: ", updates.timer);
+          return updates;
+        });
+        
+      }
+    } catch (error) {
+      console.error("Error parsing game start response:", error);
+    }
+  },
+  [setGameState]
+);
+
   return {
     handleGameStartResponse,
     handleMoveResponse,
@@ -396,6 +436,7 @@ const handleMoveResponse = useCallback(
     handleOutResponse,
     handleEmergencyResponse,
     handleVoteResponse,
-    handleLastVoteResponse
+    handleLastVoteResponse,
+    handleTimeSyncResponse
   };
 };
