@@ -90,10 +90,10 @@ const Content = styled.div`
   border-radius: 10px;
   text-align: left;
   position: relative;
-  width: 90%;
-  max-width: 600px;
+  width: 95%;
+  max-width: 650px;
   /* 화면이 작을 경우 스크롤이 생기도록 최대 높이와 오버플로우 지정 */
-  max-height: 80vh;
+  max-height: 90vh;
   overflow-y: auto;
 `;
 
