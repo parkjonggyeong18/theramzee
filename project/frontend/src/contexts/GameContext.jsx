@@ -229,12 +229,12 @@ export const GameProvider = ({ children }) => {
       try {
         const nicknameList = players.map(player => player.nickName);
         // gameService.startEmergency 대신 startEmergencyVote 사용
-        await gameService.startEmergencyVote(roomId, nicknameList);
+        await gameService.startEmergencyVote(roomId, nicknameList, nickname);
       } catch (error) {
         console.error('Failed to start emergency vote:', error);
       }
     }
-}, [isConnected, roomId, players]);
+}, [isConnected, roomId, players, nickname]);
 
   // 투표 기록
   const recordVote = useCallback((voter, votedPlayer) => {

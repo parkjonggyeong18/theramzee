@@ -199,7 +199,7 @@ public class GameServiceImpl implements GameService {
      * @param nicknames 모든 참가자의 닉네임
      * @return 모든 사용자의 닉네임과 새로운 토큰 값을 담은 EmergencyResponse 객체
      */
-    public EmergencyResponse emergency(int roomId, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException {
+    public EmergencyResponse emergency(int roomId, List<String> nicknames, String voter) throws OpenViduJavaClientException, OpenViduHttpException {
         String roomKey = "ROOM:" + roomId;
         String forestKey = roomKey + ":FOREST:1";
 
@@ -219,6 +219,7 @@ public class GameServiceImpl implements GameService {
 
         Map<Integer, List<String>> forestUsers = getForestUserMap(roomId, nicknames);
         response.setForestUsers(forestUsers);
+        response.setVoter(voter);
 
         return response;
     }

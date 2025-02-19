@@ -20,7 +20,7 @@ public interface GameService {
     RoomInitializationResponse initializeRoomStructure(int roomId, List<String> nicknames)
             throws OpenViduJavaClientException, OpenViduHttpException;
 
-    EmergencyResponse emergency(int roomId, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException;
+    EmergencyResponse emergency(int roomId, List<String> nicknames, String voter) throws OpenViduJavaClientException, OpenViduHttpException;
 
     MoveForestResponse moveForest(int roomId, String nickname, int newForest, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException;
     /**

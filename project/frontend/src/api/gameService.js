@@ -63,9 +63,9 @@ export const completeMission = async (roomId, forestNum, missionNum, nickname) =
   }
 };
 
-export const startEmergencyVote = async (roomId, nicknames) => {
+export const startEmergencyVote = async (roomId, nicknames, voter) => {
   try {
-    await sendMessage(`/app/game/${roomId}/emergency`, { roomId, nicknames });
+    await sendMessage(`/app/game/${roomId}/emergency`, { roomId, nicknames, voter });
   } catch (error) {
     console.error('Failed to start emergency vote:', error);
     throw error;

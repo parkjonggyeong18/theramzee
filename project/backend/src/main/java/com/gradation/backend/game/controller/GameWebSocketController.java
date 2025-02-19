@@ -56,7 +56,7 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/emergency")
     @SendTo("/topic/game/{roomId}/emergency")
     public BaseResponse<EmergencyResponse> handleGameEmergency(@Payload GameEmergencyRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-        EmergencyResponse userTokens = gameService.emergency(request.getRoomId(), request.getNicknames());
+        EmergencyResponse userTokens = gameService.emergency(request.getRoomId(), request.getNicknames(), request.getVoter());
         return BaseResponse.success("긴급 상황 처리", userTokens);
     }
 

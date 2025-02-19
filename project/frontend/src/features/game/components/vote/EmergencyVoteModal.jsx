@@ -25,7 +25,7 @@ const EmergencyVoteModal = ({ isOpen, players, roomId }) => {
     <Overlay>
       <ModalContainer>
         <Header>
-          <Title>긴급 투표</Title>
+          <Title>{gameState.voter}의 긴급 투표</Title>
         </Header>
 
         <AlertBox>
