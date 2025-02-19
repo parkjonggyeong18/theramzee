@@ -286,7 +286,7 @@ const EmailButton = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: -0.5rem;
+  margin-top: -0.6rem;
   &:hover {
     background-color: #98FB98;
   }
