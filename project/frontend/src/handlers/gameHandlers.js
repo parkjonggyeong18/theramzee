@@ -301,7 +301,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               totalVote: initializedData.totalVote
             };
             
-            if (initializedData.totalVote === 3) {
+            if (initializedData.totalVote === 6-updates.killedPlayers.length) {
               const result = endVote(newVotedPlayers);
 
               if (result === null) return;
