@@ -66,6 +66,12 @@ const ProfileSettings = () => {
       return;
     }
 
+    // 새 비밀번호가 비밀번호 양식과 일치하는지 확인인
+    if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(passwordForm.newPassword)) {
+      alert('비밀번호는 8자 이상, 숫자, 대소문자, 특수문자를 포함해야 합니다');
+      return;
+    }
+
     try {
       // 현재 비밀번호 검증을 위한 로그인 시도
       try {
