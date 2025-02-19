@@ -1,4 +1,3 @@
-// constants/zIndex.js
 export const Z_INDEX = {
   BACKGROUND: 0,
   MISSION_BUTTONS: 10,

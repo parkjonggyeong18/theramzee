@@ -10,11 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
-
-import java.util.Map;
 
 /**
  * 게임 관련 WebSocket 컨트롤러
@@ -25,17 +22,6 @@ import java.util.Map;
 public class GameWebSocketController {
 
     private final GameService gameService;
-
-    /**
-     * 게임 정보 요청 처리
-     * 클라이언트가 특정 방의 정보를 요청할 때 호출됩니다.
-     */
-    @MessageMapping("/game/{roomId}/info")
-    @SendToUser("/queue/game/{roomId}/info")
-    public BaseResponse<RoomInfoResponse> handleGameInfo(@Payload GameInfoRequest request, SimpMessageHeaderAccessor headerAccessor) {
-        RoomInfoResponse roomInfoData = gameService.getRoomInformation(request.getRoomId());
-        return BaseResponse.success("방 정보 조회 성공", roomInfoData);
-    }
 
     /**
      * 게임 시작 요청 처리
@@ -67,11 +53,6 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/move")
     @SendTo("/topic/game/{roomId}/move")
     public BaseResponse<MoveForestResponse> handleGameMove(@Payload GameMoveRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-        System.out.println("여기까지3");
-        System.out.println("request.getNickname() = " + request.getNickname());
-        System.out.println("request.getRoomId() = " + request.getRoomId());
-        System.out.println("request.getNewForest() = " + request.getNewForest());
-        System.out.println("request.getNicknames() = " + request.getNicknames());
         MoveForestResponse token = gameService.moveForest(request.getRoomId(), request.getNickname(), request.getNewForest(), request.getNicknames());
         return BaseResponse.success("사용자 이동", token);
     }
@@ -83,7 +64,6 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/acorns")
     @SendTo("/topic/game/{roomId}/acorns")
     public BaseResponse<ResultResponse> handleResult(@Payload ResultRequest request) {
-        System.out.println("플레이어: " + request.getNicknames());
         ResultResponse result = gameService.result(request.getRoomId(), request.getNicknames());
         return BaseResponse.success("결과 조회 성공", result);
     }
@@ -98,17 +78,6 @@ public class GameWebSocketController {
         SaveUserAcornsResponse result = gameService.saveUserAcorns(request.getRoomId(), request.getNickname());
         return BaseResponse.success("도토리 저장 성공", result);
     }
-
-//    /**
-//     * 사용자 피로도 조회
-//     * 특정 사용자의 피로도를 조회합니다.
-//     */
-//    @MessageMapping("/game/{roomId}/fatigue")
-//    @SendToUser("/queue/game/{roomId}/fatigue")
-//    public BaseResponse<Integer> handleGetUserFatigue(@Payload getUserFatigueRequest request, SimpMessageHeaderAccessor headerAccessor) {
-//        int fatigue = gameService.getUserFatigue(request.getRoomId(), request.getUserNum());
-//        return BaseResponse.success("피로도 조회 성공", fatigue);
-//    }
 
     /**
      * 피로도 충전 처리
@@ -131,17 +100,6 @@ public class GameWebSocketController {
         KillResponse result = gameService.Kill(request.getRoomId(), request.getVictimNickname(), request.getKillerNickname());
         return BaseResponse.success("사용자 제거", result);
     }
-
-//    /**
-//     * 미션 정보 조회
-//     * 특정 숲의 미션 상태를 조회합니다.
-//     */
-//    @MessageMapping("/game/{roomId}/mission")
-//    @SendToUser("/queue/game/{roomId}/mission")
-//    public BaseResponse<Map<String, Map<String, Object>>> handleGetMission(@Payload getMissionRequest request, SimpMessageHeaderAccessor headerAccessor) {
-//        Map<String, Map<String, Object>> missionData = gameService.getForestMissionStatus(request.getRoomId(), request.getForestNum());
-//        return BaseResponse.success("미션 조회 성공", missionData);
-//    }
 
     /**
      * 미션 완료 처리

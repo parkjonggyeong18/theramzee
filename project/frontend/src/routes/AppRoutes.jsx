@@ -15,7 +15,6 @@ import TimeForest from '../features/game/forests/TimeForest';
 import RegisterPage from '../features/auth/RegisterPage';
 import BackgroundMusic from '../features/audio/BackgroundMusic';
 import ForgotPassword from '../features/auth/components/ForgotPasswordForm';
-import { useAuth } from '../contexts/AuthContext';
 import {relog} from '../api/auth';
 const AppRoutes = () => {
   const location = useLocation(); // 현재 경로를 가져오는 React Router 훅

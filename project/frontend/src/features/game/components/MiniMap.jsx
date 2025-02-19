@@ -1,4 +1,3 @@
-// components/game/MiniMap.jsx
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
@@ -48,6 +47,7 @@ const MiniMap = () => {
    }
  ];
 
+ // 미니맵 속 특정 숲 클릭 
  const clkForest = (forestId, forestNum) => {
   if (!gameState.isStarted || gameState.isDead) return;
   if (!gameState.roomId) return;
@@ -56,6 +56,7 @@ const MiniMap = () => {
   navigate(`/game/${gameState.roomId}/forest/${forestId}`);
 };
 
+// 미니맵 속 메인 숲 클릭 
 const clkMainForest = () => {
   if (!gameState.isStarted || gameState.isDead) return;
   if (!gameState.roomId) return;

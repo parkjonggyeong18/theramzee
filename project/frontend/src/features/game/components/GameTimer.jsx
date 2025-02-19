@@ -7,7 +7,7 @@ import diaImage from'../../../assets/images/object/PAN.png'
 
 const GameTimer = () => {
   const { gameState, setGameState,cancelAction, moveForest } = useGame();
-  const INITIAL_TIME = 240; // 7분 = 420초
+  const INITIAL_TIME = 240; // 4분
   const { roomId } = useParams();
   const navigate = useNavigate();
 
@@ -41,13 +41,6 @@ const GameTimer = () => {
   
     return () => clearInterval(timerInterval);
   }, [gameState.isStarted, gameState.isPaused, gameState.timer]);
-  
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  };
 
   const getProgressBarColor = (timer) => {
     const percentage = (timer / INITIAL_TIME) * 100;
@@ -74,7 +67,7 @@ const GameTimer = () => {
 
   return (
     <TimerContainer $timer={gameState.timer}>
-      <TimeText>남은 시간</TimeText>
+      <TimeText>남은 시간 {gameState.timer}</TimeText>
       <ProgressBarContainer>
         <ProgressBar 
           $progress={(gameState.timer / INITIAL_TIME) * 100}
