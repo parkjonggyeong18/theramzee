@@ -1,4 +1,3 @@
-// pages/forests/TimeForest.jsx
 import { useState,useEffect } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
@@ -12,7 +11,6 @@ import MyVideo from '../components/MyVideo';
 import GameTimer from '../components/GameTimer';
 import StatePanel from '../components/StatePanel';
 import MiniMap from '../components/MiniMap';
-import MissionButton from '../components/MissionButton';
 import HackingGame from '../components/missions/HackingGame';
 import BrightnessGame from '../components/missions/BrightnessGame';
 import CircuitGame from '../components/missions/CircuitConnectionGame'
@@ -21,24 +19,22 @@ import bri from '../../../assets/images/object/BRI.png'
 import line from '../../../assets/images/object/line.png'
 
 import { leaveRoom } from '../../../api/room';
-import { connectSocket, disconnectSocket } from '../../../api/stomp';
+import { disconnectSocket } from '../../../api/stomp';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
 
 const TimeForest = () => {
-  const { gameState, players, completeMission } = useGame();
+  const { gameState, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [currentMission, setCurrentMission] = useState(null);
-  const [completedMissions, setCompletedMissions] = useState([]);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
   
   const showDescriptionOverlay = () => setIsDescriptionVisible(true);
   const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const { handleLogout, handleLogout2 } = useAuth();
+  const { handleLogout2 } = useAuth();
     const {
-      joinSession,
       subscribers,
       leaveSession,
       initPreview
@@ -46,7 +42,7 @@ const TimeForest = () => {
    
     // 현재 사용자가 위치한 숲 번호 가져오기
     const currentForestNum = gameState.forestNum;
-    const currentForestUser = gameState.forestUsers?.[currentForestNum]; // 배열열
+    const currentForestUser = gameState.forestUsers?.[currentForestNum]; // 배열
   
     const filteredSubscribers = subscribers.filter(sub => {
       try {
@@ -58,7 +54,6 @@ const TimeForest = () => {
           // 🔥 현재 숲에 속한 유저(`currentForestUser`)와 일치하는 경우만 필터링
           return currentForestUser.includes(subscriberNickname);
       } catch (error) {
-          console.error("🚨 OpenVidu 데이터 파싱 오류:", error);
           return false; // 파싱 실패한 경우 필터링에서 제외
       }
   });
@@ -72,6 +67,7 @@ const TimeForest = () => {
                       missionId === 'bright' ? 2 : 3;
     return gameState[`5_${missionNum}`][0]; // gameState에서 미션 완료 상태 확인
   };
+
   const handleMissionClick = (missionId) => {
     if (isMissionCompleted(missionId)) return;
     if (gameState.fatigue < 1) return;
@@ -79,7 +75,6 @@ const TimeForest = () => {
     setCurrentMission(missionId);
     setShowMiniGame(true);
   };
-
 
   const handleMissionComplete = async () => {
     try {
@@ -93,10 +88,10 @@ const TimeForest = () => {
       console.error('Failed to complete mission:', error);
     }
   };
+
   useEffect(() => {
     const handleBeforeUnload = () => { 
           handleExit2();
-    
         };
             const handleExit2 = () => {
               disconnectSocket();
@@ -119,6 +114,7 @@ const TimeForest = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [gameState.isStarted, gameState.evilSquirrel,roomId, navigate]);
+  
   const gameLayoutProps = {
     // 기본 레이아웃 요소
     leftVideoGrid: <VideoGrid players={leftFilterCam} totalSlots={3} gridPosition="left" />,

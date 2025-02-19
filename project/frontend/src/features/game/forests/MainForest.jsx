@@ -5,7 +5,6 @@ import { backgroundImages, characterImages } from '../../../assets/images';
 import GameLayout from '../components/common/GameLayout';
 import { useNavigate, useParams } from 'react-router-dom';
 import GameOverScreen from '../components/GameOverScreen';
-import { subscribeToTopic, unsubscribeTopic } from '../../../api/stomp';
 
 // components import
 import VideoGrid from '../components/VideoGrid';
@@ -17,19 +16,18 @@ import MiniMap from '../components/MiniMap';
 import EmergencyVoteModal from '../../game/components/vote/EmergencyVoteModal';
 import FinalVoteModal from '../../game/components/vote/FinalVoteModal';
 import { leaveRoom } from '../../../api/room';
-import { connectSocket, disconnectSocket } from '../../../api/stomp';
+import { disconnectSocket } from '../../../api/stomp';
 import { useAuth } from '../../../contexts/AuthContext';
 const MainForest = () => {
   const { 
     gameState, 
     players, 
-    setGameState 
   } = useGame();
 
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const { handleLogout, handleLogout2 } = useAuth();
+  const { handleLogout2 } = useAuth();
   const {
     subscribers,
     leaveSession,
@@ -47,7 +45,6 @@ const MainForest = () => {
       const subscriberNickname = subData.clientData;
       return currentForestUser?.includes(subscriberNickname);
     } catch (error) {
-      console.error("🚨 OpenVidu 데이터 파싱 오류:", error);
       return false;
     }
   });
@@ -59,7 +56,6 @@ const MainForest = () => {
   useEffect(() => {
     const handleBeforeUnload = () => { 
       handleExit2();
-
     };
         const handleExit2 = () => {
           disconnectSocket();
@@ -69,7 +65,7 @@ const MainForest = () => {
           handleLogout2();
         }
         
-        // 공통 종료 처리 함수
+    // 공통 종료 처리 함수
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
       document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;

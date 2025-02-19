@@ -1,8 +1,7 @@
-import { useCallback, useEffect } from "react";
-import { useNavigate, useParams } from 'react-router-dom';
-import { useGame } from '../contexts/GameContext';
+import { useCallback } from "react";
+import { useNavigate } from 'react-router-dom';
 
-export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, endVote, voteReset) => {
+export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, endVote) => {
   const nickName = sessionStorage.getItem('nickName');
   const navigate = useNavigate();
 
@@ -14,12 +13,10 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
           const initializedData = message.data;
           const userKey = `ROOM:${roomId}:USER:${nickName}`;
           const forestKey = `ROOM:${roomId}:FOREST:1`;
-          console.log("게임 초기화 성공:", initializedData);
 
           setGameState((prev) => ({
             ...prev,
             isStarted: true,
-            timerRunning: true,
             evilSquirrel: initializedData.users[userKey].evilSquirrel,
             forestToken: initializedData.users[userKey].forestToken,
             forestUsers: initializedData.forestUsers,
@@ -39,15 +36,12 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
   const handleEmergencyResponse = useCallback(
     (message) => {
     const initializedData = message.data;
-    console.log("긴급 요청 성공:", initializedData)
     if (message.success) {
       setGameState(prev => ({
         ...prev,
         isVoting: true,
         isEmergencyVote: true,
-        votingInProgress: true,
-        currentVotes: {},
-        forestNum: 1, // 모든 플레이어를 메인 숲으로 이동
+        forestNum: 1, 
         forestUsers: initializedData.forestUsers,
         isPaused: true,
         hasUsedEmergency: true,
@@ -61,34 +55,33 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
   [roomId]
 );
 
-  // 숲 이동 응답 처리
-  const handleMoveResponse = useCallback(
-    async (message) => {
-      try {
-        if (message.success) {
-          const initializedData = message.data;
+// 숲 이동 응답 처리
+const handleMoveResponse = useCallback(
+  async (message) => {
+    try {
+      if (message.success) {
+        const initializedData = message.data;
 
+        setGameState((prev) => ({
+          ...prev,
+          forestUsers: initializedData.forestUsers,
+        }));
+
+        if (message.data['nickname'] === nickName) {
           setGameState((prev) => ({
             ...prev,
-            forestUsers: initializedData.forestUsers,
+            forestToken: initializedData.forestToken,
+            forestNum: initializedData.forestNum,
           }));
-
-          if (message.data['nickname'] === nickName) {
-            console.log("숲 이동 성공:", initializedData.forestNum);
-            setGameState((prev) => ({
-              ...prev,
-              forestToken: initializedData.forestToken,
-              forestNum: initializedData.forestNum,
-            }));
-          }
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
-      } catch (error) {
-        console.error("Error parsing game start response:", error);
+      } else {
+        console.error("Game initialization failed:", message.errorCode);
       }
-    },
-    []
+    } catch (error) {
+      console.error("Error parsing game start response:", error);
+    }
+  },
+  []
   );
 
   // 도토리 저장 응답 처리
@@ -97,7 +90,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("도토리 저장 성공:", initializedData);
           
           // 도토리가 13개 이상이면 게임 종료
           if (initializedData.newTotalAcorns >= 13) {
@@ -109,7 +101,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               isGameOver: true,
               gameOverReason: 'acorns',
               winner: 'good',
-              timerRunning: false,
               isStarted: false
             }));setTimeout(() => {
               setGameState(prev => ({
@@ -118,7 +109,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               }));
             }, 500);
           } else {
-            // 게임 진행 중
             setGameState((prev) => ({
               ...prev,
               totalAcorns: initializedData.newTotalAcorns
@@ -140,36 +130,33 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     [setGameState, nickName, navigate, roomId]
   );
 
-    // 결과 조회 처리
-    const handleResultResponse = useCallback(
-      (message) => {
-        try {
-          if (message.success) {
-            const initializedData = message.data.results;
-            console.log("결과 조회 성공", initializedData)
+  // 결과 조회 처리
+  const handleResultResponse = useCallback(
+    (message) => {
+      try {
+        if (message.success) {
+          const initializedData = message.data.results;
 
-            setGameState((prev) => ({
-              ...prev,
-              results: initializedData
-            }));
-          } else {
-            console.error("Game initialization failed:", message.errorCode);
-          }
-        } catch (error) {
-          console.error("Error parsing game start response:", error);
+          setGameState((prev) => ({
+            ...prev,
+            results: initializedData
+          }));
+        } else {
+          console.error("Game initialization failed:", message.errorCode);
         }
-      },
-      [setGameState, nickName]
+      } catch (error) {
+        console.error("Error parsing game start response:", error);
+      }
+    },
+    [setGameState, nickName]
   );
   
-
   // 피로도 충전 응답 처리
   const handleChargeFatigueResponse = useCallback(
     (message) => {
       try {
         if (message.success && message.data['nickname'] === nickName) {
           const initializedData = message.data;
-          console.log("피로도 충전 성공", initializedData)
           setGameState((prev) => ({
             ...prev,
             fatigue: initializedData.userFatigue
@@ -182,7 +169,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
       }
     },
     [setGameState, nickName]
-);
+  );
 
   // 킬 응답 처리
   const handleKillResponse = useCallback(
@@ -190,7 +177,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("킬 성공:", initializedData);
           
           setGameState((prev) => {
             const newKilledPlayers = [...prev.killedPlayers, initializedData['victimNickname']];
@@ -216,7 +202,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               updates.isGameOver = true;
               updates.gameOverReason = 'kill';
               updates.winner = 'bad';
-              updates.timerRunning = false;
               updates.isStarted = false;
             }
   
@@ -236,7 +221,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("미션 완료 성공:", initializedData);
           
           // initializedData에서 미션 정보 추출
           const forestNum = initializedData.forestNum;
@@ -267,12 +251,11 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     [nickName, setGameState]
   );
 
+  // 퇴장 응답 처리 
   const handleOutResponse = useCallback(
     (message) => {
       try {
         if (message.status) {
-          const initializedData = message.data;
-          console.log("퇴장 성공:", initializedData);
           navigate("/rooms");
         } else {
           console.error("퇴장 실패:", message.errorCode);
@@ -284,12 +267,12 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     [setGameState]
   );
 
+  // 긴급 투표 처리 
   const handleVoteResponse = useCallback(
     (message) => {
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("투표 성공:", initializedData);
 
           setGameState((prev) => {
             const newVotedPlayers = [...prev.votedPlayers, initializedData.nickname];
@@ -301,18 +284,18 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               totalVote: initializedData.totalVote
             };
             
+            // 모든 유저 투표 완료 
             if (initializedData.totalVote === 6-updates.killedPlayers.length) {
               const result = endVote(newVotedPlayers);
-
+              
+              // 동표일 경우 
               if (result === null) return;
 
               // 나쁜 다람쥐 색출 유무
               if (result === updates.evilSquirrelNickname) {
-                  navigate(`/game/${roomId}/main`);
                   updates.isGameOver = true;
                   updates.winner = 'good';
                   updates.gameOverReason = 'emergency';
-                  updates.timerRunning = false;
                   updates.isStarted = false;
                 } 
 
@@ -320,7 +303,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               updates.killedPlayers = newKilledPlayers;
               updates.isVoting = false;
               updates.isEmergencyVote = false;
-              updates.votingInProgress = false;
               updates.totalVote = 0;
               updates.votedPlayers = [];
               updates.isPaused = false;
@@ -330,11 +312,9 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
 
               // 나쁜 다람쥐 승리 조건 체크 (4명 사망)
               if (newKilledPlayers.length >= 4) {
-                navigate(`/game/${roomId}/main`);
                 updates.isGameOver = true;
                 updates.gameOverReason = 'kill';
                 updates.winner = 'bad';
-                updates.timerRunning = false;
                 updates.isStarted = false;
               }
 
@@ -355,12 +335,12 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     [setGameState]
   );
 
+  // 최종 투표 처리 
   const handleLastVoteResponse = useCallback(
     (message) => {
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("투표 성공:", initializedData);
 
           setGameState((prev) => {
             const newVotedPlayers = [...prev.votedPlayers, initializedData.nickname];
@@ -372,23 +352,20 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               totalVote: initializedData.totalVote
             };
             
+            // 모든 유저 투표 완료 
             if (initializedData.totalVote === 6-updates.killedPlayers.length) {
               const result = endVote(newVotedPlayers);
 
               // 나쁜 다람쥐 색출 유무
               if (result === updates.evilSquirrelNickname) {
-                  navigate(`/game/${roomId}/main`);
                   updates.isGameOver = true;
                   updates.winner = 'good';
                   updates.gameOverReason = 'time';
-                  updates.timerRunning = false;
                   updates.isStarted = false;
                 } else {
-                navigate(`/game/${roomId}/main`);
                 updates.isGameOver = true;
                 updates.winner = 'bad';
                 updates.gameOverReason = 'time';
-                updates.timerRunning = false;
                 updates.isStarted = false;
                 }
                 for (const player of newVotedPlayers) {

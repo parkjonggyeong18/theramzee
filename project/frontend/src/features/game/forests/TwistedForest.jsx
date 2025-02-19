@@ -1,4 +1,3 @@
-// pages/forests/TwistedForest.jsx
 import { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
@@ -6,6 +5,7 @@ import { useOpenVidu } from '../../../contexts/OpenViduContext';
 import { backgroundImages, characterImages } from '../../../assets/images';
 import GameLayout from '../components/common/GameLayout';
 import { useNavigate, useParams } from 'react-router-dom';
+
 // components import
 import VideoGrid from '../components/VideoGrid';
 import MyVideo from '../components/MyVideo';
@@ -19,14 +19,13 @@ import snake from '../../../assets/images/object/snake.png';
 import mushroom from '../../../assets/images/object/mushroom.png';
 import tree from '../../../assets/images/object/tree.png';
 import { leaveRoom } from '../../../api/room';
-import { connectSocket, disconnectSocket } from '../../../api/stomp';
+import { disconnectSocket } from '../../../api/stomp';
 import { useAuth } from '../../../contexts/AuthContext';
 
 const TwistedForest = () => {
   const { gameState, players, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [currentMission, setCurrentMission] = useState(null);
-  const [completedMissions, setCompletedMissions] = useState([]);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
   
   const showDescriptionOverlay = () => setIsDescriptionVisible(true);
@@ -34,9 +33,8 @@ const TwistedForest = () => {
   
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const { handleLogout, handleLogout2 } = useAuth();
+  const { handleLogout2 } = useAuth();
   const {
-    joinSession,
     subscribers,
     leaveSession,
     initPreview
@@ -56,7 +54,6 @@ const TwistedForest = () => {
       // 🔥 현재 숲에 속한 유저(`currentForestUser`)와 일치하는 경우만 필터링
       return currentForestUser?.includes(subscriberNickname);
     } catch (error) {
-      console.error("🚨 OpenVidu 데이터 파싱 오류:", error);
       return false; // 파싱 실패한 경우 필터링에서 제외
     }
   });

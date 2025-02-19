@@ -10,6 +10,7 @@ const EmergencyVoteModal = ({ isOpen, players, roomId }) => {
 
   if (!isOpen) return null;
 
+  // 투표 
   const clkVote = (roomId, nickName) => {
     // 이미 투표가 완료된 경우 클릭 방지
     if (isVoteCompleted) return;
@@ -137,49 +138,6 @@ const VoteCount = styled.span`
   font-family: 'NeoDunggeunmoPro-Regular', sans-serif; 
   font-size: 0.9rem;
   color: #666;
-`;
-
-const ButtonGroup = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-`;
-
-const BaseButton = styled.button`
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-family: 'NeoDunggeunmoPro-Regular', sans-serif; 
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  border: none;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-`;
-
-const CancelButton = styled(BaseButton)`
-  background-color: #f0f0f0;
-  color: #666;
-
-  &:hover {
-    background-color: #e0e0e0;
-  }
-`;
-
-const VoteButton = styled(BaseButton)`
-  background-color: #4a90e2;
-  color: white;
-
-  &:hover:not(:disabled) {
-    background-color: #357abd;
-  }
-
-  &:disabled {
-    background-color: #cccccc;
-  }
 `;
 
 export default EmergencyVoteModal;

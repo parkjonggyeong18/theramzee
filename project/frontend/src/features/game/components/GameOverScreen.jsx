@@ -1,10 +1,7 @@
-// src/features/game/components/GameOverScreen.jsx
 import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGame } from '../../../contexts/GameContext';
-import { useOpenVidu } from '../../../contexts/OpenViduContext';
 import styled from 'styled-components';
-import { joinRoom } from '../../../api/room';
 import { disconnectSocket } from '../../../api/stomp';
 
 const GameOverScreen = () => {
@@ -26,7 +23,6 @@ const GameOverScreen = () => {
     setGameState((prev) => ({
       ...prev,
     // 유저 정보
-    userNum: null,
     nickName: null,
 
     // 숲 별 유저 정보
@@ -35,7 +31,6 @@ const GameOverScreen = () => {
     // 게임 진행 상태
     isStarted: false, // 게임 시작 여부
     timer: 240, // 게임 시간 (7분)
-    timerRunning: false,    // 타이머 실행 상태
     evilSquirrel: null, // true | false
     forestToken: null,  // 숲 토큰
     forestNum: 1, // 현재 숲 번호 (초기는 메인 숲숲)
@@ -48,8 +43,6 @@ const GameOverScreen = () => {
     // 투표 시스템
     isVoting: false,
     isEmergencyVote: false,
-    currentVotes: {},
-    votingInProgress: false, 
     totalVote: 0,
     votedPlayers: [],
     hasUsedEmergency: false,
@@ -61,19 +54,13 @@ const GameOverScreen = () => {
     killedPlayers: [], // 죽은 플레이어들의 ID 배열
     isSpectating: false, // 관전자 모드
     isDead: false, // 죽음 상태
-    killingAnimation: false, // 킬 애니메이션 재생 중 여부
 
-    // UI 상태
-    forceVideosOff: false,    // 안개 숲 캠 강제 OFF
-    foggyVoiceEffect: false,  // 안개 숲 음성 변조
-    miniMapEnabled: false,  // 미니맵 활성화 상태 (게임 시작 후 true)
     // 종료 상태
     isGameOver: false,           // 게임 종료 여부
     gameOverReason: null,        // 'acorns' | 'emergency' | 'time'
     winner: null,                // 'good' | 'bad'
-    lastKilledPlayer: null,      // 마지막으로 죽은 플레이어
-    //미션 상태
 
+    //미션 상태
     "2_1": [false, 1], // 2번 숲 1번 미션
     "2_2": [false, 2], // 2번 숲 2번 미션
     "2_3": [false, 3], // 2번 숲 3번 미션
@@ -94,32 +81,33 @@ const GameOverScreen = () => {
     "7_3": [false, 3], // 6번 숲 3번 미션
     }));
     setPlayers([]);
-    // const roomPassword = sessionStorage.getItem('roomPassword');
-    // const response = await joinRoom(roomId, roomPassword);
-    // const openViduToken = response.data.token;
-    // sessionStorage.setItem('openViduToken', openViduToken);
     navigate(`/room/${roomId}/game`);
   };
 
   const getMessage = () => {
+
+    // 도토리로 인한 종료 
     if (gameState.gameOverReason === 'acorns') {
       return gameState.goodSquirrel 
         ? "도토리를 모두 모으지 못했습니다!\n나쁜 다람쥐 승리!" 
         : "도토리를 모두 모았습니다!\n착한 다람쥐 승리!";
     }
   
+    // 긴급 투표로 인한 종료 
     if (gameState.gameOverReason === 'emergency') {
       return gameState.winner === "good"
         ? "나쁜 다람쥐를 찾아냈습니다!\n착한 다람쥐 승리!"
         : "착한 다람쥐를 죽였습니다!\n나쁜 다람쥐 승리!";
     }
   
+    // 최종 투표로 인한 종료 
     if (gameState.gameOverReason === 'time') {
       return gameState.winner === "good"
         ? "시간 종료! 나쁜 다람쥐를 찾아냈습니다!\n착한 다람쥐 승리!"
         : "시간 종료! 나쁜 다람쥐를 찾지 못했습니다!\n나쁜 다람쥐 승리!";
     }
   
+    // 킬로 인한 종료 
     if (gameState.gameOverReason === 'kill') {
       return "4명의 다람쥐를 처치했습니다!\n나쁜 다람쥐 승리!";
     }
