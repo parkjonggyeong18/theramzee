@@ -24,7 +24,10 @@ const AppRoutes = () => {
     const callApiOnRouteChange = async () => {
       // 로그인, 비밀번호 찾기, 회원가입 페이지에서는 세션 초기화
       if (["/login", "/forgot-password", "/register"].includes(location.pathname)) {
-        sessionStorage.clear();
+        sessionStorage.removeItem('accessToken');
+        sessionStorage.removeItem('username');
+        sessionStorage.removeItem('nickName');
+        sessionStorage.removeItem('isRefreshing');
       } else {
           await relog();
         

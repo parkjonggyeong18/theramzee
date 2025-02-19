@@ -20,7 +20,10 @@ export const AuthProvider = ({ children }) => {
       console.error('로그아웃 실패', error);
     }
     // 토큰 삭제 및 로그인 페이지로 리다이렉트
-    sessionStorage.clear();
+    sessionStorage.removeItem('accessToken');
+    sessionStorage.removeItem('username');
+    sessionStorage.removeItem('nickName');
+    sessionStorage.removeItem('isRefreshing');
     setAccessToken(null);
     window.location.href = '/login'; // ✅ useNavigate 대신 사용
   };
