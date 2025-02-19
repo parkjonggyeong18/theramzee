@@ -5,8 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class GameEmergencyRequest {
+public class ResultRequest {
     private int roomId;
     private List<String> nicknames;
-    private String voter;
 }

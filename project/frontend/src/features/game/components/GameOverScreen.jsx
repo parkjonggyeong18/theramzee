@@ -1,5 +1,5 @@
 // src/features/game/components/GameOverScreen.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useGame } from '../../../contexts/GameContext';
 import { useOpenVidu } from '../../../contexts/OpenViduContext';
@@ -11,10 +11,15 @@ const GameOverScreen = () => {
   const navigate = useNavigate();
   const { gameState, 
           setGameState,
-          setPlayers
+          setPlayers,
+          result,
         } 
         = useGame();
   const { roomId } = useParams();
+
+  useEffect(() => {
+    result();
+  }, []);
 
   const handleExit = async () => {
     await disconnectSocket();
@@ -126,6 +131,14 @@ const GameOverScreen = () => {
     <OverlayContainer>
       <ContentBox>
         <Title>게임 종료</Title>
+        <Message>모은 도토리 개수</Message>
+        <Message>
+        {gameState.results && Object.entries(gameState.results).map(([key, value]) => (
+          <div key={key}>
+            {key}는 {value === -1 ? "나쁜 다람쥐!!" : `도토리 ${value}개 저장`}
+          </div>
+        ))}
+        </Message>
         <Message>{getMessage()}</Message>
         <ExitButton onClick={handleExit}>
           로비로 돌아가기

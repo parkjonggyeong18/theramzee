@@ -50,7 +50,8 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
         forestNum: 1, // 모든 플레이어를 메인 숲으로 이동
         forestUsers: initializedData.forestUsers,
         isPaused: true,
-        hasUsedEmergency: true
+        hasUsedEmergency: true,
+        voter: initializedData.voter
       }));
       cancelAction();
       moveForest(1);
@@ -139,6 +140,29 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     [setGameState, nickName, navigate, roomId]
   );
 
+    // 결과 조회 처리
+    const handleResultResponse = useCallback(
+      (message) => {
+        try {
+          if (message.success) {
+            const initializedData = message.data.results;
+            console.log("결과 조회 성공", initializedData)
+
+            setGameState((prev) => ({
+              ...prev,
+              results: initializedData
+            }));
+          } else {
+            console.error("Game initialization failed:", message.errorCode);
+          }
+        } catch (error) {
+          console.error("Error parsing game start response:", error);
+        }
+      },
+      [setGameState, nickName]
+  );
+  
+
   // 피로도 충전 응답 처리
   const handleChargeFatigueResponse = useCallback(
     (message) => {
@@ -174,7 +198,8 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             // 기본 업데이트 객체
             const updates = {
               ...prev,
-              killedPlayers: newKilledPlayers
+              killedPlayers: newKilledPlayers,
+              killerNickname: initializedData['killerNickname']
             };
   
             // 킬러/희생자 관련 업데이트
@@ -387,6 +412,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     handleGameStartResponse,
     handleMoveResponse,
     handleSaveAcornsResponse,
+    handleResultResponse,
     handleChargeFatigueResponse,
     handleKillResponse,
     handleCompleteMissionResponse,

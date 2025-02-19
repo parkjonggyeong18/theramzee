@@ -36,6 +36,15 @@ export const saveUserAcorns = async (roomId, nickname) => {
   }
 };
 
+export const result = async (roomId, nicknames) => {
+  try {
+    await sendMessage(`/app/game/${roomId}/acorns`, { roomId, nicknames });
+  } catch (error) {
+    console.error('Failed to save user acorns:', error);
+    throw error;
+  }
+};
+
 export const chargeFatigue = async (roomId, nickname) => {
   try {
     await sendMessage(`/app/game/${roomId}/charge-fatigue`, { roomId, nickname });
@@ -63,9 +72,9 @@ export const completeMission = async (roomId, forestNum, missionNum, nickname) =
   }
 };
 
-export const startEmergencyVote = async (roomId, nicknames) => {
+export const startEmergencyVote = async (roomId, nicknames, voter) => {
   try {
-    await sendMessage(`/app/game/${roomId}/emergency`, { roomId, nicknames });
+    await sendMessage(`/app/game/${roomId}/emergency`, { roomId, nicknames, voter });
   } catch (error) {
     console.error('Failed to start emergency vote:', error);
     throw error;
