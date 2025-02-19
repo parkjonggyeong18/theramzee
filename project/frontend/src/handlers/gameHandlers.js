@@ -300,15 +300,14 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               votedPlayers: newVotedPlayers,
               totalVote: initializedData.totalVote
             };
-            
-            if (initializedData.totalVote === 6-updates.killedPlayers.length) {
+
+            if (initializedData.totalVote === 3) {
               const result = endVote(newVotedPlayers);
 
               if (result === null) return;
 
               // 나쁜 다람쥐 색출 유무
               if (result === updates.evilSquirrelNickname) {
-                  navigate(`/game/${roomId}/main`);
                   updates.isGameOver = true;
                   updates.winner = 'good';
                   updates.gameOverReason = 'emergency';
@@ -330,7 +329,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
 
               // 나쁜 다람쥐 승리 조건 체크 (4명 사망)
               if (newKilledPlayers.length >= 4) {
-                navigate(`/game/${roomId}/main`);
                 updates.isGameOver = true;
                 updates.gameOverReason = 'kill';
                 updates.winner = 'bad';

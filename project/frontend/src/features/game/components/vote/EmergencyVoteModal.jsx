@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Z_INDEX } from '../../../../constants/zIndex';
 import { useGame } from '../../../../contexts/GameContext';
 import { sendVote } from '../../../../api/gameService';
 
-const EmergencyVoteModal = ({ isOpen, players, roomId }) => {
+const EmergencyVoteModal = ({ isOpen, players, roomId, timeLeft }) => {
   const { gameState } = useGame();
   const [isVoteCompleted, setIsVoteCompleted] = useState(false);
 
@@ -26,6 +26,7 @@ const EmergencyVoteModal = ({ isOpen, players, roomId }) => {
       <ModalContainer>
         <Header>
           <Title>{gameState.voter}의 긴급 투표</Title>
+          <Timer>{timeLeft}초</Timer>
         </Header>
 
         <AlertBox>
@@ -180,6 +181,13 @@ const VoteButton = styled(BaseButton)`
   &:disabled {
     background-color: #cccccc;
   }
+`;
+
+const Timer = styled.div`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e74c3c;
+  font-family: 'NeoDunggeunmoPro-Regular', sans-serif;
 `;
 
 export default EmergencyVoteModal;
