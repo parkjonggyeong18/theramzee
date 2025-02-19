@@ -23,7 +23,8 @@ const MainForest = () => {
   const { 
     gameState, 
     players, 
-    setGameState 
+    setGameState,
+    endVote 
   } = useGame();
 
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
@@ -35,6 +36,139 @@ const MainForest = () => {
     leaveSession,
     initPreview
   } = useOpenVidu();
+
+  const [showEmergencyModal, setShowEmergencyModal] = useState(false);
+  const [showLastVoteModal, setShowLastVoteModal] = useState(false);
+  const nickName = sessionStorage.getItem('nickName');
+  const [timeLeft, setTimeLeft] = useState(60);
+  const [lastTimeLeft, setLastTimeLeft] = useState(60);
+
+  // 긴급 투표 모달 띄우기기
+  useEffect(() => {
+    if (gameState.isVoting && gameState.isEmergencyVote) {
+      setShowEmergencyModal(true);
+
+      const timer = setInterval(() => {
+        setTimeLeft((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timer);
+            handleEmergencyEnd();
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [gameState.isVoting, gameState.isEmergencyVote, gameState.votedPlayers, setGameState]);
+
+  // 최종 투표 모달 띄우기기
+  useEffect(() => {
+    if (gameState.isVoting && !gameState.isEmergencyVote) {
+      setShowLastVoteModal(true);
+
+      const timer = setInterval(() => {
+        setLastTimeLeft((prevTime) => {
+          if (prevTime <= 1) {
+            clearInterval(timer);
+            handleLastVoteEnd();
+            return 0;
+          }
+          return prevTime - 1;
+        });
+      }, 1000);
+
+      return () => clearInterval(timer);
+    }
+  }, [gameState.isVoting, gameState.isEmergencyVote, gameState.votedPlayers, setGameState]);
+
+  // 긴급 투표 처리리
+  const handleEmergencyEnd = () => {
+    const result = endVote(gameState.votedPlayers)
+    if (result === gameState.evilSquirrelNickname) {
+      setGameState(prev => ({
+        ...prev,
+        isGameOver: true,
+        winner: 'good',
+        gameOverReason: 'emergency',
+        timerRunning: false,
+        isStarted: false,
+      }));
+    }
+
+    setGameState((prev) => {
+      const newKilledPlayers = [...prev.killedPlayers, result];
+
+      const updates = {
+        ...prev,
+        killedPlayers: newKilledPlayers,
+        isVoting: false,
+        isEmergencyVote: false,
+        votingInProgress: false,
+        totalVote: 0,
+        votedPlayers: [],
+        isPaused: false,
+      };
+      for (const player of gameState.votedPlayers) {
+        updates[player] = 0;
+      }
+
+      // 나쁜 다람쥐 승리 조건 체크 (4명 사망)
+      if (newKilledPlayers.length >= 4) {
+        updates.isGameOver = true;
+        updates.gameOverReason = 'kill';
+        updates.winner = 'bad';
+        updates.timerRunning = false;
+        updates.isStarted = false;
+      }
+
+      if (result === nickName) {
+        updates.isDead = true;
+      }
+      return updates;
+    });
+
+    setShowEmergencyModal(false);
+  };
+
+  // 최종 투표 처리
+  const handleLastVoteEnd = () => {
+    const result = endVote(gameState.votedPlayers)
+    if (result === gameState.evilSquirrelNickname) {
+      setGameState((prev) => {
+        const updates = {
+          ...prev,
+          isGameOver: true,
+          winner: 'good',
+          gameOverReason: 'time',
+          timerRunning: false,
+          isStarted: false,
+        }
+        for (const player of gameState.votedPlayers) {
+          updates[player] = 0;
+        }
+        return updates;
+      })
+    } else{
+      setGameState((prev) => {
+        const updates = {
+          ...prev,
+          isGameOver: true,
+          winner: 'bad',
+          gameOverReason: 'time',
+          timerRunning: false,
+          isStarted: false,
+        }
+        for (const player of gameState.votedPlayers) {
+          updates[player] = 0;
+        }
+        return updates;
+      })
+    }
+
+    setShowLastVoteModal(false);
+  };
 
   // 현재 사용자가 위치한 숲 번호 가져오기
   const currentForestNum = gameState.forestNum;
@@ -112,18 +246,20 @@ const MainForest = () => {
       ) : (
         <>
           <GameLayout {...gameLayoutProps} />
-          {gameState.isVoting && gameState.isEmergencyVote && (
+          {gameState.isVoting && gameState.isEmergencyVote && showEmergencyModal && (
             <EmergencyVoteModal
               isOpen={gameState.isVoting && !gameState.isDead}
               players={players.filter(p => !gameState.killedPlayers.includes(p.nickName))}
               roomId={roomId}
+              timeLeft={timeLeft}
             />
           )}
-          {gameState.isVoting && !gameState.isEmergencyVote && (
+          {gameState.isVoting && !gameState.isEmergencyVote && showLastVoteModal && (
             <FinalVoteModal
               isOpen={gameState.isVoting && !gameState.isDead}
               players={players.filter(p => !gameState.killedPlayers.includes(p.nickName))}
               roomId={roomId}
+              lastTimeLeft={lastTimeLeft}
             />
           )}
         </>
