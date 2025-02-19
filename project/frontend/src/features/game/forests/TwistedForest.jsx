@@ -5,7 +5,7 @@ import { useGame } from '../../../contexts/GameContext';
 import { useOpenVidu } from '../../../contexts/OpenViduContext';
 import { backgroundImages, characterImages } from '../../../assets/images';
 import GameLayout from '../components/common/GameLayout';
-
+import { useNavigate, useParams } from 'react-router-dom';
 // components import
 import VideoGrid from '../components/VideoGrid';
 import MyVideo from '../components/MyVideo';
@@ -18,6 +18,9 @@ import MushiroomCollectionGame from '../components/missions/MushiroomCollectionG
 import snake from '../../../assets/images/object/snake.png';
 import mushroom from '../../../assets/images/object/mushroom.png';
 import tree from '../../../assets/images/object/tree.png';
+import { leaveRoom } from '../../../api/room';
+import { connectSocket, disconnectSocket } from '../../../api/stomp';
+import { useAuth } from '../../../contexts/AuthContext';
 
 const TwistedForest = () => {
   const { gameState, players, completeMission } = useGame();
@@ -29,9 +32,14 @@ const TwistedForest = () => {
   const showDescriptionOverlay = () => setIsDescriptionVisible(true);
   const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
   
+  const navigate = useNavigate();
+  const { roomId } = useParams();
+  const { handleLogout, handleLogout2 } = useAuth();
   const {
     joinSession,
     subscribers,
+    leaveSession,
+    initPreview
   } = useOpenVidu();
    
   // 현재 사용자가 위치한 숲 번호 가져오기
@@ -84,6 +92,18 @@ const TwistedForest = () => {
   };
 
   useEffect(() => {
+    const handleBeforeUnload = () => { 
+          handleExit2();
+    
+        };
+            const handleExit2 = () => {
+              disconnectSocket();
+              leaveRoom(roomId);
+              leaveSession();
+              initPreview();
+              handleLogout2();
+            }
+
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
       document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;
@@ -91,10 +111,12 @@ const TwistedForest = () => {
       document.body.style.cursor = 'auto';
     }
 
+    window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
       document.body.style.cursor = 'auto';
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [gameState.isStarted, gameState.evilSquirrel]);
+  }, [gameState.isStarted, gameState.evilSquirrel,roomId, navigate]);
 
   const gameLayoutProps = {
     // 기본 레이아웃 요소

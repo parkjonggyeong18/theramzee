@@ -20,7 +20,10 @@ import FireEscapeGame from '../components/missions/FireEscapeGame'
 import arrow from '../../../assets/images/object/arrow.png'
 import fire from '../../../assets/images/object/fire.png'
 import escape from '../../../assets/images/object/arcon.png'
-
+import { leaveRoom } from '../../../api/room';
+import { connectSocket, disconnectSocket } from '../../../api/stomp';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useNavigate, useParams } from 'react-router-dom';
 const DryForest = () => {
   const { gameState, players, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
@@ -32,9 +35,14 @@ const DryForest = () => {
   const showDescriptionOverlay = () => setIsDescriptionVisible(true);
   const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
 
+  const navigate = useNavigate();
+  const { roomId } = useParams();
+  const { handleLogout, handleLogout2 } = useAuth();
   const {
     joinSession,
     subscribers,
+    leaveSession,
+    initPreview
   } = useOpenVidu();
  
   // 현재 사용자가 위치한 숲 번호 가져오기
@@ -96,6 +104,17 @@ const rightFilterCam = filteredSubscribers.slice(3, 7);
     }
   };
   useEffect(() => {
+    const handleBeforeUnload = () => { 
+      handleExit2();
+
+    };
+        const handleExit2 = () => {
+          disconnectSocket();
+          leaveRoom(roomId);
+          leaveSession();
+          initPreview();
+          handleLogout2();
+        }
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
       document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;
@@ -103,10 +122,12 @@ const rightFilterCam = filteredSubscribers.slice(3, 7);
       document.body.style.cursor = 'auto';
     }
 
+    window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
       document.body.style.cursor = 'auto';
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [gameState.isStarted, gameState.evilSquirrel]);
+  }, [gameState.isStarted, gameState.evilSquirrel,roomId, navigate]);
   const gameLayoutProps = {
     // 기본 레이아웃 요소
     leftVideoGrid: <VideoGrid players={leftFilterCam} totalSlots={3} gridPosition="left" />,

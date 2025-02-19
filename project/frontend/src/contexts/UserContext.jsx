@@ -44,10 +44,13 @@ export const UserProvider = ({ children }) => {
         return;
       }
       // 그렇지 않다면 창을 닫는 것으로 판단하여 logout 호출
-      // await logout();
+      //await logout();
       // 로그아웃 후 인증 상태 초기화 및 로그인 페이지 리다이렉트
       setAccessToken(null);
-      sessionStorage.clear();
+      sessionStorage.removeItem('accessToken');
+      sessionStorage.removeItem('username');
+      sessionStorage.removeItem('nickName');
+      sessionStorage.removeItem('isRefreshing');
       // window.location.href = '/login';
     };
 

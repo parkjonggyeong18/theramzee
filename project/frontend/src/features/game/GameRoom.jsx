@@ -23,7 +23,7 @@ import MiniMap from './components/MiniMap';
 import { useAuth } from '../../contexts/AuthContext'; // 추가
 
 const GameRoom = () => {
-    const { handleLogout } = useAuth();
+    const { handleLogout, handleLogout2 } = useAuth();
   const navigate = useNavigate();
   const [showRoleReveal, setShowRoleReveal] = useState(false);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
@@ -61,7 +61,14 @@ const GameRoom = () => {
 
 
   useEffect(() => {
-    setIsDescriptionVisible(true);
+  const overlayKey = `overlay_${roomId}`;
+  const hasSeenOverlay = localStorage.getItem(overlayKey);
+
+  if (!hasSeenOverlay) {
+    setIsDescriptionVisible(true); // Show overlay
+    localStorage.setItem(overlayKey, "true"); // Mark as shown
+  }
+
     setRoomId(roomId);
     if (!roomId) {
       console.error("⚠️ roomId is missing.");
@@ -118,8 +125,8 @@ const GameRoom = () => {
       disconnectSocket();
       leaveRoom(roomId);
       leaveSession();
-      handleLogout();
       initPreview();
+      handleLogout2();
     }
     // 공통 종료 처리 함수
     const handleExit = () => {

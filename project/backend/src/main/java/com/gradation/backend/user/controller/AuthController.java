@@ -10,6 +10,7 @@ import com.gradation.backend.user.model.response.UserResponse;
 import com.gradation.backend.user.service.impl.CustomUserDetailsServiceImpl;
 import com.gradation.backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -126,5 +127,28 @@ public class AuthController {
         userService.logout(username);
         redisUtil.delete(username + ":refresh");
         return ResponseEntity.ok(BaseResponse.success("로그아웃이 성공적으로 처리되었습니다.", null));
+    }
+    @PostMapping("/relog")
+    @Operation(summary = "사용자 재로그인", description = "Access Token을 사용해 사용자의 상태를 온라인으로 변경하고 친구들에게 알립니다.")
+    public ResponseEntity<BaseResponse<String>> relog(@RequestHeader("Authorization") String token) {
+        if (token.startsWith("Bearer ")) {
+            token = token.substring(7); // Remove "Bearer " prefix
+        }
+
+        try {
+            // Extract username from token
+            String username = jwtTokenUtil.extractUsername(token);
+
+            // Update user status to online
+            userService.updateUserStatusToOnline(username);
+
+            // Notify friends about status change
+            userService.notifyFriendsAboutStatusChange(username, true);
+
+            return ResponseEntity.ok(BaseResponse.success("사용자의 상태가 온라인으로 변경되었습니다.", null));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(BaseResponse.error("토큰이 유효하지 않거나 사용자 상태를 업데이트할 수 없습니다."));
+        }
     }
 }

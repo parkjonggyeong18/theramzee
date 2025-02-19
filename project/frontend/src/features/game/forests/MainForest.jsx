@@ -16,8 +16,9 @@ import MainForestButtons from '../components/MainForestButtons';
 import MiniMap from '../components/MiniMap';
 import EmergencyVoteModal from '../../game/components/vote/EmergencyVoteModal';
 import FinalVoteModal from '../../game/components/vote/FinalVoteModal';
-
-
+import { leaveRoom } from '../../../api/room';
+import { connectSocket, disconnectSocket } from '../../../api/stomp';
+import { useAuth } from '../../../contexts/AuthContext';
 const MainForest = () => {
   const { 
     gameState, 
@@ -29,9 +30,11 @@ const MainForest = () => {
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
   const navigate = useNavigate();
   const { roomId } = useParams();
-
+  const { handleLogout, handleLogout2 } = useAuth();
   const {
     subscribers,
+    leaveSession,
+    initPreview
   } = useOpenVidu();
 
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
@@ -188,17 +191,31 @@ const MainForest = () => {
 
   // 커서 효과 설정
   useEffect(() => {
+    const handleBeforeUnload = () => { 
+      handleExit2();
+
+    };
+        const handleExit2 = () => {
+          disconnectSocket();
+          leaveRoom(roomId);
+          leaveSession();
+          initPreview();
+          handleLogout2();
+        }
+        
+        // 공통 종료 처리 함수
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
       document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;
     } else {
       document.body.style.cursor = 'auto';
     }
-
+    window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
       document.body.style.cursor = 'auto';
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [gameState.isStarted, gameState.evilSquirrel]);
+  }, [gameState.isStarted, gameState.evilSquirrel,roomId, navigate]);
 
   const handleExitGame = () => {
     navigate('/rooms');
@@ -219,6 +236,7 @@ const MainForest = () => {
     isDescriptionVisible,
     onShowDescription: () => setIsDescriptionVisible(true),
     onHideDescription: () => setIsDescriptionVisible(false),
+    
   };
 
   return (

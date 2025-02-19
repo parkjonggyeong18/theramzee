@@ -15,3 +15,6 @@ export const refreshToken = async () => {
 export const logout = async () => {
   return await apiRequest('/api/v1/auth/logout', 'POST');
 };
+export const relog = async () => {
+  return await apiRequest('/api/v1/auth/relog', 'POST');
+};

@@ -7,7 +7,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { leaveRoom } from '../../api/room';
 import { connectSocket, disconnectSocket } from '../../api/stomp';
 const OpenViduPage = () => {
-   const { handleLogout } = useAuth();
+   const { handleLogout, handleLogout2 } = useAuth();
   const {
     session,
     mainStreamManager,
@@ -23,6 +23,7 @@ const OpenViduPage = () => {
   const { roomId } = useParams();
   const navigate = useNavigate();
   const sessionId = `${roomId}-1`;
+  const username = sessionStorage.getItem('username') || 'Guest';
   const nickname = sessionStorage.getItem('nickName') || 'Guest';
   const token = sessionStorage.getItem('openViduToken');
 
@@ -37,25 +38,25 @@ const OpenViduPage = () => {
 useEffect(() => {
     
 
-    const handleBeforeUnload = () => { 
-      handleExit2();
+  const handleBeforeUnload = () => { 
+    handleExit2();
 
-    };
+  };
   
     // 뒤로가기 처리
     const handlePopState = () => {
       handleExit();
       navigate('/rooms');
     };
-    
+    // 종료 처리 함수
     const handleExit2 = () => {
       disconnectSocket();
       leaveRoom(roomId);
       leaveSession();
-      handleLogout();
       initPreview();
+      handleLogout2();
     }
-    // 공통 종료 처리 함수
+    // 뒤로가기 종료 처리 함수
     const handleExit = () => {
       disconnectSocket();
       leaveRoom(roomId);

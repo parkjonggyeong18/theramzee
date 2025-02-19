@@ -20,8 +20,10 @@ import ShadowEscapeGame from '../components/missions/ShadowEscapeGame';
 import door from '../../../assets/images/object/door.png'
 import arcondumy from '../../../assets/images/object/arcondumy.png'
 import rock from '../../../assets/images/object/rock.png'
-
-
+import { leaveRoom } from '../../../api/room';
+import { connectSocket, disconnectSocket } from '../../../api/stomp';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useNavigate, useParams } from 'react-router-dom';
 const FoggyForest = () => {
   const { gameState, players, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
@@ -33,10 +35,15 @@ const FoggyForest = () => {
   const showDescriptionOverlay = () => setIsDescriptionVisible(true);
   const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
   
-    const {
-      joinSession,
-      subscribers,
-    } = useOpenVidu();
+  const navigate = useNavigate();
+  const { roomId } = useParams();
+  const { handleLogout, handleLogout2 } = useAuth();
+  const {
+    joinSession,
+    subscribers,
+    leaveSession,
+    initPreview
+  } = useOpenVidu();
    
     // 현재 사용자가 위치한 숲 번호 가져오기
     const currentForestNum = gameState.forestNum;
@@ -44,6 +51,7 @@ const FoggyForest = () => {
 
       // 숲 이동 시 전환 애니메이션: forestNum 변경 시 1초 전환
     useEffect(() => {
+      
       setIsForestTransitioning(true);
       const timer = setTimeout(() => {
         setIsForestTransitioning(false);
@@ -86,6 +94,7 @@ const FoggyForest = () => {
 
 
   const handleMissionComplete = async () => {
+    
     try {
       const missionNum = currentMission === 'door' ? 1 : 
                         currentMission === 'shadow' ? 2 : 3;
@@ -98,6 +107,17 @@ const FoggyForest = () => {
     }
   };
   useEffect(() => {
+    const handleBeforeUnload = () => { 
+      handleExit2();
+
+    };
+        const handleExit2 = () => {
+          disconnectSocket();
+          leaveRoom(roomId);
+          leaveSession();
+          initPreview();
+          handleLogout2();
+        }
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
       document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;
@@ -105,10 +125,12 @@ const FoggyForest = () => {
       document.body.style.cursor = 'auto';
     }
 
+    window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
       document.body.style.cursor = 'auto';
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [gameState.isStarted, gameState.evilSquirrel]);
+  }, [gameState.isStarted, gameState.evilSquirrel,roomId, navigate]);
   const gameLayoutProps = {
     // 기본 레이아웃 요소
     leftVideoGrid: <VideoGrid players={leftFilterCam} totalSlots={3} gridPosition="left" />,
