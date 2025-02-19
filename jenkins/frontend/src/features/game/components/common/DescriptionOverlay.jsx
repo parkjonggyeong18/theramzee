@@ -20,7 +20,8 @@ const DescriptionOverlay = ({ isVisible, onClose }) => {
               <SectionTitle>착한 다람쥐</SectionTitle>
               <Description>
                 다람쥐들과 함께 숲속 모험을 떠나, 곳곳에 숨겨진 미니게임을 클리어하며 도토리를 모으세요!
-                <br />에너지를 모아 미니게임을 완료하고 창고에 도토리를 가득 채우면 승리합니다.
+                <br />에너지를 모아 미니게임을 완료하여 도토리를 모으세요.
+                <br />다람쥐들과 협력하여 창고에 도토리를 가득 채우면 승리합니다.
                 <br />의심되는 상대를 투표로 지목해 나쁜 다람쥐를 찾아내세요.
               </Description>
             </div>
@@ -33,7 +34,7 @@ const DescriptionOverlay = ({ isVisible, onClose }) => {
               <SectionTitle>나쁜 다람쥐</SectionTitle>
               <Description>
                 숲의 평화를 깨뜨리려는 나쁜 다람쥐!
-                <br />모든 에너지를 모아 캠 화면을 내려 착한 다람쥐를 쫓아내 승리를 노리세요.
+                <br />모든 에너지를 모아 캠 화면을 내려 착한 다람쥐를 쫓아내 승리하세요.
                 <br />미니게임을 방해하고, 투표에서 의심받지 않도록 주의하세요.
                 <br />두 번의 투표에서 생존하거나 착한 다람쥐를 모두 제거하면 승리합니다.
               </Description>
@@ -58,7 +59,7 @@ const DescriptionOverlay = ({ isVisible, onClose }) => {
             <div>
               <SectionTitle>미니게임</SectionTitle>
               <Description>
-                맵 곳곳에 숨겨진 미니게임은 도토리를 획득할 수 있는 기회를 제공합니다.
+                맵 곳곳에 숨겨진 미니게임은 도토리를 획득할 기회를 제공합니다.
                 <br />획득한 도토리를 창고에 채워 승리를 이끌어 주세요.
                 <br />미니 게임은 에너지를 1 소모합니다.
               </Description>
