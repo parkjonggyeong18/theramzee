@@ -56,7 +56,7 @@ public class GameWebSocketController {
     @MessageMapping("/game/{roomId}/emergency")
     @SendTo("/topic/game/{roomId}/emergency")
     public BaseResponse<EmergencyResponse> handleGameEmergency(@Payload GameEmergencyRequest request) throws OpenViduJavaClientException, OpenViduHttpException {
-        EmergencyResponse userTokens = gameService.emergency(request.getRoomId(), request.getNicknames());
+        EmergencyResponse userTokens = gameService.emergency(request.getRoomId(), request.getNicknames(), request.getVoter());
         return BaseResponse.success("긴급 상황 처리", userTokens);
     }
 
@@ -76,16 +76,17 @@ public class GameWebSocketController {
         return BaseResponse.success("사용자 이동", token);
     }
 
-//    /**
-//     * 사용자 도토리 조회
-//     * 특정 사용자의 도토리 수를 조회합니다.
-//     */
-//    @MessageMapping("/game/{roomId}/acorns")
-//    @SendToUser("/queue/game/{roomId}/acorns")
-//    public BaseResponse<Integer> handleGetUserAcorns(@Payload getUserAcornsRequest request, SimpMessageHeaderAccessor headerAccessor) {
-//        int acorns = gameService.getUserAcorns(request.getRoomId(), request.getUserNum());
-//        return BaseResponse.success("도토리 조회 성공", acorns);
-//    }
+    /**
+     * 사용자 도토리 조회
+     * 특정 사용자의 도토리 수를 조회합니다.
+     */
+    @MessageMapping("/game/{roomId}/acorns")
+    @SendTo("/topic/game/{roomId}/acorns")
+    public BaseResponse<ResultResponse> handleResult(@Payload ResultRequest request) {
+        System.out.println("플레이어: " + request.getNicknames());
+        ResultResponse result = gameService.result(request.getRoomId(), request.getNicknames());
+        return BaseResponse.success("결과 조회 성공", result);
+    }
 
     /**
      * 도토리 저장 처리
