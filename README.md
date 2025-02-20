@@ -58,14 +58,13 @@ PR가 merge되면 Jenkins을 통한 CI/CD가 시작됩니다. 이 파이프라�
 
 ### 개발환경
  - 개발도구: Intellij IDEA - Ultimate, VSCode
- - 언어: Java 17 LTS Temurin, JavaScript, CSS, html5
  - 빌드도구: Gradle
  - 데이터베이스
     - MySQL: 8.0.25
     - Redis : 7.2.1
  - ERD
     - ERDCloud
- - 프론트 개발 환경 및 언어
+ - 개발 환경 및 언어
     - 언어:
       - HTML
       - CSS
@@ -73,8 +72,8 @@ PR가 merge되면 Jenkins을 통한 CI/CD가 시작됩니다. 이 파이프라�
       - Java
     - 라이브러리 및 프레임워크:
       - react
-      - Spring Framework: 3.4.1
-      - Spring Boot: 3.4.1
+      - Spring Framework
+      - Spring Boot
         - Spring Data
         - Spring Data JPA
         - Spring Data Elasticsearch
