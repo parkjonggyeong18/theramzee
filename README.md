@@ -46,8 +46,9 @@
 ![image](https://github.com/user-attachments/assets/382a737b-e125-4fce-aa23-06f12e95ceba)
 <br>
 
-- FRONTEND : 
-- BACKEND :
+- FRONTEND : 클라이언트의 요청은 nginx를 통해서 들어오게 됩니다.  프론트엔드는 react로 구현되어 있으며, 사용자 인증 및 권한 관리를 위해 accessToken을 사용합니다.
+- BACKEND : 프론트앤드에서 요청한 요청을 바탕으로 MySQL, Redis에 대이터를 저장 추출해 프론트로 전달합니다. 보안을 위해 springsecurity를 이용하여 구현되었으며, jwt를 활용해 사용자의 인증 및 권한 부여를 담당합니다.
+- Redis : 게임 진행 정보, 방의 sessionId, 채팅기록든 빠른 요청과 휘발성 데이터들을 저장합니다.
 
 ### CI/CD
 - GitLab를 통해 코드베이스를 관리하며 변경 사항을 병합하기 위해 Pull Request를 생성하고 팀원들을 이를 검토하고 코드 리뷰를 진행합니다.
