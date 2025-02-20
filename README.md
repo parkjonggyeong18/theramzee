@@ -81,10 +81,9 @@ PR가 merge되면 Jenkins을 통한 CI/CD가 시작됩니다. 이 파이프라�
         - Spring Data Redis
         - Spring Security
         - JPA
- - NHN Cloud
+ - AWS
     - Instance
     - Secure Key Manager
-    - Object Storage
  - 형상관리 및 이슈관리
     - GitLab
     - Jira
