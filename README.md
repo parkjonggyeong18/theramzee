@@ -19,6 +19,14 @@
       <th align="center" width='14%'>팀원</th>
       <th align="center" width='14%'>팀원</th>
     </tr>
+    <tr>
+      <td align="center"><img width="100" alt="image" src="https://github.com/user-attachments/assets/4b295f2c-bc5d-4502-9403-42208371d7cc"></td>
+      <td align='center'><img width="100" alt="image" src="https://github.com/user-attachments/assets/e7c61dc8-be96-4b84-8959-4dd10b3c33e1"></td>
+      <td align='center'><img width="100" height="130" alt="image" src="https://github.com/user-attachments/assets/961882e6-ddd8-414a-8930-5cce1f476e0c"></td>
+      <td align='center'><img width="100" alt="image" src="https://github.com/user-attachments/assets/b2d853de-6247-4a5f-8488-91892a70e1cb"></td>
+      <td align='center'><img width="100" alt="image" src="https://github.com/user-attachments/assets/9bb6cedf-60a9-4d27-8697-c07e4de2d9f4"></td>
+      <td align='center'><img width="100" alt="image" src="https://github.com/user-attachments/assets/f85618d9-081f-415e-b6c3-d3085e039660"></td>
+    </tr>
     <tr width='100%'>
       <th align="center" width='14%'>김선진</th>
       <th align="center" width='14%'>신경원</th>
@@ -27,15 +35,6 @@
       <th align="center" width='14%'>박종경</th>
       <th align="center" width='14%'>이대현</th>
     </tr>
-         <tr>
-      <td align="center"><img width="100" alt="image" src="https://github.com/user-attachments/assets/4b295f2c-bc5d-4502-9403-42208371d7cc"></td>
-      <td align='center'><img width="100" alt="image" src="https://github.com/user-attachments/assets/e7c61dc8-be96-4b84-8959-4dd10b3c33e1"></td>
-      <td align='center'><img width="100" height="130" alt="image" src="https://github.com/user-attachments/assets/961882e6-ddd8-414a-8930-5cce1f476e0c"></td>
-      <td align='center'><img width="100" alt="image" src="https://github.com/user-attachments/assets/b2d853de-6247-4a5f-8488-91892a70e1cb"></td>
-      <td align='center'><img width="100" alt="image" src="https://github.com/user-attachments/assets/9bb6cedf-60a9-4d27-8697-c07e4de2d9f4"></td>
-      <td align='center'><img width="100" alt="image" src="https://github.com/user-attachments/assets/f85618d9-081f-415e-b6c3-d3085e039660"></td>
-    </tr>
-    
     <tr width='100%'>
       <th align="center" width='14%'>프론트앤드</th>
       <th align="center" width='14%'>프론트앤드, 디자인</th>
