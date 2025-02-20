@@ -193,12 +193,18 @@ const Title = styled.h2`
 `;
 
 const Input = styled.input`
-  width: 100%;
+  width:93.5%;
   padding: 0.75rem;
   margin-bottom: 0.5rem;
   border: none;
   border-radius: 5px;
   font-size: 1rem;
+  transition: transform 0.2s;
+
+  &:focus {
+    outline: none;
+    transform: scale(1.02);
+  }
 `;
 
 const EmailContainer = styled.div`
@@ -222,13 +228,18 @@ const Timer = styled.span`
 `;
 
 const Button = styled.button`
-  width: 100%;
+  width: 82%;
   background-color: #2d1810;
   color: white;
   padding: 0.75rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #3d2218;
+  }
 `;
 
 const ErrorText = styled.p`
@@ -236,14 +247,24 @@ const ErrorText = styled.p`
   font-size: 0.8rem;
   margin-bottom: 0.5rem;
 `;
-const ButtonGroup=styled.div`display
-:flex;
-justify-content:flex-end;
-gap:.5rem;`;
+
+const ButtonGroup=styled.div`
+  display: flex;
+  justify-content:space-between;
+  // gap:.5rem;
+`;
+
 const LoginButton=styled.button`
-background:black;
-color:white;
-border-radius:.5rem;
-cursor:pointer;`;
+  background-color: #2d1810;
+  color: white;
+  border-radius: 5px;
+  border: none;
+  cursor:pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #3d2218;
+  }
+`;
 
 export default RegisterForm;

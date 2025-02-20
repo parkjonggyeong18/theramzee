@@ -15,8 +15,8 @@ const LoginForm = ({ onLogin, loading }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
-      <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+      <Input type="text" placeholder="아이디" value={username} onChange={(e) => setUsername(e.target.value)} required />
+      <Input type="password" placeholder="비밀번호" value={password} onChange={(e) => setPassword(e.target.value)} required />
       <ButtonGroup>
         <LoginButton type="submit" disabled={loading}>{loading ? '로그인 중...' : '로그인'}</LoginButton>
         <ForgotButton type="button" onClick={() => navigate('/forgot-password')} disabled={loading}>아이디/ 비밀번호 찾기
@@ -82,7 +82,7 @@ const ForgotButton = styled.button`
 
 const RegisterButton = styled.button`
   width: 100%;
-   background-color: #2d1810;
+  background-color: #2d1810;
   border: none;
   color: white;
   padding: 0.5rem 1.5rem;
@@ -91,7 +91,7 @@ const RegisterButton = styled.button`
   transition: color 0.2s;
 
   &:hover {
-    color: #90EE90;
+    background-color: #3d2218;
   }
 `;
 
