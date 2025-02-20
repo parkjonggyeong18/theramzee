@@ -114,24 +114,9 @@ const MainForest = () => {
 
   // 긴급 투표 처리 함수  
   const handleEmergencyEnd = () => {
-    const result = endVote(gameState.votedPlayers);
-
-    if (result === null) return;
-
-    if (result === gameState.evilSquirrelNickname) {
-      setGameState(prev => ({
-        ...prev,
-        isGameOver: true,
-        winner: 'good',
-        gameOverReason: 'emergency',
-        isStarted: false,
-      }));
-    }
     setGameState(prev => {
-      const newKilledPlayers = [...prev.killedPlayers, result];
       const updates = {
         ...prev,
-        killedPlayers: newKilledPlayers,
         isVoting: false,
         isEmergencyVote: false,
         votingInProgress: false,
@@ -142,17 +127,40 @@ const MainForest = () => {
       for (const player of gameState.votedPlayers) {
         updates[player] = 0;
       }
-      if (updates.count - newKilledPlayers.length <= 2) {
-        updates.isGameOver = true;
-        updates.gameOverReason = 'kill';
-        updates.winner = 'bad';
-        updates.isStarted = false;
-      }
-      if (result === nickName) {
-        updates.isDead = true;
-      }
       return updates;
     });
+    const result = endVote(gameState.votedPlayers);
+
+    if (result != null) {
+      if (result === gameState.evilSquirrelNickname) {
+        setGameState(prev => ({
+          ...prev,
+          isGameOver: true,
+          winner: 'good',
+          gameOverReason: 'emergency',
+          isStarted: false,
+        }));
+      } else {
+        setGameState(prev => {
+          const newKilledPlayers = [...prev.killedPlayers, result];
+          const updates = {
+            ...prev,
+            killedPlayers: newKilledPlayers,
+          };
+
+          if (updates.count - newKilledPlayers.length <= 2) {
+            updates.isGameOver = true;
+            updates.gameOverReason = 'kill';
+            updates.winner = 'bad';
+            updates.isStarted = false;
+          }
+          if (result === nickName) {
+            updates.isDead = true;
+          }
+          return updates;
+        });
+      }
+    }
     setShowEmergencyModal(false);
   };
 

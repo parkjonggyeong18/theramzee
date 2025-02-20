@@ -224,7 +224,7 @@ export const GameProvider = ({ children }) => {
     // ✅ 동점자 체크 및 결과 할당
     const result = topVoted.length === 1 ? topVoted[0] : null;
 
-    if (result === null) return;
+    // if (result === null) return;
 
     return result;
   }, []);
