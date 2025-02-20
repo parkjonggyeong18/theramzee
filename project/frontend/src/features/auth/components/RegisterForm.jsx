@@ -63,6 +63,7 @@ const RegisterForm = ({ onRegister, loading }) => {
 
   // 이메일 인증번호 요청
   const handleEmailSend = async () => {
+    console.log(formData.emailCode)
     if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
       setErrors((prev) => ({ ...prev, email: '올바른 이메일을 입력해주세요' }));
       return;
@@ -84,6 +85,7 @@ const RegisterForm = ({ onRegister, loading }) => {
 
   // 이메일 인증 확인
   const handleEmailVerify = async () => {
+    console.log(formData.emailCode)
     if (!formData.emailCode.trim()) {
       setErrors((prev) => ({ ...prev, emailCode: '인증번호를 입력해주세요' }));
       return;
@@ -100,6 +102,7 @@ const RegisterForm = ({ onRegister, loading }) => {
 
   // 회원가입 요청
   const handleSubmit = async (e) => {
+    console.log(formData.emailCode)
     e.preventDefault();
 
     if (!validateForm()) return;
