@@ -61,7 +61,7 @@ const DescriptionOverlay = ({ isVisible, onClose }) => {
               <Description>
                 맵 곳곳에 숨겨진 미니게임은 도토리를 획득할 기회를 제공합니다.
                 <br />획득한 도토리를 창고에 채워 승리를 이끌어 주세요.
-                <br />미니 게임은 에너지를 1 소모합니다.
+                <br />미니게임은 에너지를 1 소모합니다.
               </Description>
             </div>
           </Section>

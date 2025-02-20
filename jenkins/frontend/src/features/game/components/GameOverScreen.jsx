@@ -95,27 +95,27 @@ const GameOverScreen = () => {
     // 도토리로 인한 종료 
     if (gameState.gameOverReason === 'acorns') {
       return gameState.goodSquirrel 
-        ? "도토리를 모두 모으지 못했습니다!\n나쁜 다람쥐 승리!" 
-        : "도토리를 모두 모았습니다!\n착한 다람쥐 승리!";
+        ? "도토리를 모두 모으지 못했습니다!\n나쁜 다람쥐 승리!\n"
+        : "도토리를 모두 모았습니다!\n착한 다람쥐 승리!\n";
     }
   
     // 긴급 투표로 인한 종료 
     if (gameState.gameOverReason === 'emergency') {
       return gameState.winner === "good"
-        ? "나쁜 다람쥐를 찾아냈습니다!\n착한 다람쥐 승리!"
-        : "착한 다람쥐를 죽였습니다!\n나쁜 다람쥐 승리!";
+        ? "나쁜 다람쥐를 찾아냈습니다!\n착한 다람쥐 승리!\n"
+        : "착한 다람쥐를 죽였습니다!\n나쁜 다람쥐 승리!\n";
     }
   
     // 최종 투표로 인한 종료 
     if (gameState.gameOverReason === 'time') {
       return gameState.winner === "good"
-        ? "시간 종료! 나쁜 다람쥐를 찾아냈습니다!\n착한 다람쥐 승리!"
-        : "시간 종료! 나쁜 다람쥐를 찾지 못했습니다!\n나쁜 다람쥐 승리!";
+        ? "시간 종료! 나쁜 다람쥐를 찾아냈습니다!\n착한 다람쥐 승리!\n"
+        : "시간 종료! 나쁜 다람쥐를 찾지 못했습니다!\n나쁜 다람쥐 승리!\n";
     }
   
     // 킬로 인한 종료 
     if (gameState.gameOverReason === 'kill') {
-      return "착한 다람쥐무리를 처치했습니다!\n나쁜 다람쥐 승리!";
+      return "착한 다람쥐무리를 처치했습니다!\n나쁜 다람쥐 승리!\n";
     }
   
     return "게임 종료!";
@@ -125,6 +125,7 @@ const GameOverScreen = () => {
     <OverlayContainer>
       <ContentBox>
         <Title>게임 종료</Title>
+        <Message>{getMessage()}</Message>
         <Message>모은 도토리 개수</Message>
         <Message>
         {gameState.results && Object.entries(gameState.results).map(([key, value]) => (
@@ -133,7 +134,6 @@ const GameOverScreen = () => {
           </div>
         ))}
         </Message>
-        <Message>{getMessage()}</Message>
         <ExitButton onClick={handleExit}>
           로비로 돌아가기
         </ExitButton>
