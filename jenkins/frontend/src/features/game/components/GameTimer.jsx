@@ -7,7 +7,7 @@ import diaImage from'../../../assets/images/object/PAN.png';
 
 const GameTimer = () => {
   const { gameState, setGameState, cancelAction, moveForest } = useGame();
-  const INITIAL_TIME = 240; // 4분
+  const INITIAL_TIME = 210; // 4분
   const { roomId } = useParams();
   const navigate = useNavigate();
 
@@ -87,6 +87,7 @@ const TimerContainer = styled.div`
   height: 100px; /* 크기 살짝 줄이기 */
   padding: 15px; /* 내부 패딩 조정 */
   position: relative;
+  z-index: 1001;
 `;
 
 const TimeText = styled.div`

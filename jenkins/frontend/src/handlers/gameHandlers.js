@@ -53,7 +53,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
         hasUsedEmergency: true,
         voter: initializedData.voter,
         serverTime: initializedData.serverTime,
-        timer: 300 - Math.floor((initializedData.serverTime - prev.initServerTime)/1000),
+        timer: 270 - Math.floor((initializedData.serverTime - prev.initServerTime)/1000),
       }));
       cancelAction();
       moveForest(1);
@@ -262,7 +262,6 @@ const handleMoveResponse = useCallback(
       try {
         if (message.success) {
           const initializedData = message.data;
-
           setGameState((prev) => {
             const newVotedPlayers = [...prev.votedPlayers, initializedData.nickname];
 

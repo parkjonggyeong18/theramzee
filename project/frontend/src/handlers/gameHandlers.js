@@ -19,7 +19,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
           const initializedData = message.data;
           const userKey = `ROOM:${roomId}:USER:${nickName}`;
           const forestKey = `ROOM:${roomId}:FOREST:1`;
-          console.log("초기화: ", initializedData);
 
           setGameState((prev) => ({
             ...prev,
@@ -43,7 +42,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
   const handleEmergencyResponse = useCallback(
     (message) => {
     const initializedData = message.data;
-    console.log("시발승윤", initializedData)
     if (message.success) {
       setGameState(prev => ({
         ...prev,
@@ -55,7 +53,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
         hasUsedEmergency: true,
         voter: initializedData.voter,
         serverTime: initializedData.serverTime,
-        timer: 300 - Math.floor((initializedData.serverTime - prev.initServerTime)/1000),
+        timer: 270 - Math.floor((initializedData.serverTime - prev.initServerTime)/1000),
       }));
       cancelAction();
       moveForest(1);
@@ -175,7 +173,6 @@ const handleMoveResponse = useCallback(
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("시발승윤2", initializedData)
           
           setGameState((prev) => {
             const newKilledPlayers = [...prev.killedPlayers, initializedData['victimNickname']];
@@ -265,7 +262,6 @@ const handleMoveResponse = useCallback(
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("handleVoteResponse", initializedData);
           setGameState((prev) => {
             const newVotedPlayers = [...prev.votedPlayers, initializedData.nickname];
 
@@ -351,14 +347,17 @@ const handleMoveResponse = useCallback(
                   updates.winner = 'good';
                   updates.gameOverReason = 'time';
                   updates.isStarted = false;
+                  for (const player of newVotedPlayers) {
+                    updates[player] = 0;
+                  }
                 } else {
                 updates.isGameOver = true;
                 updates.winner = 'bad';
                 updates.gameOverReason = 'time';
                 updates.isStarted = false;
-                }
                 for (const player of newVotedPlayers) {
                   updates[player] = 0;
+                }
                 }
             }
             return updates;
