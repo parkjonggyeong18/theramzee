@@ -121,7 +121,7 @@ gateway-6DB33F?style=for-the-badge&logo=spring&logoColor=white"> <img src="https
 <br>
 
 ### ERD
-![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/fc93c9c3-4f86-46c4-84d3-dd7a2e4203c6/de940088-56bd-4f14-94d0-66055bd809da/image.png)
+![image](https://github.com/user-attachments/assets/4ecf95f6-741a-4f9f-9dda-3af8736f1e51)
 <br>
 
 ### 스크럼
