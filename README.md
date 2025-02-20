@@ -43,7 +43,7 @@
 
 ### 프로젝트 아키텍쳐
 
- ![image](https://github.com/user-attachments/assets/382a737b-e125-4fce-aa23-06f12e95ceba)
+![image](https://github.com/user-attachments/assets/382a737b-e125-4fce-aa23-06f12e95ceba)
 <br>
 
 - FRONTEND : 
@@ -53,7 +53,6 @@
 - GitLab를 통해 코드베이스를 관리하며 변경 사항을 병합하기 위해 Pull Request를 생성하고 팀원들을 이를 검토하고 코드 리뷰를 진행합니다.
 PR가 merge되면 Jenkins을 통한 CI/CD가 시작됩니다. 이 파이프라인은 빌드를 자동으로 시작하고 빌드된 코드가 자동으로 배포가 진행됩니다.
 - 또한, AWS의 Secure Key Manager를 사용하여 DB 정보를 비롯한 암호화가 필요한 중요한 데이터들을 안전하게 관리하고 환경변수를 통해 접근합니다.
-<img width="5636" alt="Project  T3Team_bookstore_wireframe (1)" src="">
 <br>
 
 ### 개발환경
@@ -122,13 +121,11 @@ gateway-6DB33F?style=for-the-badge&logo=spring&logoColor=white"> <img src="https
 <br>
 
 ### ERD
-![image]()
+![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/fc93c9c3-4f86-46c4-84d3-dd7a2e4203c6/de940088-56bd-4f14-94d0-66055bd809da/image.png)
 <br>
 
 ### 스크럼
 개발 기간 동안 총 20번이 넘는 스크럼이 진행되었고, 스크럼에서는 팀원들이 각자의 진행 상황을 공유하고 발생한 이슈들을 함께 논의하여 프로젝트를 원활하게 진행할 수 있었습니다.
-
-<img width="492" alt=" ">
 <br>
 
 ### 구성원 별 담당 내용
