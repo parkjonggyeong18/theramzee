@@ -113,7 +113,6 @@ public class GameServiceImpl implements GameService {
             try {
                 map.put(field.getName(), field.get(dto));
             } catch (IllegalAccessException e) {
-                System.out.println("변환 불가");
             }
         }
         return map;

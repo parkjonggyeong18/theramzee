@@ -68,8 +68,8 @@ const RegisterForm = ({ onRegister, loading }) => {
       return;
     }
     try {
-      await sendEmailVerification(formData.email);
       setIsEmailSent(true);
+      await sendEmailVerification(formData.email);
       setEmailTimer(180);
       setErrors((prev) => ({ ...prev, email: '' }));
     } catch (error) {
@@ -242,7 +242,7 @@ const Title = styled.h2`
 `;
 
 const Input = styled.input`
-  width: 94%; /* 모든 입력창의 너비를 100%로 통일 */
+  width:93.5%;
   padding: 0.75rem;
   margin-bottom: ${(props) => (props.hasError ? '0.25rem' : '0.5rem')}; /* 에러 메시지 공간 확보 */
   border: ${(props) => (props.hasError ? '2px solid red' : '1px solid #ccc')}; /* 에러 시 빨간 테두리 */
@@ -268,7 +268,7 @@ const EmailButton = styled.button`
   border: none;
   border-radius: 5px;
   cursor: pointer;
-
+  margin-top: -0.6rem;
   &:hover {
     background-color: #98FB98;
   }
@@ -280,13 +280,18 @@ const Timer = styled.span`
 `;
 
 const Button = styled.button`
-  width: 100%;
+  width: 82%;
   background-color: #2d1810;
   color: white;
   padding: 0.75rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #3d2218;
+  }
 `;
 
 const ErrorText = styled.p`
