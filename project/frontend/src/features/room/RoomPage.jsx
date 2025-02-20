@@ -153,10 +153,10 @@ const RoomPage = () => {
   );
 };
 const RefreshIcon = styled.svg`
-  width: 36px;
+  width: 100px;
   height: 36px;
   cursor: pointer;
-  fill: lightgreen;
+  fill: white;
   transition: transform 0.2s ease-in-out;
 
   &:hover {
