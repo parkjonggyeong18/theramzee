@@ -19,6 +19,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
           const initializedData = message.data;
           const userKey = `ROOM:${roomId}:USER:${nickName}`;
           const forestKey = `ROOM:${roomId}:FOREST:1`;
+          console.log("초기화: ", initializedData);
 
           setGameState((prev) => ({
             ...prev,
@@ -42,6 +43,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
   const handleEmergencyResponse = useCallback(
     (message) => {
     const initializedData = message.data;
+    console.log("시발승윤", initializedData)
     if (message.success) {
       setGameState(prev => ({
         ...prev,
@@ -173,6 +175,7 @@ const handleMoveResponse = useCallback(
       try {
         if (message.success) {
           const initializedData = message.data;
+          console.log("시발승윤2", initializedData)
           
           setGameState((prev) => {
             const newKilledPlayers = [...prev.killedPlayers, initializedData['victimNickname']];
@@ -262,7 +265,7 @@ const handleMoveResponse = useCallback(
       try {
         if (message.success) {
           const initializedData = message.data;
-
+          console.log("handleVoteResponse", initializedData);
           setGameState((prev) => {
             const newVotedPlayers = [...prev.votedPlayers, initializedData.nickname];
 
