@@ -19,12 +19,13 @@ import { leaveRoom } from '../../../api/room';
 import { disconnectSocket } from '../../../api/stomp';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useNavigate, useParams } from 'react-router-dom';
+
+
 const BreathingForest = () => {
   const { gameState, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [currentMission, setCurrentMission] = useState(null);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
-  const [isForestTransitioning, setIsForestTransitioning] = useState(false);
   
   const showDescriptionOverlay = () => setIsDescriptionVisible(true);
   const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
@@ -38,15 +39,6 @@ const BreathingForest = () => {
   
   const currentForestNum = gameState.forestNum;
   const currentForestUser = gameState.forestUsers?.[currentForestNum];
-
-  // 숲 이동 시 전환 애니메이션: forestNum 변경 시 1초 전환
-  useEffect(() => {
-    setIsForestTransitioning(true);
-    const timer = setTimeout(() => {
-      setIsForestTransitioning(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [currentForestNum]);
   
   const filteredSubscribers = subscribers.filter(sub => {
     try {
@@ -165,26 +157,8 @@ const BreathingForest = () => {
     onHideDescription: hideDescriptionOverlay,
   };
 
-  return (
-    <>
-      <GameLayout {...gameLayoutProps}>
-        {isForestTransitioning && <TransitionOverlay />}
-      </GameLayout>
-      {/* RoleReveal 등의 추가 컴포넌트가 있을 수 있음 */}
-    </>
-  );
+  return <GameLayout {...gameLayoutProps} />;
 };
-
-const TransitionOverlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: url('/path/to/transition.gif') center center no-repeat;
-  background-size: cover;
-  z-index: 9999;
-`;
 
 const MissionButtons = styled.div`
   display: flex;

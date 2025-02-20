@@ -114,7 +114,7 @@ const RoomCard = styled.div`
   flex-direction: column;
   gap: 1.5rem;
   transition: transform 0.2s;
-  margin-bottom: 100px;
+  // margin-bottom: 100px;
   &:hover {
     transform: translateY(-5px);
   }

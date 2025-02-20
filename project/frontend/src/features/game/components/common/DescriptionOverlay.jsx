@@ -15,7 +15,7 @@ const DescriptionOverlay = ({ isVisible, onClose }) => {
 
           {/* 착한 다람쥐 */}
           <Section>
-            <Image src="/cursors/good-squirrel.png" alt="착한 다람쥐" />
+            <Image src="/cursors/good-squirrel.gif" alt="착한 다람쥐" />
             <div>
               <SectionTitle>착한 다람쥐</SectionTitle>
               <Description>
@@ -29,7 +29,7 @@ const DescriptionOverlay = ({ isVisible, onClose }) => {
 
           {/* 나쁜 다람쥐 */}
           <Section>
-            <Image src="/cursors/evil-squirrel.png" alt="나쁜 다람쥐" />
+            <Image src="/cursors/evil-squirrel.gif" alt="나쁜 다람쥐" />
             <div>
               <SectionTitle>나쁜 다람쥐</SectionTitle>
               <Description>

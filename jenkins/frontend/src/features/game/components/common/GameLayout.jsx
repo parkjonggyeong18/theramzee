@@ -143,6 +143,7 @@ const RightVideoGridArea = styled.div`
 
 const StatePanelArea = styled.div`
   flex: 1;
+  z-index: 1001;
 `;
 
 const ButtonContainerArea = styled.div`
