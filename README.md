@@ -58,7 +58,7 @@ PR가 merge되면 Jenkins을 통한 CI/CD가 시작됩니다. 이 파이프라�
 
 ### 개발환경
  - 개발도구: Intellij IDEA - Ultimate, VSCode
- - 언어: Java 17 LTS Temurin
+ - 언어: Java 17 LTS Temurin, JavaScript, CSS, html5
  - 빌드도구: Gradle
  - 데이터베이스
     - MySQL: 8.0.25
