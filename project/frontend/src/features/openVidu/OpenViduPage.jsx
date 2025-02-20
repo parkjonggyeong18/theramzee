@@ -113,7 +113,7 @@ const Header = styled.div``;
 
 const Title = styled.h1`
   font-size: 2.5rem;
-  color: #a4e17d;
+  color: #a4e17d; /* 밝은 녹색 */
 `;
 
 const VideoWrapper = styled.div`

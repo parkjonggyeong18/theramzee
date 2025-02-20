@@ -54,7 +54,6 @@ const VideoGrid = (props) => {
             const rawData = player.stream.connection.data.split("%/%")[0];
             const parsedData = JSON.parse(rawData);
             const subscriberNickname = parsedData.clientData;
-            // 현재 숲에 포함되어 있다면 오디오 활성화, 아니면 음소거
             // 1) 숲에 포함되어 있는지 체크
             const isInForest = gameState.forestUsers?.[gameState.forestNum]?.includes(subscriberNickname);
 
@@ -67,7 +66,6 @@ const VideoGrid = (props) => {
               player.subscribeToAudio(false);
             }
           } catch (error) {
-            console.error("오디오 제어 처리 중 오류:", error);
           }
         }
       });
@@ -85,7 +83,6 @@ const VideoGrid = (props) => {
         playerNickname = playerData.clientData;
       }
     } catch (error) {
-      console.error("Error extracting nickname:", error);
     }
     const isPlayerDead = gameState.killedPlayers?.includes(playerNickname);
     return { playerNickname, isPlayerDead };
@@ -98,7 +95,7 @@ const VideoGrid = (props) => {
 
   return (
     <GridContainer>
-      {slots.map((sub, idx) => {
+      {slots.map((sub) => {
         const connectionId = sub?.stream?.connection?.connectionId;
         const { playerNickname, isPlayerDead } = getPlayerInfo(sub);
 

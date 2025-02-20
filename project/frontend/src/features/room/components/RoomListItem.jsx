@@ -11,7 +11,6 @@ const RoomListItem = ({ room }) => {
   const navigate = useNavigate();
 
   // 안전한 방식으로 nickname 접근
-  const hostNickname = room?.host?.nickname || '알 수 없음';
   const userCount = room?.users?.length || 0;
   const passwordEnabled = room?.password ? true : false;
 
@@ -28,7 +27,6 @@ const RoomListItem = ({ room }) => {
       sessionStorage.setItem('openViduToken', openViduToken);
       navigate(`/room/${room.roomId}`);
     } catch (error) {
-      console.error('Join room error:', error.response?.data || error);
       const errorMessage = error.response?.data?.message || '방 참가에 실패했습니다';
       setError(errorMessage);
       setIsJoining(false);

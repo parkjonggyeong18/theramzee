@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect, useRef } from 'react';
+import { createContext, useContext, useState, useCallback, useRef } from 'react';
 import * as gameService from '../api/gameService';
 import { fetchRoomById } from '../api/room';
 
@@ -8,7 +8,6 @@ export const GameProvider = ({ children }) => {
   // 게임의 전체 상태 관리
   const [gameState, setGameState] = useState({
     // 유저 정보
-    userNum: null,
     nickName: null,
 
     // 숲 별 유저 정보
@@ -22,7 +21,6 @@ export const GameProvider = ({ children }) => {
     serverTime: null, // 서버 시간 (현재 시간)
     timer: 240, // 게임 시간 (4분)
    
-    timerRunning: false,    // 타이머 실행 상태
     evilSquirrel: null, // true | false
     forestToken: null,  // 숲 토큰
     forestNum: 1, // 현재 숲 번호 (초기는 메인 숲)
@@ -35,32 +33,24 @@ export const GameProvider = ({ children }) => {
     // 투표 시스템
     isVoting: false,
     isEmergencyVote: false,
-    currentVotes: {},
-    votingInProgress: false, 
     totalVote: 0,
     votedPlayers: [],
     hasUsedEmergency: false,
 
-    // 게임 전체 정지(추후)
+    // 게임 전체 정지
     isPaused: false, // 게임 타이머 일시정지 여부
 
     // 플레이어 상태
     killedPlayers: [], // 죽은 플레이어들의 ID 배열
     isSpectating: false, // 관전자 모드
     isDead: false, // 죽음 상태
-    killingAnimation: false, // 킬 애니메이션 재생 중 여부
 
-    // UI 상태
-    forceVideosOff: false,    // 안개 숲 캠 강제 OFF
-    foggyVoiceEffect: false,  // 안개 숲 음성 변조
-    miniMapEnabled: false,  // 미니맵 활성화 상태 (게임 시작 후 true)
     // 종료 상태
     isGameOver: false,           // 게임 종료 여부
     gameOverReason: null,        // 'acorns' | 'emergency' | 'time'
     winner: null,                // 'good' | 'bad'
-    lastKilledPlayer: null,      // 마지막으로 죽은 플레이어
-    //미션 상태
 
+    //미션 상태
     "2_1": [false, 1], // 2번 숲 1번 미션
     "2_2": [false, 2], // 2번 숲 2번 미션
     "2_3": [false, 3], // 2번 숲 3번 미션
@@ -81,6 +71,8 @@ export const GameProvider = ({ children }) => {
     "7_3": [false, 3], // 6번 숲 3번 미션
   });
 
+  // const navigate = useNavigate();
+
   const [videoSettings, setVideoSettings] = useState({
     videoEnabled: true,
     audioEnabled: true
@@ -94,12 +86,8 @@ export const GameProvider = ({ children }) => {
   // 피로도 및 도토리 저장 
   const [isStorageActive, setIsStorageActive] = useState(false);
   const [isEnergyActive, setIsEnergyActive] = useState(false);
-  const timerRef = useRef(null);
   const [isActionInProgress, setIsActionInProgress] = useState(false);
-
-  // useEffect(() => {
-  //   console.log("게임 상태 변경됨:", gameState);
-  // }, [gameState]);
+  const timerRef = useRef(null);
 
   // 최신 닉네임 리스트 가져오기 (startGame을 누를 때 실행됨)
   const getPlayers = useCallback(async () => {
@@ -121,11 +109,9 @@ export const GameProvider = ({ children }) => {
         // 최신 값 반환
         return updatedPlayers;
       } catch (error) {
-        console.error('Failed to get member nicknames:', error);
         return players; // 에러 발생 시 기존 nicknames 반환
       }
     } else {
-      console.error('WebSocket is not connected or required fields are empty');
       return players;
     }
   }, [isConnected, roomId, players, nickname]);
@@ -143,11 +129,8 @@ export const GameProvider = ({ children }) => {
         // ✅ 게임 시작 요청
         gameService.startGame(roomId, nicknameList);
       } catch (error) {
-        console.error('Failed to start game:', error);
       }
-    } else {
-      console.error('Socket connection not initialized');
-    }
+    } 
   }, [isConnected, roomId, getPlayers]);
 
   // 피로도 충전 처리
@@ -156,31 +139,9 @@ export const GameProvider = ({ children }) => {
       try {
         await gameService.chargeFatigue(roomId, nickname);
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
-
-  // // 게임 종료 처리
-  // const checkGameOver = useCallback(() => {
-  //   if (gameState.totalAcorns >= 10) {
-  //     console.log("게임 종료");
-  //     setGameState(prev => ({
-  //       ...prev,
-  //       isGameOver: true,
-  //       gameOverReason: 'acorns',
-  //       winner: prev.evilSquirrel ? 'bad' : 'good',
-  //       timerRunning: false,
-  //       isStarted: false  // 추가
-  //     }));
-  //   }
-  // }, [gameState.totalAcorns]);
-
-  // useEffect(() => {
-  //   checkGameOver();
-  // }, [gameState.totalAcorns, checkGameOver]);
 
   // 도토리 저장 처리
   const saveUserAcorns = useCallback(async () => {
@@ -188,10 +149,7 @@ export const GameProvider = ({ children }) => {
       try {
         await gameService.saveUserAcorns(roomId, nickname);
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
 
@@ -206,10 +164,7 @@ export const GameProvider = ({ children }) => {
         const nicknameList = updatedNicknames.map(player => player.nickName);
         await gameService.result(roomId, nicknameList);
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId]);
 
@@ -225,10 +180,7 @@ export const GameProvider = ({ children }) => {
         await gameService.moveForest(roomId, nickname, forestNum, nicknameList);
         setGameState.currentForestNum = forestNum;
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
   
@@ -238,10 +190,7 @@ export const GameProvider = ({ children }) => {
       try {
         await gameService.killUser(roomId, vitimNickname, nickname);
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
 
@@ -250,26 +199,13 @@ export const GameProvider = ({ children }) => {
     if (isConnected && roomId) {
       try {
         const nicknameList = players.map(player => player.nickName);
-        // gameService.startEmergency 대신 startEmergencyVote 사용
         await gameService.startEmergencyVote(roomId, nicknameList, nickname);
       } catch (error) {
-        console.error('Failed to start emergency vote:', error);
       }
     }
 }, [isConnected, roomId, players, nickname]);
 
-  // 투표 기록
-  const recordVote = useCallback((voter, votedPlayer) => {
-    setGameState(prev => ({
-      ...prev,
-      currentVotes: {
-        ...prev.currentVotes,
-        [voter]: votedPlayer
-      }
-    }));
-  }, []);
-
-  // 투표 종료
+  // 투표 종료 처리 
   const endVote = useCallback((newVotedPlayers) => {
 
     // ✅ 투표 결과 카운트
@@ -296,7 +232,6 @@ export const GameProvider = ({ children }) => {
   const completeMission = useCallback(async (forestNum, missionNum) => {
     if (isConnected && roomId) {
       try {
-        console.log("미션 완료 전송");
         await gameService.completeMission(roomId, forestNum, missionNum, nickname);
 
         const missionKey = `${forestNum}_${missionNum}`;
@@ -304,60 +239,16 @@ export const GameProvider = ({ children }) => {
         setGameState(prev => {
           const newState = {
             ...prev,
-            [missionKey]: [true, prev[missionKey][1]],
-            // 피로도 업데이트 제거
+            [missionKey]: [true, prev[missionKey][1]]
           };
           return newState;
         });
       } catch (error) {
-        console.error('Failed to complete mission:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty:', {
-        isConnected,
-        roomId
-      });
     }
   }, [isConnected, roomId, nickname, gameState]);
-  
-  // 안개 숲 특수 효과 토글
-  const toggleFoggyEffects = (isInFoggyForest) => {
-    setGameState(prev => ({
-      ...prev,
-      forceVideosOff: isInFoggyForest,
-      foggyVoiceEffect: isInFoggyForest   // openVidu 넣었을때, 실행되는 코드 구현 필요
-    }));
-  };
 
-  // 게임 초기화 처리
-  const resetGame = useCallback(() => {
-    setGameState(prev => ({
-      ...prev,
-      isStarted: false,
-      timer: 420,
-      timerRunning: false,
-      evilSquirrel: null,
-      forestToken: null,
-      totalAcorns: 0,
-      heldAcorns: 0,
-      fatigue: 0,
-      isVoting: false,
-      isEmergencyVote: false,
-      hasUsedEmergency: false,
-      voteTimer: 20,
-      isPaused: false,
-      killedPlayers: [],
-      isSpectating: false,
-      isDead: false,
-      killingAnimation: false,
-      isGameOver: false,
-      gameOverReason: null,
-      winner: null,
-      lastKilledPlayer: null
-    }));
-  }, []);
-
-  // 액션 취소 함수
+  // 액션 취소 함수 
   const cancelAction = useCallback(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -368,7 +259,7 @@ export const GameProvider = ({ children }) => {
     timerRef.current = null;
   }, []);
 
-  // 도토리 저장 시작
+  // 도토리 저장 함수 
   const startSaveAcorns = useCallback(() => {
     if (gameState.evilSquirrel !== false && gameState.heldAcorns === 0 && isStorageActive && gameState.isDead) return;
     setIsStorageActive(true);
@@ -380,7 +271,7 @@ export const GameProvider = ({ children }) => {
     }, 10000);
   }, [gameState.evilSquirrel, gameState.heldAcorns, isStorageActive, gameState.isDead, saveUserAcorns]);
 
-  // 피로도 충전 시작
+  // 피로도 충전 함수  
   const startChargeFatigue = useCallback(() => {
     if (gameState.fatigue >= 3 || isEnergyActive || gameState.isDead) return;
     setIsEnergyActive(true);
@@ -393,35 +284,33 @@ export const GameProvider = ({ children }) => {
   }, [gameState.fatigue, isEnergyActive, gameState.isDead, gameState.evilSquirrel, chargeFatigue]);
 
   const value = {
-    gameState,         // 게임 전체 상태
-    setGameState,      // 게임 상태 변경
-    startGame,        // 게임 시작
-    chargeFatigue,       // 피로도 충전
-    saveUserAcorns,       // 도토리 저장
-    result,           // 결과 조회
-    moveForest,       // 숲 이동
-    killUser,       // 플레이어 사망 처리// 긴급 투표 시작
-    completeMission, // 미션 완료
-    endVote,          // 투표 종료  // 일반 투표 시작
-    toggleFoggyEffects, // 안개 숲 효과
-    videoSettings,     // 비디오 설정
-    setVideoSettings,   // 비디오 설정 변경
+    gameState,            
+    videoSettings,        
     isConnected,
-    setRoomId,
     roomId,
-    setIsConnected,
     players,
-    setPlayers,
     isStorageActive,
-    setIsStorageActive,
     isEnergyActive,
+    isActionInProgress,
+    setGameState,         
+    startGame,            
+    chargeFatigue,        
+    saveUserAcorns,       
+    result,               
+    moveForest,           
+    killUser,              
+    completeMission,      
+    endVote,                    
+    setVideoSettings,     
+    setRoomId,
+    setIsConnected,
+    setPlayers,
+    setIsStorageActive,
     setIsEnergyActive,
     cancelAction,
     startSaveAcorns,
     startChargeFatigue,
     startEmergencyVote,
-    recordVote,
-    isActionInProgress,
   };
 
   return (

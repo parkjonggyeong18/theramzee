@@ -7,7 +7,7 @@ import diaImage from'../../../assets/images/object/PAN.png'
 
 const GameTimer = () => {
   const { gameState, setGameState,cancelAction, moveForest } = useGame();
-  const INITIAL_TIME = 240; // 4분 = 420초
+  const INITIAL_TIME = 240; // 4분
   const { roomId } = useParams();
   const navigate = useNavigate();
 
@@ -41,13 +41,6 @@ const GameTimer = () => {
   
     return () => clearInterval(timerInterval);
   }, [gameState.isStarted, gameState.isPaused, gameState.timer]);
-  
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  };
 
   const getProgressBarColor = (timer) => {
     const percentage = (timer / INITIAL_TIME) * 100;
@@ -68,7 +61,6 @@ const GameTimer = () => {
     font.load().then((loadedFont) => {
       document.fonts.add(loadedFont);
     }).catch((error) => {
-      console.error('폰트 로드 실패:', error);
     });
   }, []);
 

@@ -1,4 +1,3 @@
-// components/lobby/ChatWindow.jsx
 import { useState } from 'react';
 import styled from 'styled-components';
 

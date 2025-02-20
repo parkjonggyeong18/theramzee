@@ -5,7 +5,6 @@ import { backgroundImages, characterImages } from '../../../assets/images';
 import GameLayout from '../components/common/GameLayout';
 import { useNavigate, useParams } from 'react-router-dom';
 import GameOverScreen from '../components/GameOverScreen';
-import { subscribeToTopic, unsubscribeTopic } from '../../../api/stomp';
 
 // components import
 import VideoGrid from '../components/VideoGrid';
@@ -17,7 +16,7 @@ import MiniMap from '../components/MiniMap';
 import EmergencyVoteModal from '../../game/components/vote/EmergencyVoteModal';
 import FinalVoteModal from '../../game/components/vote/FinalVoteModal';
 import { leaveRoom } from '../../../api/room';
-import { connectSocket, disconnectSocket } from '../../../api/stomp';
+import { disconnectSocket } from '../../../api/stomp';
 import { useAuth } from '../../../contexts/AuthContext';
 const MainForest = () => {
   const { 
@@ -30,7 +29,7 @@ const MainForest = () => {
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const { handleLogout, handleLogout2 } = useAuth();
+  const { handleLogout2 } = useAuth();
   const {
     subscribers,
     leaveSession,
@@ -42,7 +41,7 @@ const MainForest = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [lastTimeLeft, setLastTimeLeft] = useState(60);
 
-  // 긴급 투표 모달 띄우기기
+  // 긴급 투표 모달 띄우기
   useEffect(() => {
     if (gameState.isVoting && gameState.isEmergencyVote) {
       setShowEmergencyModal(true);
@@ -62,7 +61,7 @@ const MainForest = () => {
     }
   }, [gameState.isVoting, gameState.isEmergencyVote, gameState.votedPlayers, setGameState]);
 
-  // 최종 투표 모달 띄우기기
+  // 최종 투표 모달 띄우기
   useEffect(() => {
     if (gameState.isVoting && !gameState.isEmergencyVote) {
       setShowLastVoteModal(true);
@@ -82,7 +81,7 @@ const MainForest = () => {
     }
   }, [gameState.isVoting, gameState.isEmergencyVote, gameState.votedPlayers, setGameState]);
 
-  // 긴급 투표 처리리
+  // 긴급 투표 처리
   const handleEmergencyEnd = () => {
     const result = endVote(gameState.votedPlayers)
     if (result === gameState.evilSquirrelNickname) {
@@ -91,7 +90,6 @@ const MainForest = () => {
         isGameOver: true,
         winner: 'good',
         gameOverReason: 'emergency',
-        timerRunning: false,
         isStarted: false,
       }));
     }
@@ -118,7 +116,6 @@ const MainForest = () => {
         updates.isGameOver = true;
         updates.gameOverReason = 'kill';
         updates.winner = 'bad';
-        updates.timerRunning = false;
         updates.isStarted = false;
       }
 
@@ -141,7 +138,6 @@ const MainForest = () => {
           isGameOver: true,
           winner: 'good',
           gameOverReason: 'time',
-          timerRunning: false,
           isStarted: false,
         }
         for (const player of gameState.votedPlayers) {
@@ -156,7 +152,6 @@ const MainForest = () => {
           isGameOver: true,
           winner: 'bad',
           gameOverReason: 'time',
-          timerRunning: false,
           isStarted: false,
         }
         for (const player of gameState.votedPlayers) {
@@ -180,7 +175,6 @@ const MainForest = () => {
       const subscriberNickname = subData.clientData;
       return currentForestUser?.includes(subscriberNickname);
     } catch (error) {
-      console.error("🚨 OpenVidu 데이터 파싱 오류:", error);
       return false;
     }
   });
@@ -192,7 +186,6 @@ const MainForest = () => {
   useEffect(() => {
     const handleBeforeUnload = () => { 
       handleExit2();
-
     };
         const handleExit2 = () => {
           disconnectSocket();
@@ -201,7 +194,7 @@ const MainForest = () => {
           handleLogout2();
         }
         
-        // 공통 종료 처리 함수
+    // 공통 종료 처리 함수
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
       document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;

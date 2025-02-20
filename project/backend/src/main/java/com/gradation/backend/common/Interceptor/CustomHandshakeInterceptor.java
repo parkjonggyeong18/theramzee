@@ -28,18 +28,15 @@ public class CustomHandshakeInterceptor implements HandshakeInterceptor {
 
         // 요청 URI에서 쿼리 스트링 추출
         String query = request.getURI().getQuery();
-        System.out.println("쿼리 스트링: " + query);
-
         // 쿼리 스트링에서 Access Token 추출
         String token = extractTokenFromQuery(query);
 
         if (token != null && jwtTokenUtil.validateToken(token)) {
             // 토큰이 유효한 경우 WebSocket 세션 속성에 Access Token 저장
-            System.out.println("유효한 토큰: " + token);
             attributes.put("accessToken", token); // Access Token 저장
             return true; // 핸드셰이크 성공
         } else {
-            System.err.println("유효하지 않은 토큰.");
+
             return false; // 핸드셰이크 실패
         }
     }

@@ -1,8 +1,6 @@
 import { useGame } from '../../../contexts/GameContext';
 import styled from 'styled-components';
-// assets/images/object 폴더에서 도토리 이미지 import
 import acornImage from '../../../assets/images/object/arcon.png'
-import energyImage from'../../../assets/images/object/energy.png'
 import buttonBgImage from '../../../assets/images/object/plat.png';
 import goodgem from '../../../assets/images/object/goodgem.png';
 import evilgem from '../../../assets/images/object/evilgem.png';

@@ -1,4 +1,3 @@
-// components/game/KillAnimation.jsx
 import { useEffect } from 'react';
 import styled, { keyframes } from 'styled-components';
 import { animationImages } from '../../../assets/images';
