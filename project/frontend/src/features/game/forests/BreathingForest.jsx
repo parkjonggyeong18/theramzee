@@ -34,7 +34,6 @@ const BreathingForest = () => {
   const {
     subscribers,
     leaveSession,
-    initPreview
   } = useOpenVidu();
   
   const currentForestNum = gameState.forestNum;
@@ -95,7 +94,6 @@ const BreathingForest = () => {
                   disconnectSocket();
                   leaveRoom(roomId);
                   leaveSession();
-                  initPreview();
                   handleLogout2();
                 }
     if (gameState.isStarted && gameState.evilSquirrel !== null) {

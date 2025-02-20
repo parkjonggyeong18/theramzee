@@ -33,7 +33,6 @@ const MainForest = () => {
   const {
     subscribers,
     leaveSession,
-    initPreview
   } = useOpenVidu();
 
   const [showEmergencyModal, setShowEmergencyModal] = useState(false);
@@ -192,7 +191,6 @@ const MainForest = () => {
           disconnectSocket();
           leaveRoom(roomId);
           leaveSession();
-          initPreview();
           handleLogout2();
         }
         
