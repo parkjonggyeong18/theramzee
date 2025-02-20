@@ -274,21 +274,6 @@ const handleMoveResponse = useCallback(
             
             // 모든 유저 투표 완료 
             if (initializedData.totalVote === updates.count-updates.killedPlayers.length) {
-              const result = endVote(newVotedPlayers);
-              
-              // 동표일 경우 
-              if (result === null) return;
-
-              // 나쁜 다람쥐 색출 유무
-              if (result === updates.evilSquirrelNickname) {
-                  updates.isGameOver = true;
-                  updates.winner = 'good';
-                  updates.gameOverReason = 'emergency';
-                  updates.isStarted = false;
-                } 
-
-              const newKilledPlayers = [...prev.killedPlayers, result];
-              updates.killedPlayers = newKilledPlayers;
               updates.isVoting = false;
               updates.isEmergencyVote = false;
               updates.totalVote = 0;
@@ -297,18 +282,31 @@ const handleMoveResponse = useCallback(
               for (const player of newVotedPlayers) {
                 updates[player] = 0;
               }
-
-              // 나쁜 다람쥐 승리 조건 체크
-              if (updates.count - newKilledPlayers.length <= 2) {
-                updates.isGameOver = true;
-                updates.gameOverReason = 'kill';
-                updates.winner = 'bad';
-                updates.isStarted = false;
+              const result = endVote(newVotedPlayers);
+              
+              if (result != null ) {
+                // 나쁜 다람쥐 색출 유무
+                if (result === updates.evilSquirrelNickname) {
+                    updates.isGameOver = true;
+                    updates.winner = 'good';
+                    updates.gameOverReason = 'emergency';
+                    updates.isStarted = false;
+                  } else {
+                    const newKilledPlayers = [...prev.killedPlayers, result];
+                    updates.killedPlayers = newKilledPlayers;
+      
+                    // 나쁜 다람쥐 승리 조건 체크
+                    if (updates.count - newKilledPlayers.length <= 2) {
+                      updates.isGameOver = true;
+                      updates.gameOverReason = 'kill';
+                      updates.winner = 'bad';
+                      updates.isStarted = false;
+                    } else if (result === nickName) {
+                      updates.isDead = true;
+                    }
+                  }
               }
 
-              if (result === nickName) {
-                updates.isDead = true;
-              }
             }
             return updates;
           }); 
