@@ -1,4 +1,3 @@
-
 ## THE RAMZEE
 
 ### 프로젝트 소개
@@ -8,8 +7,7 @@
 - 미니게임을 플레이하고 나쁜 다람쥐를 피해 미션을 모두 완수합니다. 미션을 모두 완수하지 못하면 투표를 통해 나쁜 다람쥐를 찾아내세요.
 - 개발 기간 : 2024.01.06 ~ 02.20
 - URL : https://RAMZEE.online/
-<br>
-
+<br><br>
 ### 구성원
 <table>
   <tbody>
@@ -39,7 +37,7 @@
     </tr>
   </tbody>
 </table>
-<br>
+<br><br>
 
 ### 프로젝트 아키텍쳐
 
@@ -54,7 +52,7 @@
 - GitLab를 통해 코드베이스를 관리하며 변경 사항을 병합하기 위해 Pull Request를 생성하고 팀원들을 이를 검토하고 코드 리뷰를 진행합니다.
 PR가 merge되면 Jenkins을 통한 CI/CD가 시작됩니다. 이 파이프라인은 빌드를 자동으로 시작하고 빌드된 코드가 자동으로 배포가 진행됩니다.
 - 또한, AWS의 Secure Key Manager를 사용하여 DB 정보를 비롯한 암호화가 필요한 중요한 데이터들을 안전하게 관리하고 환경변수를 통해 접근합니다.
-<br>
+<br><br>
 
 ### 개발환경
  - 개발도구: Intellij IDEA - Ultimate, VSCode
@@ -135,7 +133,33 @@ Jira를 통해 한주의 스프린트를 정하고 백로그를 진행해 현재
 
 ### 스크럼
 개발 기간 동안 총 20번이 넘는 스크럼이 진행되었고, 스크럼에서는 팀원들이 각자의 진행 상황을 공유하고 발생한 이슈들을 함께 논의하여 프로젝트를 원활하게 진행할 수 있었습니다.
-<br>
+<br><br>
+
+### 사이트 소개
+
+> ### 로그인<br>
+<img src="https://github.com/user-attachments/assets/eaf3ed90-b862-45e7-99ee-27c04abf38df" width="400" height="250"/><br>
+회원가입 후 로그인 진행합니다. 회원가입시 이메일 인증을 통해 회원가입을 진행합니다.<br>
+아이디 / 비밀번호 찾기는 이메일로 아이디 / 비밀번호를 발급합니다.
+<br><br>
+
+> ### 로비, 친구 및 채팅, 프로필<br>
+<img src="https://github.com/user-attachments/assets/438251a7-53f6-4a4a-b146-a5c794133cc0" width="400" height="250"/><br>
+만들어진 방에 참여하거나 친구 목록을 확인 가능<br>
+웹소캣을 활용해 실시간 친구 추가, 삭제, 친구 게임 따라가기 기능과 채팅 기능을 제공<br>
+프로필에서 지금 캠화면을 체크하고 닉네임, 비밀번호 수정 및 탈퇴 기능 지원원
+<br><br>
+> ### 게임 진행<br>
+<img src="https://github.com/user-attachments/assets/af1b42a0-da27-4190-8bd1-08edfc63a21d" width="400" height="250"/>
+<img src="https://github.com/user-attachments/assets/2e884b7e-4aa2-4a41-afd3-021152cd9ff0" width="400" height="300"/>
+<img src="https://github.com/user-attachments/assets/95417f95-59fa-40d6-bc5c-041f759bada4" width="400" height="250"/>
+<img src="https://github.com/user-attachments/assets/36beadbc-21ef-4f40-8884-b198ed0902d1" width="400" height="250"/>
+<img src="https://github.com/user-attachments/assets/63704158-c2be-488b-918a-0928b691f9c1" width="400" height="250"/>
+<img src="https://github.com/user-attachments/assets/26ec5db4-3af7-45b6-a130-0513c140bbe0" width="400" height="250"/>
+<img src="https://github.com/user-attachments/assets/2baec8ab-67aa-450a-bd1a-94f88953cc88" width="400" height="250"/>
+<img src="https://github.com/user-attachments/assets/b7f68536-0a5e-418f-8ddc-4c6fe5212f67" width="400" height="250"/><br>
+착한 다람쥐와, 나쁜다람쥐가 선정됩니다. 착한 다람쥐는 에너지를 채워 미션을 수행하고 창고에 도토리를 저장해 게임에서 승리합니다.<br> 나쁜 다람쥐는 에너지를 채워 착한 다람쥐를 모두 죽이고 승리합니다. 투표는 총 2회로 중간 투표, 최종 투표가 주어집니다.<br> 중간 투표에서는 게임을 망치는 인원이나 나쁜 다람쥐를 찾아 죽입니다.<br> 만약 나쁜 다람쥐가 죽으면 착한 다람쥐의 승리입니다.<br> 최종 투표에서는 나쁜 다람쥐가 죽으면 착한 다람쥐가 승리이지만 나쁜 다람쥐가 살아남았다면 나쁜 다람쥐의 최종 승리입니다.
+<br><br>
 
 ### 구성원 별 담당 내용
 
@@ -234,5 +258,3 @@ Jira를 통해 한주의 스프린트를 정하고 백로그를 진행해 현재
   - Jenkins build 정보 알림 메시지 봇 구현
   
 <br/>
-
-
