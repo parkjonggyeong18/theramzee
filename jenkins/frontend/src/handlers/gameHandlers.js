@@ -258,65 +258,83 @@ const handleMoveResponse = useCallback(
 
   // 긴급 투표 처리 
   const handleVoteResponse = useCallback(
-    (message) => {
-      try {
-        if (message.success) {
-          const initializedData = message.data;
-          setGameState((prev) => {
-            const newVotedPlayers = [...prev.votedPlayers, initializedData.nickname];
+      (message) => {
+        try {
+          if (message.success) {
+            const initializedData = message.data;
+            setGameState((prev) => {
+              const newVotedPlayers = [...prev.votedPlayers, initializedData.nickname];
 
-            const updates = {
-              ...prev,
-              [initializedData.nickname]: initializedData.voteNum,
-              votedPlayers: newVotedPlayers,
-              totalVote: initializedData.totalVote
-            };
-            
-            // 모든 유저 투표 완료 
-            if (initializedData.totalVote === updates.count-updates.killedPlayers.length) {
-              const result = endVote(newVotedPlayers);
-              
-              // 동표일 경우 
-              if (result === null) return;
+              const updates = {
+                ...prev,
+                [initializedData.nickname]: initializedData.voteNum,
+                votedPlayers: newVotedPlayers,
+                totalVote: initializedData.totalVote
+              };
 
-              // 나쁜 다람쥐 색출 유무
-              if (result === updates.evilSquirrelNickname) {
-                  updates.isGameOver = true;
-                  updates.winner = 'good';
-                  updates.gameOverReason = 'emergency';
-                  updates.isStarted = false;
-                } 
+              // 모든 유저 투표 완료
+              if (initializedData.totalVote === updates.count - updates.killedPlayers.length) {
+                const result = endVote(newVotedPlayers);
 
-              const newKilledPlayers = [...prev.killedPlayers, result];
-              updates.killedPlayers = newKilledPlayers;
-              updates.isVoting = false;
-              updates.isEmergencyVote = false;
-              updates.totalVote = 0;
-              updates.votedPlayers = [];
-              updates.isPaused = false;
-              for (const player of newVotedPlayers) {
-                updates[player] = 0;
+                // 동표 처리
+                if (result === null) return updates;
+
+                // 1. 좋은 다람쥐 승리 조건 (악당 색출 성공)
+                if (result === updates.evilSquirrelNickname) {
+                  return {
+                    ...updates,
+                    isGameOver: true,
+                    winner: 'good',
+                    gameOverReason: 'emergency',
+                    isStarted: false,
+                    isVoting: false,
+                    isEmergencyVote: false,
+                    totalVote: 0,
+                    votedPlayers: [],
+                    isPaused: false,
+                    ...Object.fromEntries(newVotedPlayers.map(p => [p, 0])) // 투표 초기화
+                  };
+                }
+
+                // 2. 악당 색출 실패 시
+                const newKilledPlayers = [...prev.killedPlayers, result];
+                const updatedState = {
+                  ...updates,
+                  killedPlayers: newKilledPlayers,
+                  isVoting: false,
+                  isEmergencyVote: false,
+                  totalVote: 0,
+                  votedPlayers: [],
+                  isPaused: false,
+                  ...Object.fromEntries(newVotedPlayers.map(p => [p, 0])) // 투표 초기화
+                };
+
+                // 3. 나쁜 다람� 승리 조건 체크 (생존자 2명 이하)
+                if (updatedState.count - newKilledPlayers.length <= 2) {
+                  return {
+                    ...updatedState,
+                    isGameOver: true,
+                    gameOverReason: 'kill',
+                    winner: 'bad',
+                    isStarted: false
+                  };
+                }
+
+                // 4. 플레이어 사망 처리
+                if (result === nickName) {
+                  updatedState.isDead = true;
+                  updatedState.isSpectating = true;
+                }
+
+                return updatedState;
               }
-
-              // 나쁜 다람쥐 승리 조건 체크
-              if (updates.count - newKilledPlayers.length <= 2) {
-                updates.isGameOver = true;
-                updates.gameOverReason = 'kill';
-                updates.winner = 'bad';
-                updates.isStarted = false;
-              }
-
-              if (result === nickName) {
-                updates.isDead = true;
-              }
-            }
-            return updates;
-          }); 
-          
+              return updates;
+            });
+          }
+        } catch (error) {
+          console.error('Vote handling error:', error);
         }
-      } catch (error) {
-      }
-    },
+      },
     [setGameState]
   );
 
