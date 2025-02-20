@@ -100,7 +100,6 @@ const GameRoom = () => {
           subscribeToTopic(`/topic/game/${roomId}/last-vote`, handlers.handleLastVoteResponse);
         }, 100);
       } catch (error) {
-        console.error("⚠️ Failed to connect or subscribe:", error);
       }
     };
 

@@ -5,7 +5,6 @@ const SplashScreen = ({ onComplete }) => {
   useEffect(() => {
     // 입장 음악 재생
     const audio = new Audio('/audio/entrance.mp3');
-    audio.play().catch((error) => console.error('음악 재생 오류:', error));
 
     // GIF 종료 후 콜백 호출
     const timer = setTimeout(() => {

@@ -1,4 +1,3 @@
-// components/game/missions/EmptyMissionOverlay.jsx
 import styled from 'styled-components';
 
 const EmptyMissionOverlay = ({ onClose }) => {

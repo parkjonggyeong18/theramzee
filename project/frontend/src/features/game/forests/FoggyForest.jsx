@@ -96,7 +96,6 @@ const FoggyForest = () => {
       setShowMiniGame(false);
       setCurrentMission(null);
     } catch (error) {
-      console.error('Failed to complete mission:', error);
     }
   };
 

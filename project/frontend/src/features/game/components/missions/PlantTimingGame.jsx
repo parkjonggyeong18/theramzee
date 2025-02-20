@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import styled, { keyframes } from 'styled-components';
+import React, { useState, useEffect } from 'react';
+import styled from 'styled-components';
 import { useGame } from '../../../../contexts/GameContext';
 
 const SquirrelGame = ({ onComplete, onClose }) => {

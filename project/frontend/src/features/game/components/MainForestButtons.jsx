@@ -34,7 +34,6 @@ const MainForestButtons = () => {
       startEmergencyVote();
       gameState.hasUsedEmergency = true;
     } catch (error) {
-      console.error('Failed to start emergency vote:', error);
     }
   };
 
@@ -50,7 +49,6 @@ const MainForestButtons = () => {
     font.load().then((loadedFont) => {
       document.fonts.add(loadedFont);
     }).catch((error) => {
-      console.error('폰트 로드 실패:', error);
     });
   }, []);
 

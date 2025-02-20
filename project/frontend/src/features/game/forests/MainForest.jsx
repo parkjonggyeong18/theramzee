@@ -42,7 +42,7 @@ const MainForest = () => {
   const [timeLeft, setTimeLeft] = useState(60);
   const [lastTimeLeft, setLastTimeLeft] = useState(60);
 
-  // 긴급 투표 모달 띄우기기
+  // 긴급 투표 모달 띄우기
   useEffect(() => {
     if (gameState.isVoting && gameState.isEmergencyVote) {
       setShowEmergencyModal(true);
@@ -62,7 +62,7 @@ const MainForest = () => {
     }
   }, [gameState.isVoting, gameState.isEmergencyVote, gameState.votedPlayers, setGameState]);
 
-  // 최종 투표 모달 띄우기기
+  // 최종 투표 모달 띄우기
   useEffect(() => {
     if (gameState.isVoting && !gameState.isEmergencyVote) {
       setShowLastVoteModal(true);
@@ -82,7 +82,7 @@ const MainForest = () => {
     }
   }, [gameState.isVoting, gameState.isEmergencyVote, gameState.votedPlayers, setGameState]);
 
-  // 긴급 투표 처리리
+  // 긴급 투표 처리
   const handleEmergencyEnd = () => {
     const result = endVote(gameState.votedPlayers)
     if (result === gameState.evilSquirrelNickname) {
