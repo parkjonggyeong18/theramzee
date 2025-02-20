@@ -66,7 +66,7 @@ const MainForestButtons = () => {
 
       <EmergencyButton 
         onClick={clkEmergency}
-        disabled={gameState.hasUsedEmergency || isActionInProgress}
+        disabled={gameState.hasUsedEmergency || isActionInProgress || gameState.timer > 180}
       >
         긴급
       </EmergencyButton>

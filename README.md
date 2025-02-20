@@ -43,17 +43,17 @@
 
 ### 프로젝트 아키텍쳐
 
-<img width="7492" alt="">
+![image](https://github.com/user-attachments/assets/382a737b-e125-4fce-aa23-06f12e95ceba)
 <br>
 
-- FRONTEND : 
-- BACKEND :
+- FRONTEND : 클라이언트의 요청은 nginx를 통해서 들어오게 됩니다.  프론트엔드는 react로 구현되어 있으며, 사용자 인증 및 권한 관리를 위해 accessToken을 사용합니다.
+- BACKEND : 프론트앤드에서 요청한 요청을 바탕으로 MySQL, Redis에 대이터를 저장 추출해 프론트로 전달합니다. 보안을 위해 springsecurity를 이용하여 구현되었으며, jwt를 활용해 사용자의 인증 및 권한 부여를 담당합니다.
+- Redis : 게임 진행 정보, 방의 sessionId, 채팅기록든 빠른 요청과 휘발성 데이터들을 저장합니다.
 
 ### CI/CD
 - GitLab를 통해 코드베이스를 관리하며 변경 사항을 병합하기 위해 Pull Request를 생성하고 팀원들을 이를 검토하고 코드 리뷰를 진행합니다.
 PR가 merge되면 Jenkins을 통한 CI/CD가 시작됩니다. 이 파이프라인은 빌드를 자동으로 시작하고 빌드된 코드가 자동으로 배포가 진행됩니다.
 - 또한, AWS의 Secure Key Manager를 사용하여 DB 정보를 비롯한 암호화가 필요한 중요한 데이터들을 안전하게 관리하고 환경변수를 통해 접근합니다.
-<img width="5636" alt="Project  T3Team_bookstore_wireframe (1)" src="">
 <br>
 
 ### 개발환경
@@ -122,13 +122,19 @@ gateway-6DB33F?style=for-the-badge&logo=spring&logoColor=white"> <img src="https
 <br>
 
 ### ERD
-![image]()
+![image](https://github.com/user-attachments/assets/4ecf95f6-741a-4f9f-9dda-3af8736f1e51)
 <br>
+### 기능 명세서
+![image](https://github.com/user-attachments/assets/3dbbcbad-26c2-4a62-bd10-e5cf8b253e75)
+https://www.notion.so/1749cc6dad12808aa476fffcc0e57079?v=6b7c044b0f0440eca1af93f8e86a80b0&pvs=4<br>
+명확한 설계와 기능 명세를 통해 명확한 기능 구현을 진행했습니다.
+
+### 형상관리 및 이슈관리
+![image](https://github.com/user-attachments/assets/4da577d9-fc7f-4b65-a28b-814e8435b8e3)
+Jira를 통해 한주의 스프린트를 정하고 백로그를 진행해 현재 작업 상황을 실시간으로 확인할 수 있도록 했습니다.
 
 ### 스크럼
 개발 기간 동안 총 20번이 넘는 스크럼이 진행되었고, 스크럼에서는 팀원들이 각자의 진행 상황을 공유하고 발생한 이슈들을 함께 논의하여 프로젝트를 원활하게 진행할 수 있었습니다.
-
-<img width="492" alt=" ">
 <br>
 
 ### 구성원 별 담당 내용

@@ -12,6 +12,7 @@ export const GameProvider = ({ children }) => {
 
     // 숲 별 유저 정보
     forestUsers: null,
+    count: 0,
 
     // 게임 진행 상태
     isStarted: false, // 게임 시작 여부
