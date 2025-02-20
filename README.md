@@ -1,6 +1,8 @@
 ## THE RAMZEE
 
 ### 프로젝트 소개
+<img src="https://github.com/user-attachments/assets/fd99f49f-84db-4add-802f-241bebfa0b04" width="50" height="50"> 
+
 - 마피아류 웹 게임으로 다람쥐를 통해 플레이합니다.
 - 이메일 인증을 통해 회원가입을 하고 게임을 플레이 할 수 있습니다.
 - 친구 추가를 통해 친구와 같이 플레이하고 채팅을 할 수 있습니다.
@@ -18,6 +20,14 @@
       <th align="center" width='14%'>팀원</th>
       <th align="center" width='14%'>팀원</th>
       <th align="center" width='14%'>팀원</th>
+    </tr>
+    <tr>
+      <td align="center"><img width="100" alt="image" src="https://github.com/user-attachments/assets/4b295f2c-bc5d-4502-9403-42208371d7cc"></td>
+      <td align='center'><img width="100" alt="image" src="https://github.com/user-attachments/assets/e7c61dc8-be96-4b84-8959-4dd10b3c33e1"></td>
+      <td align='center'><img width="100" height="130" alt="image" src="https://github.com/user-attachments/assets/961882e6-ddd8-414a-8930-5cce1f476e0c"></td>
+      <td align='center'><img width="100" alt="image" src="https://github.com/user-attachments/assets/b2d853de-6247-4a5f-8488-91892a70e1cb"></td>
+      <td align='center'><img width="100" alt="image" src="https://github.com/user-attachments/assets/9bb6cedf-60a9-4d27-8697-c07e4de2d9f4"></td>
+      <td align='center'><img width="100" alt="image" src="https://github.com/user-attachments/assets/f85618d9-081f-415e-b6c3-d3085e039660"></td>
     </tr>
     <tr width='100%'>
       <th align="center" width='14%'>김선진</th>
@@ -105,8 +115,11 @@ PR가 merge되면 Jenkins을 통한 CI/CD가 시작됩니다. 이 파이프라�
 <img src="https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white"/>
 <img src="https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white"/>
  <img src="https://img.shields.io/badge/Gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white">
-
- 
+ <img src="https://img.shields.io/badge/eslint-4B32C3?style=for-the-badge&logo=eslint&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Hibernate-59666C?style=for-the-badge&logo=Hibernate&logoColor=white"/>
+<img src="https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white"/>
+ <img src="https://img.shields.io/badge/soundcloud-FF5500?style=for-the-badge&logo=soundcloud&logoColor=white"/>
+  <img src="https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white"/>
 
 ### etc
   <img src="https://img.shields.io/badge/Ubuntu-E95420?style=for-the-badge&logo=ubuntu&logoColor=white"/> <img src="https://img.shields.io/badge/Postman-FF6C37?style=for-the-badge&logo=postman&logoColor=white"/>
@@ -116,7 +129,9 @@ PR가 merge되면 Jenkins을 통한 CI/CD가 시작됩니다. 이 파이프라�
   <img src="https://img.shields.io/badge/amazonwebservices-232F3E?style=for-the-badge&logo=amazonwebservices&logoColor=white">
   <img src="https://img.shields.io/badge/Jenkins-D24939?style=for-the-badge&logo=Jenkins&logoColor=white"/>
   <img src="https://img.shields.io/badge/figma-F24E1E?style=for-the-badge&logo=Figma&logoColor=white"/>
-    <img src="https://img.shields.io/badge/jira-0052CC?style=for-the-badge&logo=jira&logoColor=white"/>
+  <img src="https://img.shields.io/badge/jira-0052CC?style=for-the-badge&logo=jira&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Gmail-D14836?style=for-the-badge&logo=gmail&logoColor=white"/>
+  
 <br>
 
 ### ERD
@@ -256,5 +271,43 @@ Jira를 통해 한주의 스프린트를 정하고 백로그를 진행해 현재
 
 - Mattermost 연동  
   - Jenkins build 정보 알림 메시지 봇 구현
+  
+<br/>
+
+## :bust_in_silhouette: 김선진
+
+> ### 피그마 활용 Mockup 및 Prototype 제작
+
+- Mockup 디자인 보조
+
+- Prototype 경로 설정
+
+
+> ### FrontEnd 
+
+- React 활용 컴포넌트 작성
+  - gameroom
+  - missionforest
+  - etc ..
+
+- 생성형 AI를 활용한 미니게임 제작
+  -18종의 미니게임 제작
+
+- api 연결
+  - 방 관련 api (생성,조회 ...)
+  - 회원 관련 api(가입, 비밀번호 찾기..)
+
+> ### 디자인
+
+- 맵 관련 디자인
+  - 미션 맵
+- 미니게임 관련 디자인
+- 게임요소 디자인
+  -상태 패널, 버튼, 타이머머 
+
+> ### 발표
+
+- 발표자료 및 영상포트폴리오 제작
+
   
 <br/>
