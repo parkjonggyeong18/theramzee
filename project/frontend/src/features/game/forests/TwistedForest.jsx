@@ -37,7 +37,6 @@ const TwistedForest = () => {
   const {
     subscribers,
     leaveSession,
-    initPreview
   } = useOpenVidu();
    
   // 현재 사용자가 위치한 숲 번호 가져오기
@@ -96,7 +95,6 @@ const TwistedForest = () => {
               disconnectSocket();
               leaveRoom(roomId);
               leaveSession();
-              initPreview();
               handleLogout2();
             }
 

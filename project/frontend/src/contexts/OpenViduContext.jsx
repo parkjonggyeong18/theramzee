@@ -9,47 +9,17 @@ export const OpenViduProvider = ({ children }) => {
   const [mainStreamManager, setMainStreamManager] = useState(undefined);
   const [publisher, setPublisher] = useState(undefined);
   const [subscribers, setSubscribers] = useState([]); // 빈 배열로 초기화
-  const [isPreview, setIsPreview] = useState(true);
   const [previewPublisher, setPreviewPublisher] = useState(null);
   
   const OV = new OpenVidu();
 
   useEffect(() => {
     window.addEventListener('beforeunload', leaveSession);
-    initPreview();
 
     return () => {
       window.removeEventListener('beforeunload', leaveSession);
     };
   }, []);
-
-  /**
-   * 미리보기(Preview) 초기화
-   */
-  const initPreview = async () => {
-    try {
-      const processedStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
-
-      const previewPub = await OV.initPublisherAsync(undefined, {
-        videoSource: processedStream.getVideoTracks()[0],
-        audioSource: processedStream.getAudioTracks()[0],
-        publishAudio: true,
-        publishVideo: true,
-        mirror: true,
-      });
-
-      setPreviewPublisher(previewPub);
-
-      // 미리보기가 필요하면 dispose 코드는 제거하거나 조건을 달아주세요.
-      // previewPub.stream.disposeWebRtcPeer();
-      // previewPub.stream.disposeMediaStream();
-
-    } catch (error) {
-    }
-  };
 
   /**
    * 게임 세션 접속
@@ -127,7 +97,6 @@ export const OpenViduProvider = ({ children }) => {
     setSubscribers([]);
     setMainStreamManager(undefined);
     setPublisher(undefined);
-    setIsPreview(true);
     setPreviewPublisher(null);
     await new Promise(resolve => setTimeout(resolve, 1000));
   };
@@ -139,12 +108,9 @@ export const OpenViduProvider = ({ children }) => {
         mainStreamManager,
         publisher,
         subscribers,
-        isPreview,
         previewPublisher,
         joinSession,
         leaveSession,
-        setIsPreview,
-        initPreview
       }}
     >
       {children}
