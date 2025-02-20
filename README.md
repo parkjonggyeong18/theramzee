@@ -360,3 +360,56 @@ Jira를 통해 한주의 스프린트를 정하고 백로그를 진행해 현재
 - 긴급투표, 게임 종료 상황별 transition 기능
     
 <br/>
+
+## :bust_in_silhouette: 김경환
+
+> ### WEBSOCKET
+
+- BackEnd
+	- WebSocket STOMP 엔드포인트 등록 및 설정
+
+	- STOMP 메시지 브로커 설정
+
+	- StompHandler를 통한 JWT토큰 헤더로 전달
+	
+- FrontEnd
+	- WebSocket 연결 및 WebSocket 해제 구현
+	
+	- 구독 및 구독 해제 구현
+	
+	- 메시지 보내기 구현
+    
+> ### 게임
+
+- BackEnd
+	- GameController 구현
+			- ApiController 구현
+			- WebSocketController 구현
+		
+	- Game 전체 로직 구현
+		- WebSocket을 이용한 통신
+		- Redis를 이용한 게임 리소스 관리
+		- Game내의 모든 이벤트에 대한 로직 구현
+		
+- FrontEnd
+	- BackEnd에 통신 보내주는 코드 구현
+	- Handler 구현을 통한 WebSocket 통신
+	- GameContext 구현 및 관리
+	
+- Connect
+	- BackEnd에서 데이터 전달
+	- FrontEnd에서 데이터 업데이트 및 참조
+	- 게임 이벤트에 대한 함수 작성
+	- 실시간으로 Redis의 값을 통해 GameContext 업데이트
+
+> ### 서기
+
+- 노션 생성 및 정리
+
+- 회의 기록
+
+- 미팅을 위한 자료 작성
+
+- 에러 기록
+    
+<br/>
