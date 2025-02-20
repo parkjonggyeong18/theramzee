@@ -264,59 +264,46 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     const handleVoteResponse = useCallback(
         (message) => {
             try {
-                if (message.success) {
-                    const data = message.data;
-                    setGameState((prev) => {
-                        // 이미 투표한 플레이어라면 중복 추가하지 않음
-                        const newVotedPlayers = prev.votedPlayers.includes(data.nickname)
-                            ? prev.votedPlayers
-                            : [...prev.votedPlayers, data.nickname];
+                if (!message.success) return;
+                const data = message.data;
+                setGameState((prev) => {
+                    // 중복 투표 방지: 이미 투표한 플레이어면 건너뜁니다.
+                    const newVotedPlayers = prev.votedPlayers.includes(data.nickname)
+                        ? prev.votedPlayers
+                        : [...prev.votedPlayers, data.nickname];
 
-                        const updates = {
-                            ...prev,
-                            [data.nickname]: data.voteNum,
-                            votedPlayers: newVotedPlayers,
-                            totalVote: data.totalVote,
-                        };
+                    // 해당 플레이어의 투표 수 업데이트
+                    const updates = {
+                        ...prev,
+                        [data.nickname]: data.voteNum,
+                        votedPlayers: newVotedPlayers,
+                        totalVote: data.totalVote,
+                    };
 
-                        // 모든 생존자(전체 count에서 killedPlayers 제외)가 투표했는지 확인
-                        if (newVotedPlayers.length === updates.count - updates.killedPlayers.length) {
-                            const result = endVote(newVotedPlayers);
+                    // 모든 생존 플레이어가 투표한 경우 (전체 count에서 killedPlayers 제외)
+                    const alivePlayers = updates.count - updates.killedPlayers.length;
+                    if (newVotedPlayers.length === alivePlayers) {
+                        // 모든 플레이어 투표 완료 시 즉시 투표 종료 처리
+                        const result = endVote(newVotedPlayers);
 
-                            // 동표 처리: result가 falsy이면 투표 상태만 초기화
-                            if (!result) {
-                                return {
-                                    ...updates,
-                                    totalVote: 0,
-                                    votedPlayers: [],
-                                    ...Object.fromEntries(newVotedPlayers.map((p) => [p, 0])),
-                                };
-                            }
-
-                            // 좋은 다람쥐 승리 조건 (악당 색출 성공)
-                            if (result === updates.evilSquirrelNickname) {
-                                return {
-                                    ...updates,
-                                    isGameOver: true,
-                                    winner: 'good',
-                                    gameOverReason: 'emergency',
-                                    isStarted: false,
-                                    isVoting: false,
-                                    isEmergencyVote: false,
-                                    totalVote: 0,
-                                    votedPlayers: [],
-                                    isPaused: false,
-                                    ...Object.fromEntries(newVotedPlayers.map((p) => [p, 0])),
-                                };
-                            }
-
-                            // 악당 색출 실패: result에 해당하는 플레이어를 처형
-                            const newKilledPlayers = prev.killedPlayers.includes(result)
-                                ? prev.killedPlayers
-                                : [...prev.killedPlayers, result];
-                            let updatedState = {
+                        // 동표인 경우: 아무도 처형하지 않고 투표 상태만 초기화합니다.
+                        if (!result) {
+                            return {
                                 ...updates,
-                                killedPlayers: newKilledPlayers,
+                                totalVote: 0,
+                                votedPlayers: [],
+                                ...Object.fromEntries(newVotedPlayers.map((p) => [p, 0])),
+                            };
+                        }
+
+                        // 좋은 다람쥐 승리 조건: 악당 색출 성공
+                        if (result === updates.evilSquirrelNickname) {
+                            return {
+                                ...updates,
+                                isGameOver: true,
+                                winner: 'good',
+                                gameOverReason: 'emergency',
+                                isStarted: false,
                                 isVoting: false,
                                 isEmergencyVote: false,
                                 totalVote: 0,
@@ -324,27 +311,43 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                                 isPaused: false,
                                 ...Object.fromEntries(newVotedPlayers.map((p) => [p, 0])),
                             };
-
-                            if (result === nickName) {
-                                updatedState.isDead = true;
-                                updatedState.isSpectating = true;
-                            }
-
-                            if (updatedState.count - newKilledPlayers.length <= 2) {
-                                updatedState = {
-                                    ...updatedState,
-                                    isGameOver: true,
-                                    gameOverReason: 'kill',
-                                    winner: 'bad',
-                                    isStarted: false,
-                                };
-                            }
-                            return updatedState;
                         }
 
-                        return updates;
-                    });
-                }
+                        // 악당 색출 실패: result에 해당하는 플레이어를 처형
+                        const newKilledPlayers = prev.killedPlayers.includes(result)
+                            ? prev.killedPlayers
+                            : [...prev.killedPlayers, result];
+                        let updatedState = {
+                            ...updates,
+                            killedPlayers: newKilledPlayers,
+                            isVoting: false,
+                            isEmergencyVote: false,
+                            totalVote: 0,
+                            votedPlayers: [],
+                            isPaused: false,
+                            ...Object.fromEntries(newVotedPlayers.map((p) => [p, 0])),
+                        };
+
+                        // 현재 플레이어가 처형 대상인 경우
+                        if (result === nickName) {
+                            updatedState.isDead = true;
+                            updatedState.isSpectating = true;
+                        }
+
+                        // 남은 생존자가 2명 이하이면 나쁜 다람쥐 승리 조건 적용
+                        if (updates.count - newKilledPlayers.length <= 2) {
+                            updatedState = {
+                                ...updatedState,
+                                isGameOver: true,
+                                gameOverReason: 'kill',
+                                winner: 'bad',
+                                isStarted: false,
+                            };
+                        }
+                        return updatedState;
+                    }
+                    return updates;
+                });
             } catch (error) {
                 console.error('Vote handling error:', error);
             }
