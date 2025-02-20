@@ -61,7 +61,7 @@ const MainForestButtons = () => {
         $evilSquirrel={gameState.evilSquirrel}
       >
         {isEnergyActive ? '충전중...' : '에너지'}
-        {isEnergyActive && <ProgressBar />}
+        {isEnergyActive && <ProgressBar $evilSquirrel={gameState.evilSquirrel} />}
       </EnergyButton>
 
       <EmergencyButton 
@@ -168,8 +168,8 @@ const ProgressBar = styled.div`
  bottom: 0;
  left: 0;
  height: 3px;
- background-color: rgba(255, 255, 255, 0.8);
- animation: progress 10s linear forwards;
+ background-color: rgba(255, 255, 255, 1); 
+ animation: progress ${props => props.$evilSquirrel === false ? '7s' : '10s'} linear forwards;
 
  @keyframes progress {
    from { width: 0; }

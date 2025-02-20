@@ -57,6 +57,7 @@ const VideoGrid = (props) => {
           // 1) 숲에 포함되어 있는지 체크
           const isInForest = gameState.forestUsers?.[gameState.forestNum]?.includes(subscriberNickname);
 
+<<<<<<< HEAD
           // 2) 죽은 사람인지 체크
           const isKilled = gameState.killedPlayers?.includes(subscriberNickname);
 
@@ -64,6 +65,23 @@ const VideoGrid = (props) => {
             player.subscribeToAudio(true);
           } else {
             player.subscribeToAudio(false);
+=======
+            // 2) 죽은 사람인지 체크
+            const isKilled = gameState.killedPlayers?.includes(subscriberNickname);
+            
+            // if (!isInForest) {
+            //   player.subscribeToAudio(false);
+            // } 
+            // if (isKilled) {
+            //   player.subscribeToAudio(false);
+            // }
+            if (isInForest && !isKilled) {
+              player.subscribeToAudio(true);
+            } else {
+              player.subscribeToAudio(false);
+            }
+          } catch (error) {
+>>>>>>> a3942d7a58c8f660f2e48721bff9778daeb35090
           }
         } catch (error) {
         }

@@ -59,7 +59,13 @@ const VideoGrid = (props) => {
 
             // 2) 죽은 사람인지 체크
             const isKilled = gameState.killedPlayers?.includes(subscriberNickname);
-  
+            
+            // if (!isInForest) {
+            //   player.subscribeToAudio(false);
+            // } 
+            // if (isKilled) {
+            //   player.subscribeToAudio(false);
+            // }
             if (isInForest && !isKilled) {
               player.subscribeToAudio(true);
             } else {

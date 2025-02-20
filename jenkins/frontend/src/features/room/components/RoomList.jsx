@@ -20,8 +20,9 @@ const RoomList = ({ rooms }) => {
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1rem;
-  padding: 1.8rem;
+  // gap: 1rem;
+  padding: 2rem;
+  padding-bottom: 3rem;
 `;
 
 const EmptyMessage = styled.div`
