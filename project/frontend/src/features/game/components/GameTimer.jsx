@@ -7,7 +7,7 @@ import diaImage from'../../../assets/images/object/PAN.png';
 
 const GameTimer = () => {
   const { gameState, setGameState, cancelAction, moveForest } = useGame();
-  const INITIAL_TIME = 240; // 4분
+  const INITIAL_TIME = 210; // 4분
   const { roomId } = useParams();
   const navigate = useNavigate();
 

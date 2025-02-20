@@ -53,7 +53,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
         hasUsedEmergency: true,
         voter: initializedData.voter,
         serverTime: initializedData.serverTime,
-        timer: 300 - Math.floor((initializedData.serverTime - prev.initServerTime)/1000),
+        timer: 270 - Math.floor((initializedData.serverTime - prev.initServerTime)/1000),
       }));
       cancelAction();
       moveForest(1);
