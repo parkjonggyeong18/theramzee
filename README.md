@@ -368,48 +368,47 @@ Jira를 통해 한주의 스프린트를 정하고 백로그를 진행해 현재
 - BackEnd
 	- WebSocket STOMP 엔드포인트 등록 및 설정
 
-	- STOMP 메시지 브로커 설정
+	- STOMP 메시지 브로커 설정 및 메시지 라우팅
 
-	- StompHandler를 통한 JWT토큰 헤더로 전달
+	- JWT 기반 인증 처리 (StompHandler를 활용한 토큰 전달 및 검증)
 	
 - FrontEnd
-	- WebSocket 연결 및 WebSocket 해제 구현
+	- WebSocket 연결 및 해제 로직 구현
 	
-	- 구독 및 구독 해제 구현
+	- 구독 및 구독 해제 기능 개발
 	
-	- 메시지 보내기 구현
+	- STOMP 메시지 전송 및 핸들링 구현
     
 > ### 게임
 
 - BackEnd
 	- GameController 구현
-			- ApiController 구현
-			- WebSocketController 구현
+			- API 요청을 처리하는 ApiController
+			- 실시간 WebSocket 메시지를 처리하는 WebSocketController
 		
 	- Game 전체 로직 구현
-		- WebSocket을 이용한 통신
-		- Redis를 이용한 게임 리소스 관리
-		- Game내의 모든 이벤트에 대한 로직 구현
+		- WebSocket 기반의 실시간 데이터 송수신
+		- Redis를 활용한 게임 리소스 관리 및 캐싱
+		- 모든 게임 이벤트 핸들링 및 로직 설계
 		
 - FrontEnd
-	- BackEnd에 통신 보내주는 코드 구현
-	- Handler 구현을 통한 WebSocket 통신
-	- GameContext 구현 및 관리
+	- 백엔드 API 및 WebSocket 통신 모듈 구현
+	- WebSocket 핸들러 개발 및 이벤트 처리
+	- GameContext 구현 및 상태 관리
 	
-- Connect
-	- BackEnd에서 데이터 전달
-	- FrontEnd에서 데이터 업데이트 및 참조
-	- 게임 이벤트에 대한 함수 작성
-	- 실시간으로 Redis의 값을 통해 GameContext 업데이트
+- Connect (연동)
+	- 백엔드로부터 실시간 데이터 수신 및 처리
+	- 프론트엔드에서 게임 데이터 업데이트 및 상태 반영
+	- Redis 기반 GameContext 동기화 및 관리
 
 > ### 서기
 
-- 노션 생성 및 정리
+- 프로젝트 문서화 (Notion 활용)
 
-- 회의 기록
+- 주간 회의 기록 및 정리
 
-- 미팅을 위한 자료 작성
+- 미팅 자료 작성 및 공유
 
-- 에러 기록
+- 에러 로그 기록 및 해결 과정 문서화
     
 <br/>
