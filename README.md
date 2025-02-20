@@ -189,4 +189,50 @@ Jira를 통해 한주의 스프린트를 정하고 백로그를 진행해 현재
     
 <br/>
 
+## :bust_in_silhouette: 이대현
+
+> ### EC2 인프라 환경 세팅
+
+- 전체 아키텍쳐 설계
+
+- 서비스 SSL 보안 적용  
+  - Letsencrypt 및 Certbot을 이용하여 SSL 보안 적용
+
+- 서버 구성 요소 설정  
+  - Nginx, Docker, MySQL, ufw 등
+
+- openvidu 환경 세팅
+
+- 환경변수 관리  
+  - .env 파일 작성
+
+> ### FrontEnd / BackEnd EC2 배포
+
+- Dockerfile 작성 및 Config 파일 설정
+
+- docker-compose 파일 설정
+
+> ### Nginx 웹서버 적용
+
+- Reverse Proxy 설정  
+  - 접근 제한 및 서비스 리다이렉트 적용
+
+- 악성 봇 접근 차단  
+  - 브루트포스, 스크래핑 등 대응
+
+> ### Jenkins CI/CD Pipeline 구축
+
+- Gitlab Webhook 연동  
+  - push 및 merge 시 Jenkins에 상태 전송 및 build 트리거
+
+- Docker Hub 이미지 배포
+
+- EC2 서버 배포  
+  - 빌드한 이미지를 pull 받아 container 실행
+
+- Mattermost 연동  
+  - Jenkins build 정보 알림 메시지 봇 구현
+  
+<br/>
+
 
