@@ -54,7 +54,6 @@ public class ChatController {
     @Transactional
     public void loadChatHistory(String receiver, Principal principal) {
         String sender = principal.getName(); // 발신자 정보
-        System.out.println("Chat history 요청 - Sender: " + sender + ", Receiver: " + receiver);
 
         // Redis에서 이전 대화 내역 조회
         List<String> chatHistory = chatMessageService.getMessages(sender, receiver);
@@ -63,8 +62,6 @@ public class ChatController {
         messagingTemplate.convertAndSendToUser(
                 sender, "/queue/chat-history", chatHistory
         );
-
-        System.out.println("Chat history 전송 완료.");
     }
 
     /**
@@ -86,20 +83,15 @@ public class ChatController {
     @Transactional
     public void sendMessage(ChatMessage chatMessage, Principal principal) {
         String sender = chatMessage.getSender();
-        System.out.println("Sender: " + sender);
 
         // 발신자와 수신자의 사용자 정보를 가져옴
         User users = userService.getUserByUserName(sender);
         User user = userService.getUserByUserNickname(chatMessage.getReceiver());
         String receiver = user.getUsername();
 
-        System.out.println("Sender: " + sender + ", Receiver: " + receiver);
-        System.out.println("Sender : " + chatMessage.getSender() + ", Receiver: " + chatMessage.getReceiver());
-
         // 메시지를 저장하고 읽지 않은 메시지 개수를 계산
         chatMessageService.saveMessage(users.getNickname(), chatMessage.getReceiver(), chatMessage.getContent());
         Long unreadCount = chatMessageService.getUnreadCount(users.getNickname(), chatMessage.getReceiver());
-        System.out.println("Unread count: " + unreadCount);
 
         // 읽지 않은 메시지가 있는 경우 알림 전송
         if (unreadCount > 0) {
@@ -114,6 +106,5 @@ public class ChatController {
                 "/topic/messages/" + receiver + "/" + users.getNickname(),
                 chatMessage
         );
-        System.out.println(receiver + ":" + users.getNickname());
     }
 }
