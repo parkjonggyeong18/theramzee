@@ -115,6 +115,9 @@ const MainForest = () => {
   // 긴급 투표 처리 함수  
   const handleEmergencyEnd = () => {
     const result = endVote(gameState.votedPlayers);
+
+    if (result === null) return;
+
     if (result === gameState.evilSquirrelNickname) {
       setGameState(prev => ({
         ...prev,
@@ -318,9 +321,9 @@ const TransitionOverlay = styled.div`
       case 'good':
         return '/path/to/good_transition2.gif'; // 착한 다람쥐 승리 전용 transition
       case 'bad':
-        return '/path/to/bad_transition.gif';  // 나쁜 다람쥐 승리 전용 transition
+        return '/path/to/bad_transition2.gif';  // 나쁜 다람쥐 승리 전용 transition
       case 'emergency':
-        return '/path/to/emergency2.gif';
+        return '/path/to/emergency3.gif';
       case 'final':
         return '/path/to/transition4.gif';
     }

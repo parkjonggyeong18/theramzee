@@ -347,14 +347,17 @@ const handleMoveResponse = useCallback(
                   updates.winner = 'good';
                   updates.gameOverReason = 'time';
                   updates.isStarted = false;
+                  for (const player of newVotedPlayers) {
+                    updates[player] = 0;
+                  }
                 } else {
                 updates.isGameOver = true;
                 updates.winner = 'bad';
                 updates.gameOverReason = 'time';
                 updates.isStarted = false;
-                }
                 for (const player of newVotedPlayers) {
                   updates[player] = 0;
+                }
                 }
             }
             return updates;

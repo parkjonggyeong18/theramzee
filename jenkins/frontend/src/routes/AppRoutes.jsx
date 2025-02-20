@@ -41,7 +41,6 @@ const AppRoutes = () => {
       <BackgroundMusic />
       <Routes>
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/start/*" element={null} /> {/* 이 라인 추가 */}
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/user" element={<UserPage />} />
         <Route path="/rooms" element={<RoomPage />} />
