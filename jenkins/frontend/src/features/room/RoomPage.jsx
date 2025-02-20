@@ -5,15 +5,20 @@ import { fetchRooms, createRoom } from '../../api/room';
 import RoomList from './components/RoomList';
 import CreateRoomForm from './components/CreateRoomForm';
 import forestBg from "../../assets/images/backgrounds/forest-bg.gif";
-import { useAuth } from '../../contexts/AuthContext'; // 추가
-import { FriendContext, FriendProvider } from '../../contexts/FriendContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { FriendContext } from '../../contexts/FriendContext';
 import  FriendPage  from '../../features/friend/FriendPage';
 import  ProfilePage  from '../../features/profile/ProfilePage';
 import ChatPage from '../../features/chat/ChatPage';
+
+//이미지 불러오기
+import PAN from "../../assets/images/object/PAN.png" ;
+
+
 import { Menu } from 'lucide-react';
 
 const RoomPage = () => {
-  const { handleLogout } = useAuth();
+  const { handleLogout, handleLogout2 } = useAuth();
   const [rooms, setRooms] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -51,7 +56,6 @@ const RoomPage = () => {
     loadRooms();
     // 주기적으로 방 목록 업데이트
     const interval = setInterval(() => {
-      console.log('🔄 방 목록 갱신 중...');
       loadRooms();
     }, 30000);
     return () => clearInterval(interval);
@@ -78,7 +82,7 @@ const RoomPage = () => {
 
   useEffect(() => {
     const handleBeforeUnload = () => {
-      handleLogout(); // 로그아웃 처리
+      handleLogout2();
     };
     const handlePopState = () => {
       handleLogout(); // 뒤로가기 시 로그아웃 실행
@@ -90,7 +94,7 @@ const RoomPage = () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [handleLogout]);
+  }, [handleLogout, handleLogout2]);
 
   return (
     <PageContainer>
@@ -177,26 +181,7 @@ const ButtonGroup = styled.div`
   display: flex;
   gap: 1rem;
 `;
-const RefreshButton = styled.button`
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 
-  &:hover span {npm 
-    transform: scale(1.2);
-    transition: transform 0.2s ease-in-out;
-  }
-`;
-
-const Emoji = styled.span`
-  font-size: 1.5rem;
-  display: inline-block;
-  color: #ff6b6b;
-`;
 const LogoutButton = styled.button`
   background-color: #ff6b6b;
   color: white;
@@ -224,7 +209,7 @@ const PageContainer = styled.div`
 `;
 
 const BackgroundImage = styled.div`
-  position: fixed;
+  position: fixed; 
   top: 0;
   left: 0;
   width: 100%;
@@ -235,7 +220,7 @@ const BackgroundImage = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-  width: 90%;
+  width: 100%;
   max-width: 1200px;
   margin: 2rem auto;
   z-index: 1;
@@ -275,10 +260,10 @@ const CreateRoomButton = styled.button`
 `;
 
 const RoomListContainer = styled.div`
-  background-color: rgba(139, 69, 19, 0.9);
-  padding: 2rem;
-  border-radius: 15px;
-  min-height: 400px;
+  background: url(${PAN}) top center;
+  width: 90%;
+  margin-bottom:-100px;
+  background-size: contain;
 `;
 
 const ModalOverlay = styled.div`

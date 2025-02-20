@@ -1,9 +1,8 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { updateUser, deleteUser } from '../../../api/user';
 import { useUser } from '../../../contexts/UserContext';
 import { useAuth } from '../../../contexts/AuthContext';
-import { FriendContext } from '../../../contexts/FriendContext';
 import { sendMessage } from '../../../api/stomp';
 import { apiRequest } from '../../../api/apiService';
 
@@ -48,7 +47,6 @@ const ProfileSettings = () => {
       }
     } catch (error) {
       alert('닉네임 변경에 실패했습니다.');
-      console.error("닉네임 변경 실패:", error);
     }
   };
 
@@ -63,6 +61,12 @@ const ProfileSettings = () => {
     // 현재 비밀번호와 새 비밀번호가 같은지 확인
     if (passwordForm.currentPassword === passwordForm.newPassword) {
       alert('현재 비밀번호와 새 비밀번호는 동일합니다. 다른 비밀번호를 입력해주세요.');
+      return;
+    }
+
+    // 새 비밀번호가 비밀번호 양식과 일치하는지 확인인
+    if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(passwordForm.newPassword)) {
+      alert('비밀번호는 8자 이상, 숫자, 대소문자, 특수문자를 포함해야 합니다');
       return;
     }
 
@@ -97,7 +101,6 @@ const ProfileSettings = () => {
       }
     } catch (error) {
       alert('비밀번호 변경에 실패했습니다.');
-      console.error("비밀번호 변경 실패:", error);
     }
   };
 
@@ -109,7 +112,6 @@ const ProfileSettings = () => {
         handleLogout();
       } catch (error) {
         alert('회원 탈퇴에 실패했습니다.');
-        console.error("회원 탈퇴 실패:", error);
       }
     }
   };

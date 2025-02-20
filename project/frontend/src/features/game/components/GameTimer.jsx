@@ -2,27 +2,27 @@ import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
-import gaegeImage from'../../../assets/images/object/gaege.png'
-import diaImage from'../../../assets/images/object/PAN.png'
+import gaegeImage from'../../../assets/images/object/gaege.png';
+import diaImage from'../../../assets/images/object/PAN.png';
 
 const GameTimer = () => {
-  const { gameState, setGameState,cancelAction, moveForest } = useGame();
-  const INITIAL_TIME = 240; // 7분 = 420초
+  const { gameState, setGameState, cancelAction, moveForest } = useGame();
+  const INITIAL_TIME = 240; // 4분
   const { roomId } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
     let timerInterval;
-  
+
     if (gameState.isStarted && !gameState.isPaused && gameState.timer > 0) {
       timerInterval = setInterval(() => {
         setGameState(prev => {
           const newTimer = prev.timer - 1;
-          
+
           if (newTimer === 0) {
             cancelAction();
             moveForest(1);
-            navigate(`/game/${roomId}/main`); 
+            navigate(`/game/${roomId}/main`);
             return {
               ...prev,
               timer: 0,
@@ -30,7 +30,7 @@ const GameTimer = () => {
               votes: {}
             };
           }
-          
+
           return {
             ...prev,
             timer: newTimer
@@ -38,16 +38,9 @@ const GameTimer = () => {
         });
       }, 1000);
     }
-  
+
     return () => clearInterval(timerInterval);
   }, [gameState.isStarted, gameState.isPaused, gameState.timer]);
-  
-
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
-  };
 
   const getProgressBarColor = (timer) => {
     const percentage = (timer / INITIAL_TIME) * 100;
@@ -57,23 +50,19 @@ const GameTimer = () => {
   };
 
   useEffect(() => {
-    // 폰트 미리 로드
     const font = new FontFace(
       'NeoDunggeunmoPro-Regular',
       `url('/fonts/NeoDunggeunmoPro-Regular.ttf')`,
       { display: 'swap' }
     );
 
-    // 폰트 로드 및 적용
     font.load().then((loadedFont) => {
       document.fonts.add(loadedFont);
-    }).catch((error) => {
-      console.error('폰트 로드 실패:', error);
-    });
+    }).catch((error) => {});
   }, []);
 
   return (
-    <TimerContainer $timer={gameState.timer}>
+    <TimerContainer>
       <TimeText>남은 시간</TimeText>
       <ProgressBarContainer>
         <ProgressBar 
@@ -89,47 +78,48 @@ const TimerContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 200px;  // dia 이미지 크기에 맞게 조정
-  height: 100px; // dia 이미지 크기에 맞게 조정
+  justify-content: center;  
   background-image: url(${diaImage});
   background-size: contain;
   background-repeat: no-repeat;
-
+  background-position: center;
+  width: 200px;  /* 크기 살짝 줄이기 */
+  height: 100px; /* 크기 살짝 줄이기 */
+  padding: 15px; /* 내부 패딩 조정 */
   position: relative;
-  padding: 20px;
-  justify-content: center;
+  z-index: 1000;
 `;
 
 const TimeText = styled.div`
-  font-size: 1.6rem;
+  font-size: 1.5rem; /* 글씨 크기 약간 줄이기 */
   font-family: 'NeoDunggeunmoPro-Regular', sans-serif;  
   color: white;
   text-align: center;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-  position: relative;
-  top: -40px;  // 위치 미세 조정
+  margin-bottom: 12px; /* 글씨와 바 사이 간격 줄이기 */
 `;
 
 const ProgressBarContainer = styled.div`
-  width: 238px;
-  height: 30px;
+  width: 80%;  /* 판자 크기에 맞게 조정 */
+  height: 25px; /* 게이지 바 크기 약간 줄이기 */
   background-image: url(${gaegeImage});
-  background-size: 100% 100%;
+  background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  position: relative;
-  background-color: transparent;
-  margin-top: -30px;  // 게이지바 위치 조정
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 4px;
+  
 `;
+
 const ProgressBar = styled.div`
-  position: absolute;
-  top: 9px;
-  left: 9px;
-  border-radius : 2px;
-  width: calc(${props => props.$progress}% - 33px);  // left 여백만큼 더 빼줌
-  height: calc(100% - 18px);                         // 높이 조절
-  background-color: rgba(76, 175, 80, 0.8);          // 약간 투명도 추가
-  transition: width 1s linear;
+  height: 50%;
+  width: ${props => props.$progress}%;
+  max-width: 100%;  /* 바가 초과되지 않도록 */
+  background-color: ${props => props.$color};
+  border-radius: 5px;
+  transition: width 1s linear, background-color 0.5s ease-in-out;
 
   @keyframes flash {
     0% { opacity: 1; }
@@ -139,4 +129,5 @@ const ProgressBar = styled.div`
 
   animation: ${props => props.$progress <= 25 ? 'flash 1s infinite' : 'none'};
 `;
+
 export default GameTimer;

@@ -67,7 +67,6 @@ public class OpenViduServiceImpl implements OpenViduService {
 
         Connection connection = session.createConnection(connectionProperties);
         String token = connection.getToken();
-        System.out.println("generated token:" + token);
 
         return token;
     }

@@ -91,7 +91,6 @@ public class ChatNotificationController {
     public ResponseEntity<BaseResponse<List<MessageResponse>>> getChatHistory(@RequestParam String sender, @RequestParam String receiver) {
         // Redis에서 채팅 기록 조회
         List<String> chatHistory = chatMessageService.getMessages(sender, receiver);
-        System.out.println("ㅎㅇ");
         // 채팅 기록 문자열을 MessageResponse 객체로 변환
         List<MessageResponse> messageResponses = chatHistory.stream()
                 .map(message -> {

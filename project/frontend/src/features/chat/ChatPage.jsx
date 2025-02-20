@@ -30,7 +30,6 @@ const ChatPage = ({ receiver, isOpen, onClose }) => {
                 setMessages(response.data.messages);
             }
         } catch (error) {
-            console.error('채팅 기록 로드 실패:', error);
             setMessages([]);
         }
     };
@@ -48,10 +47,9 @@ const ChatPage = ({ receiver, isOpen, onClose }) => {
         
         // 새로운 구독 설정
         const subscription = subscribeToTopic(myTopic, (message) => {
-          console.log('Subscribing to my topic:', message);
           const isCurrentChat = (
-            (message.sender = receiver && message.receiver == nickname) ||
-            (message.sender = nickname && message.receiver == receiver)
+            (message.sender = receiver && message.receiver === nickname) ||
+            (message.sender = nickname && message.receiver === receiver)
           );
           
           if (isCurrentChat) {
@@ -63,7 +61,6 @@ const ChatPage = ({ receiver, isOpen, onClose }) => {
         // 구독 객체 저장
         subscriptionRef.current = subscription;
       } catch (error) {
-        console.error('WebSocket 연결 실패:', error);
       }
     };
 
@@ -80,13 +77,6 @@ const ChatPage = ({ receiver, isOpen, onClose }) => {
 
   }, [isOpen, receiver]);
 
-  // // 창 포커스 시 읽음 처리
-  // useEffect(() => {
-  //   const handleFocus = () => markAsRead();
-  //   window.addEventListener('focus', handleFocus);
-  //   return () => window.removeEventListener('focus', handleFocus);
-  // }, [isOpen, receiver]);
-
   const markAsRead = async () => {
     if (!isActiveChatRoom(receiver)) return;
     
@@ -97,7 +87,6 @@ const ChatPage = ({ receiver, isOpen, onClose }) => {
       });
       fetchUnreadCounts();
     } catch (error) {
-      console.error("메시지 읽음 처리 실패:", error);
     }
   };
 
@@ -118,7 +107,6 @@ const ChatPage = ({ receiver, isOpen, onClose }) => {
       // 보낸 메시지를 즉시 화면에 표시
       setMessages(prev => [...prev, message]);
     } catch (error) {
-      console.error('메시지 전송 실패:', error);
     }
   };
 

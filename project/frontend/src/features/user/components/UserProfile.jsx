@@ -1,12 +1,9 @@
-// filepath: /c:/Users/SSAFY/Kims/S12P11B204/project/frontend/src/features/user/components/UserProfile.jsx
 import React, { useState, useEffect } from 'react';
 import { useUser } from '../../../contexts/UserContext';
-import { useAuth } from '../../../contexts/AuthContext';
 import { updateUser } from '../../../api/user';
 
 const UserProfile = () => {
   const { user, setUser } = useUser();
-  const { accessToken } = useAuth();
   const [nickname, setNickname] = useState(user.nickname);
   const [email, setEmail] = useState(user.email);
 
@@ -16,7 +13,6 @@ const UserProfile = () => {
       const updatedUser = await updateUser({ nickname, email });
       setUser(updatedUser);
     } catch (error) {
-      console.error('사용자 프로필 업데이트 실패', error);
     }
   };
 

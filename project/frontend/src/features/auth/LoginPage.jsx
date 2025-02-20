@@ -6,6 +6,7 @@ import { login, register} from '../../api/auth';
 import { sendEmailVerification, verifyEmailCode } from '../../api/email';
 import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
+import PAN from "../../assets/images/object/PAN.png" ;
 import forestBg from "../../assets/images/backgrounds/forest-bg.gif"; 
 import { FriendContext } from '../../contexts/FriendContext';
 const LoginPage = () => {
@@ -28,7 +29,6 @@ const LoginPage = () => {
       setUsername(username);
       navigate('/rooms');
     } catch (error) {
-      console.error('로그인 실패', error);
       setError(error.response?.data?.message || '로그인에 실패했습니다');
     } finally {
       setLoading(false);
@@ -112,6 +112,7 @@ const Title = styled.h1`
 `;
 
 const FormContainer = styled.div`
+  background: url(${PAN}) no-repeat center center;
   background-color: rgba(139, 69, 19, 0.9);
   padding: 2rem;
   border-radius: 15px;

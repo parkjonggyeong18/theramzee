@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { apiRequest } from '../api/apiService';
-import { connectSocket, subscribeToTopic, disconnectSocket, FRIEND_TOPICS } from '../api/stomp';
+import { connectSocket, subscribeToTopic, FRIEND_TOPICS } from '../api/stomp';
 
 export const FriendContext = createContext();
 
@@ -24,9 +24,7 @@ export const FriendProvider = ({ children }) => {
     try {
       const response = await apiRequest('/api/v1/friends/list', 'GET');
       setFriends(response.data || []);
-      console.log('친구 목록:', response.data);
     } catch (error) {
-      console.error('친구 목록 조회 실패:', error);
     }
   };
 
@@ -36,7 +34,6 @@ export const FriendProvider = ({ children }) => {
       const response = await apiRequest('/api/v1/friends/request', 'GET');
       setFriendRequests(response.data || []);
     } catch (error) {
-      console.error('친구 요청 목록 조회 실패:', error);
     }
   };
 
@@ -51,7 +48,6 @@ export const FriendProvider = ({ children }) => {
       }, {});
       setUnreadCounts(counts);
     } catch (error) {
-      console.error('읽지 않은 메시지 수 조회 실패:', error);
     }
   };
 
@@ -62,7 +58,6 @@ export const FriendProvider = ({ children }) => {
       await fetchFriendRequests();
       return true;
     } catch (error) {
-      console.error('친구 요청 실패:', error);
       return false;
     }
   };
@@ -74,7 +69,6 @@ export const FriendProvider = ({ children }) => {
       await Promise.all([fetchFriends(), fetchFriendRequests()]);
       return true;
     } catch (error) {
-      console.error('친구 요청 수락 실패:', error);
       return false;
     }
   };
@@ -86,7 +80,6 @@ export const FriendProvider = ({ children }) => {
       await fetchFriends();
       return true;
     } catch (error) {
-      console.error('친구 삭제 실패:', error);
       return false;
     }
   };
@@ -131,20 +124,17 @@ export const FriendProvider = ({ children }) => {
     connectSocket().then(() => {
       // 친구 목록 업데이트 구독
       setTimeout(() => {subscribeToTopic(FRIEND_TOPICS.FRIENDS(username), (message) => {
-        console.log('친구 목록 실시간 업데이트:', message);
         fetchFriends();
       })},100);
 
       // 친구 요청 업데이트 구독
       setTimeout(()=>{subscribeToTopic(FRIEND_TOPICS.FRIEND_REQUESTS(username), (message) => {
-        console.log('새로운 친구 요청:', message);
         fetchFriendRequests();
       })}, 100);
       
       // 읽지 않은 메시지 알림 구독 추가
       setTimeout(() => {
         subscribeToTopic(`/topic/notifications${username}`, () => {
-          console.log('새로운 메시지 알림 수신');
           fetchUnreadCounts();
         });
       }, 100);
@@ -152,7 +142,6 @@ export const FriendProvider = ({ children }) => {
       // 닉네임 업데이트 구독
       setTimeout(() => {
         subscribeToTopic(FRIEND_TOPICS.NICKNAME_UPDATES(username), () => {
-          console.log('닉네임 업데이트 알림 수신');
           fetchFriends();  // 친구 목록 갱신
         });
       }, 100);

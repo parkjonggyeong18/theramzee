@@ -8,4 +8,5 @@ import java.util.List;
 public class GameEmergencyRequest {
     private int roomId;
     private List<String> nicknames;
+    private String voter;
 }

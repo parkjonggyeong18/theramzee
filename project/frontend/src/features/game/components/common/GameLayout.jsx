@@ -1,4 +1,3 @@
-// GameLayout.jsx
 import styled from 'styled-components';
 import { Z_INDEX } from '../../../../constants/zIndex';
 import DescriptionOverlay from './DescriptionOverlay';
@@ -18,12 +17,14 @@ const GameLayout = ({
   mainForestButtons,
   missionButtons,
   miniGameOverlay,
+
   // Vote related props
   isVoting,
   isEmergencyVote,
   onVote,
   onCloseVote,
   players,
+
   // Description related props
   isDescriptionVisible,
   onShowDescription,

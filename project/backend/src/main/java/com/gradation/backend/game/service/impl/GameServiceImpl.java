@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -21,70 +22,6 @@ public class GameServiceImpl implements GameService {
 
     private final RedisUtil redisUtil;
     private final OpenViduService openViduService;
-
-    /**
-     * 방 정보 조회
-     *
-     * @param roomId 조회할 방의 Id
-     * @return 방의 전체 정보를 담은 RoomInfoResponseDto
-     */
-    public RoomInfoResponse getRoomInformation(int roomId) {
-        RoomInfoResponse roomInfo = new RoomInfoResponse();
-        String roomKey = "ROOM:" + roomId;
-
-        Map<String, UserResponse> users = new HashMap<>();
-        Map<String, ForestResponse> forests = new HashMap<>();
-
-        // 1. Users 데이터 조회
-        for (int userNum = 1; userNum <= 6; userNum++) {
-            String userKey = roomKey + ":USER:" + userNum;
-            Map<Object, Object> userData = redisUtil.hgetAll(userKey);
-            if (!userData.isEmpty()) {
-                UserResponse user = new UserResponse();
-                user.setNickname((String) userData.get("nickname"));
-                user.setAlive((Boolean) userData.get("alive"));
-                user.setAcorns((Integer) userData.get("acorns"));
-                user.setFatigue((Integer) userData.get("fatigue"));
-                user.setForestToken((String) userData.get("forestToken"));
-                user.setForestNum((Integer) userData.get("forestNum"));
-                user.setEvilSquirrel((Boolean) userData.get("isEvilSquirrel"));
-                users.put(userKey, user);
-            }
-        }
-
-        // 2. Forests 데이터 조회
-        for (int forestNum = 1; forestNum <= 7; forestNum++) {
-            String forestKey = roomKey + ":FOREST:" + forestNum;
-            Map<Object, Object> forestData = redisUtil.hgetAll(forestKey);
-            if (!forestData.isEmpty()) {
-                ForestResponse forest = new ForestResponse();
-                forest.setEmergencyPossible((Boolean) forestData.get("emergencyPossible"));
-                forest.setTotalAcorns((Integer) forestData.get("totalAcorns"));
-
-                // MissionData 객체 설정
-                if (forestNum != 1) {
-                    for (int i = 1; i <= 3; i++) {
-                        String missionKey = "mission" + i;
-                        if (forestData.containsKey(missionKey)) {
-                            MissionData missionData = (MissionData) forestData.get(missionKey);
-                            switch (i) {
-                                case 1: forest.setMission1(missionData); break;
-                                case 2: forest.setMission2(missionData); break;
-                                case 3: forest.setMission3(missionData); break;
-                            }
-                        }
-                    }
-                }
-                forests.put(forestKey, forest);
-            }
-        }
-
-        roomInfo.setUsers(users);
-        roomInfo.setForests(forests);
-
-        return roomInfo;
-    }
-
 
     /**
      * 방 초기화 (시작하기 클릭 시)
@@ -145,14 +82,12 @@ public class GameServiceImpl implements GameService {
                 forestData.setTotalAcorns(0);
                 forestData.setTotalVote(0);
                 forestData.setTotalLastVote(0);
+                forestData.setCount(nicknames.size());
                 forestData.setEvilSquirrelNickname(evilSquirrelNickname);
             } else {
                 forestData.setMission1(new MissionData(false, 1));
                 forestData.setMission2(new MissionData(false, 1));
                 forestData.setMission3(new MissionData(false, 1));
-
-                //각 Forest에 해당하는 openvidu 세션 생성
-//                openViduService.createSession(roomId + "-" + forestNum);
             }
 
             // Redis Hash로 저장
@@ -165,6 +100,9 @@ public class GameServiceImpl implements GameService {
         Map<Integer, List<String>> forestUsers = getForestUserMap(roomId, nicknames);
         responseDto.setForestUsers(forestUsers);
 
+        Long serverTime = Instant.now().toEpochMilli();
+        responseDto.setServerTime(serverTime);
+
         return responseDto;
     }
 
@@ -176,7 +114,6 @@ public class GameServiceImpl implements GameService {
             try {
                 map.put(field.getName(), field.get(dto));
             } catch (IllegalAccessException e) {
-                System.out.println("변환 불가");
             }
         }
         return map;
@@ -222,9 +159,11 @@ public class GameServiceImpl implements GameService {
         response.setForestUsers(forestUsers);
         response.setVoter(voter);
 
+        Long serverTime = Instant.now().toEpochMilli();
+        response.setServerTime(serverTime);
+
         return response;
     }
-
 
     /**
      * 특정 유저가 특정 숲으로 이동
@@ -239,17 +178,10 @@ public class GameServiceImpl implements GameService {
         String userKey = roomKey + ":USER:" + nickname;
         int forestNum = newForest;
 
-        // 새로운 숲 토큰 생성
-//        String token = openViduService.generateToken(roomId + "-" + newForest, nickname);
-
-        // forestToken newForest값으로 변경
-//        redisUtil.hset(userKey, "forestToken", token);
         redisUtil.hset(userKey, "forestNum", forestNum);
 
         // 최신 숲별 유저 정보 조회
         Map<Integer, List<String>> forestUsers = getForestUserMap(roomId, nicknames);
-
-        System.out.println("Updated forestNum: " + forestUsers);
 
         // MoveForestResponse 객체 생성 및 반환
         return new MoveForestResponse(nickname, forestNum, forestUsers);
@@ -262,7 +194,6 @@ public class GameServiceImpl implements GameService {
         String roomKey = "ROOM:" + roomId;
         Map<Integer, List<String>> forestUsers = new HashMap<>();
 
-        System.out.println("nicknames = " + nicknames);
         for (int forestNum = 1; forestNum <= 7; forestNum++) {
             List<String> userList = new ArrayList<>();
     
@@ -270,8 +201,6 @@ public class GameServiceImpl implements GameService {
                 String userKey = roomKey + ":USER:" + nickname;
                 Object userForestNumObj = redisUtil.hget(userKey, "forestNum");
                 Integer userForestNum = (Integer) userForestNumObj;
-                System.out.println("userForestNum = " + userForestNum);
-
 
                 if (userForestNum != null && userForestNum == forestNum) {
                     if (nickname != null) {
@@ -292,7 +221,6 @@ public class GameServiceImpl implements GameService {
      * @return 유저의 acorns 값
      */
     public ResultResponse result(int roomId, List<String> nicknames) {
-        System.out.println("nicknames = " + nicknames);
         String roomKey = "ROOM:" + roomId;
         Map<String, Integer> resultsData = new HashMap<>();
 
@@ -349,24 +277,6 @@ public class GameServiceImpl implements GameService {
         return new SaveUserAcornsResponse(nickname, newTotalAcorns, currentAcorns);
     }
 
-//    /**
-//     * 특정 유저의 fatigue 값을 조회
-//     *
-//     * @param roomId: 해당 방의 Id
-//     * @param userNum: 유저 번호 (1-6)
-//     * @return 유저의 fatigue 값
-//     */
-//    public int getUserFatigue(int roomId, int userNum) {
-//        String roomKey = "ROOM:" + roomId;
-//        String userKey = roomKey + ":USER:" + userNum;
-//
-//        // 유저의 fatigue 값 가져오기
-//        Object fatigueObj = redisUtil.hget(userKey, "fatigue");
-//
-//        // fatigue 값을 정수로 반환
-//        return (Integer) fatigueObj;
-//    }
-
     /**
      * 특정 유저의 fatigue 값을 1충전
      *
@@ -420,34 +330,6 @@ public class GameServiceImpl implements GameService {
         // KillResponse 객체 생성 및 반환
         return new KillResponse(killerNickname, newFatigue, victimNickname);
     }
-
-//    /**
-//     * 특정 forest의 mission1, mission2, mission3 상태와 보상을 조회
-//     *
-//     * @param roomId: 해당 방의 Id
-//     * @param forestNum: forest 번호 (2-7)
-//     * @return Map<String, Map<String, Object>> 형태로 각 mission의 완료 상태와 보상을 반환
-//     */
-//    public Map<String, Map<String, Object>> getForestMissionStatus(int roomId, int forestNum) {
-//        String roomKey = "ROOM:" + roomId;
-//        String forestKey = roomKey + ":FOREST:" + forestNum;
-//
-//        Map<String, Map<String, Object>> missionStatus = new HashMap<>();
-//
-//        for (int i = 1; i <= 3; i++) {
-//            String missionKey = "mission" + i;
-//            Object missionObj = redisUtil.hget(forestKey, missionKey);
-//
-//            Map<String, Object> missionInfo = new HashMap<>();
-//            MissionData missionData = (MissionData) missionObj;
-//            missionInfo.put("isCompleted", missionData.isCompleted());
-//            missionInfo.put("acornReward", missionData.getAcornReward());
-//
-//            missionStatus.put(missionKey, missionInfo);
-//        }
-//
-//        return missionStatus;
-//    }
 
     /**
      * 특정 forest의 특정 mission 상태를 완료로 변경
@@ -512,7 +394,9 @@ public class GameServiceImpl implements GameService {
         redisUtil.hset(userKey, "vote", voteNum);
         redisUtil.hset(forestKey, "totalVote", totalVote);
 
-        return new VoteResponse(nickname, voteNum, totalVote);
+        Long serverTime = Instant.now().toEpochMilli();
+
+        return new VoteResponse(nickname, voteNum, totalVote, serverTime);
     }
 
     public VoteResponse lastVote (int roomId, String nickname) {
@@ -529,7 +413,9 @@ public class GameServiceImpl implements GameService {
         redisUtil.hset(userKey, "lastVote", voteNum);
         redisUtil.hset(forestKey, "totalLastVote", totalVote);
 
-        return new VoteResponse(nickname, voteNum, totalVote);
+        Long serverTime = Instant.now().toEpochMilli();
+
+        return new VoteResponse(nickname, voteNum, totalVote, serverTime);
     }
 
 }

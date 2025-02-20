@@ -1,35 +1,38 @@
-import { useCallback, useEffect } from "react";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useCallback } from "react";
+import { useNavigate } from 'react-router-dom';
+import { subscribeToTopic } from '../api/stomp'
 import { useGame } from '../contexts/GameContext';
 
-export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, endVote, voteReset) => {
+export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, endVote) => {
   const nickName = sessionStorage.getItem('nickName');
   const navigate = useNavigate();
+    const { 
+      players
+    } = useGame();
 
   // 게임 초기화 응답 처리
   const handleGameStartResponse = useCallback(
     (message) => {
       try {
         if (message.success) {
+          subscribeToTopic(`/topic/server-time`, handleTimeSyncResponse);
           const initializedData = message.data;
           const userKey = `ROOM:${roomId}:USER:${nickName}`;
           const forestKey = `ROOM:${roomId}:FOREST:1`;
-          console.log("게임 초기화 성공:", initializedData);
 
           setGameState((prev) => ({
             ...prev,
             isStarted: true,
-            timerRunning: true,
             evilSquirrel: initializedData.users[userKey].evilSquirrel,
             forestToken: initializedData.users[userKey].forestToken,
             forestUsers: initializedData.forestUsers,
-            evilSquirrelNickname: initializedData.forests[forestKey].evilSquirrelNickname
+            count: initializedData.forests[forestKey].count,
+            evilSquirrelNickname: initializedData.forests[forestKey].evilSquirrelNickname,
+            initServerTime: initializedData.serverTime,
+            serverTime: initializedData.serverTime,
           }));
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [roomId, setGameState, nickName]
@@ -39,19 +42,18 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
   const handleEmergencyResponse = useCallback(
     (message) => {
     const initializedData = message.data;
-    console.log("긴급 요청 성공:", initializedData)
     if (message.success) {
       setGameState(prev => ({
         ...prev,
         isVoting: true,
         isEmergencyVote: true,
-        votingInProgress: true,
-        currentVotes: {},
-        forestNum: 1, // 모든 플레이어를 메인 숲으로 이동
+        forestNum: 1, 
         forestUsers: initializedData.forestUsers,
         isPaused: true,
         hasUsedEmergency: true,
-        voter: initializedData.voter
+        voter: initializedData.voter,
+        serverTime: initializedData.serverTime,
+        timer: 300 - Math.floor((initializedData.serverTime - prev.initServerTime)/1000),
       }));
       cancelAction();
       moveForest(1);
@@ -61,34 +63,30 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
   [roomId]
 );
 
-  // 숲 이동 응답 처리
-  const handleMoveResponse = useCallback(
-    async (message) => {
-      try {
-        if (message.success) {
-          const initializedData = message.data;
+// 숲 이동 응답 처리
+const handleMoveResponse = useCallback(
+  async (message) => {
+    try {
+      if (message.success) {
+        const initializedData = message.data;
 
+        setGameState((prev) => ({
+          ...prev,
+          forestUsers: initializedData.forestUsers,
+        }));
+
+        if (message.data['nickname'] === nickName) {
           setGameState((prev) => ({
             ...prev,
-            forestUsers: initializedData.forestUsers,
+            forestToken: initializedData.forestToken,
+            forestNum: initializedData.forestNum,
           }));
-
-          if (message.data['nickname'] === nickName) {
-            console.log("숲 이동 성공:", initializedData.forestNum);
-            setGameState((prev) => ({
-              ...prev,
-              forestToken: initializedData.forestToken,
-              forestNum: initializedData.forestNum,
-            }));
-          }
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
-      } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
-    },
-    []
+    } catch (error) {
+    }
+  },
+  []
   );
 
   // 도토리 저장 응답 처리
@@ -97,7 +95,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("도토리 저장 성공:", initializedData);
           
           // 도토리가 13개 이상이면 게임 종료
           if (initializedData.newTotalAcorns >= 13) {
@@ -109,7 +106,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               isGameOver: true,
               gameOverReason: 'acorns',
               winner: 'good',
-              timerRunning: false,
               isStarted: false
             }));setTimeout(() => {
               setGameState(prev => ({
@@ -118,7 +114,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               }));
             }, 500);
           } else {
-            // 게임 진행 중
             setGameState((prev) => ({
               ...prev,
               totalAcorns: initializedData.newTotalAcorns
@@ -130,59 +125,47 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               }));
             }
           }
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [setGameState, nickName, navigate, roomId]
   );
 
-    // 결과 조회 처리
-    const handleResultResponse = useCallback(
-      (message) => {
-        try {
-          if (message.success) {
-            const initializedData = message.data.results;
-            console.log("결과 조회 성공", initializedData)
+  // 결과 조회 처리
+  const handleResultResponse = useCallback(
+    (message) => {
+      try {
+        if (message.success) {
+          const initializedData = message.data.results;
 
-            setGameState((prev) => ({
-              ...prev,
-              results: initializedData
-            }));
-          } else {
-            console.error("Game initialization failed:", message.errorCode);
-          }
-        } catch (error) {
-          console.error("Error parsing game start response:", error);
+          setGameState((prev) => ({
+            ...prev,
+            results: initializedData
+          }));
         }
-      },
-      [setGameState, nickName]
+      } catch (error) {
+      }
+    },
+    [setGameState, nickName]
   );
   
-
   // 피로도 충전 응답 처리
   const handleChargeFatigueResponse = useCallback(
     (message) => {
       try {
         if (message.success && message.data['nickname'] === nickName) {
           const initializedData = message.data;
-          console.log("피로도 충전 성공", initializedData)
           setGameState((prev) => ({
             ...prev,
             fatigue: initializedData.userFatigue
           }));
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [setGameState, nickName]
-);
+  );
 
   // 킬 응답 처리
   const handleKillResponse = useCallback(
@@ -190,7 +173,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("킬 성공:", initializedData);
           
           setGameState((prev) => {
             const newKilledPlayers = [...prev.killedPlayers, initializedData['victimNickname']];
@@ -210,13 +192,12 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               updates.isSpectating = true;
             }
   
-            // 나쁜 다람쥐 승리 조건 체크 (4명 사망)
-            if (newKilledPlayers.length >= 4) {
+            // 나쁜 다람쥐 승리 조건 체크
+            if (updates.count - newKilledPlayers.length <= 2) {
               navigate(`/game/${roomId}/main`);
               updates.isGameOver = true;
               updates.gameOverReason = 'kill';
               updates.winner = 'bad';
-              updates.timerRunning = false;
               updates.isStarted = false;
             }
   
@@ -224,7 +205,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
           });
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [setGameState, nickName, navigate, roomId]
@@ -236,7 +216,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("미션 완료 성공:", initializedData);
           
           // initializedData에서 미션 정보 추출
           const forestNum = initializedData.forestNum;
@@ -257,39 +236,32 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               heldAcorns: initializedData.userAcorns
             }));
           }
-        } else {
-          console.error("미션 완료 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("미션 완료 응답 처리 중 에러:", error);
       }
     },
     [nickName, setGameState]
   );
 
+  // 퇴장 응답 처리 
   const handleOutResponse = useCallback(
     (message) => {
       try {
         if (message.status) {
-          const initializedData = message.data;
-          console.log("퇴장 성공:", initializedData);
           navigate("/rooms");
-        } else {
-          console.error("퇴장 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("퇴장 응답 처리 중 에러:", error);
       }
     },
     [setGameState]
   );
 
+  // 긴급 투표 처리 
   const handleVoteResponse = useCallback(
     (message) => {
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("투표 성공:", initializedData);
 
           setGameState((prev) => {
             const newVotedPlayers = [...prev.votedPlayers, initializedData.nickname];
@@ -301,18 +273,18 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               totalVote: initializedData.totalVote
             };
             
-            if (initializedData.totalVote === 6-updates.killedPlayers.length) {
+            // 모든 유저 투표 완료 
+            if (initializedData.totalVote === updates.count-updates.killedPlayers.length) {
               const result = endVote(newVotedPlayers);
-
+              
+              // 동표일 경우 
               if (result === null) return;
 
               // 나쁜 다람쥐 색출 유무
               if (result === updates.evilSquirrelNickname) {
-                  navigate(`/game/${roomId}/main`);
                   updates.isGameOver = true;
                   updates.winner = 'good';
                   updates.gameOverReason = 'emergency';
-                  updates.timerRunning = false;
                   updates.isStarted = false;
                 } 
 
@@ -320,7 +292,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               updates.killedPlayers = newKilledPlayers;
               updates.isVoting = false;
               updates.isEmergencyVote = false;
-              updates.votingInProgress = false;
               updates.totalVote = 0;
               updates.votedPlayers = [];
               updates.isPaused = false;
@@ -328,13 +299,11 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                 updates[player] = 0;
               }
 
-              // 나쁜 다람쥐 승리 조건 체크 (4명 사망)
-              if (newKilledPlayers.length >= 4) {
-                navigate(`/game/${roomId}/main`);
+              // 나쁜 다람쥐 승리 조건 체크
+              if (updates.count - newKilledPlayers.length <= 2) {
                 updates.isGameOver = true;
                 updates.gameOverReason = 'kill';
                 updates.winner = 'bad';
-                updates.timerRunning = false;
                 updates.isStarted = false;
               }
 
@@ -345,22 +314,19 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             return updates;
           }); 
           
-        } else {
-          console.error("투표 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("투표 응답 처리 중 에러:", error);
       }
     },
     [setGameState]
   );
 
+  // 최종 투표 처리 
   const handleLastVoteResponse = useCallback(
     (message) => {
       try {
         if (message.success) {
           const initializedData = message.data;
-          console.log("투표 성공:", initializedData);
 
           setGameState((prev) => {
             const newVotedPlayers = [...prev.votedPlayers, initializedData.nickname];
@@ -372,23 +338,20 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
               totalVote: initializedData.totalVote
             };
             
-            if (initializedData.totalVote === 6-updates.killedPlayers.length) {
+            // 모든 유저 투표 완료 
+            if (initializedData.totalVote === updates.count-updates.killedPlayers.length) {
               const result = endVote(newVotedPlayers);
 
               // 나쁜 다람쥐 색출 유무
               if (result === updates.evilSquirrelNickname) {
-                  navigate(`/game/${roomId}/main`);
                   updates.isGameOver = true;
                   updates.winner = 'good';
                   updates.gameOverReason = 'time';
-                  updates.timerRunning = false;
                   updates.isStarted = false;
                 } else {
-                navigate(`/game/${roomId}/main`);
                 updates.isGameOver = true;
                 updates.winner = 'bad';
                 updates.gameOverReason = 'time';
-                updates.timerRunning = false;
                 updates.isStarted = false;
                 }
                 for (const player of newVotedPlayers) {
@@ -398,15 +361,39 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             return updates;
           }); 
           
-        } else {
-          console.error("투표 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("투표 응답 처리 중 에러:", error);
       }
     },
     [setGameState]
   );
+
+  // 서버시간 동기화
+  const handleTimeSyncResponse = useCallback(
+    (message) => {
+      try {
+      if (message) {
+        const initializedData = message['serverTime'];
+        
+        setGameState((prev) => {
+          
+          const totalGameTime = prev.hasUsedEmergency ? 300 : 240;
+          const now = initializedData;
+          // 기본 업데이트 객체
+          const updates = {
+            ...prev,
+            serverTime : now,
+            timer: totalGameTime - Math.floor((now - prev.initServerTime)/1000)
+          };
+          return updates;
+        });
+        
+      }
+    } catch (error) {
+    }
+  },
+  [setGameState]
+);
 
   return {
     handleGameStartResponse,
@@ -419,6 +406,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     handleOutResponse,
     handleEmergencyResponse,
     handleVoteResponse,
-    handleLastVoteResponse
+    handleLastVoteResponse,
+    handleTimeSyncResponse
   };
 };

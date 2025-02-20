@@ -3,16 +3,18 @@ import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import { useGame } from '../../contexts/GameContext';
 import { useOpenVidu } from '../../contexts/OpenViduContext';
-import { backgroundImages, characterImages } from '../../assets/images';
+import { backgroundImages } from '../../assets/images';
 import { connectSocket, disconnectSocket } from '../../api/stomp';
 import { useGameHandlers } from '../../handlers/gameHandlers';
 import { subscribeToTopic } from '../../api/stomp';
 import { leaveRoom } from '../../api/room';
+
 // 공통 레이아웃 import
 import GameLayout from './components/common/GameLayout';
 import RoleReveal from './components/RoleReveal';
 import buttonBgImage from'../../assets/images/object/plat.png'
 import buttonBgImage2 from'../../assets/images/object/dia.png'
+
 // components import
 import VideoGrid from './components/VideoGrid';
 import MyVideo from './components/MyVideo';
@@ -23,7 +25,7 @@ import MiniMap from './components/MiniMap';
 import { useAuth } from '../../contexts/AuthContext'; // 추가
 
 const GameRoom = () => {
-    const { handleLogout } = useAuth();
+    const { handleLogout2 } = useAuth();
   const navigate = useNavigate();
   const [showRoleReveal, setShowRoleReveal] = useState(false);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
@@ -35,36 +37,35 @@ const GameRoom = () => {
   const { 
     gameState, 
     startGame, 
-    players,
     setRoomId,
     setIsConnected,
     setGameState,
     moveForest,
     cancelAction,
     endVote,
-    voteReset
   } = useGame();
 
   const {
-    joinSession,
     subscribers,
     leaveSession,
-    initPreview
   } = useOpenVidu();
 
-
   const { roomId } = useParams();  // roomId 가져오기
-  const handlers = useGameHandlers(roomId, setGameState, moveForest, cancelAction, endVote, voteReset);
+  const handlers = useGameHandlers(roomId, setGameState, moveForest, cancelAction, endVote);
   const isSubscribed = useRef(false); // 중복 실행 방지 플래그
-  const nickName = sessionStorage.getItem('nickName')
   const roomHost = sessionStorage.getItem('roomHost') || null;
 
-
   useEffect(() => {
-    setIsDescriptionVisible(true);
+    const overlayKey = `overlay_${roomId}`;
+    const hasSeenOverlay = localStorage.getItem(overlayKey);
+
+    if (!hasSeenOverlay) {
+      setIsDescriptionVisible(true); // Show overlay
+      localStorage.setItem(overlayKey, "true"); // Mark as shown
+    }
+
     setRoomId(roomId);
     if (!roomId) {
-      console.error("⚠️ roomId is missing.");
       return;
     }
     
@@ -73,6 +74,7 @@ const GameRoom = () => {
       roomId: roomId,
     }));
 
+    // 소켓 연결 및 구독 
     const connectAndSubscribe = async () => {
       try {
         if (isSubscribed.current) return; // 이미 구독된 경우 실행하지 않음
@@ -97,7 +99,6 @@ const GameRoom = () => {
           subscribeToTopic(`/topic/game/${roomId}/last-vote`, handlers.handleLastVoteResponse);
         }, 100);
       } catch (error) {
-        console.error("⚠️ Failed to connect or subscribe:", error);
       }
     };
 
@@ -105,7 +106,6 @@ const GameRoom = () => {
 
     const handleBeforeUnload = () => { 
       handleExit2();
-
     };
   
     // 뒤로가기 처리
@@ -118,15 +118,14 @@ const GameRoom = () => {
       disconnectSocket();
       leaveRoom(roomId);
       leaveSession();
-      handleLogout();
-      initPreview();
+      handleLogout2();
     }
+
     // 공통 종료 처리 함수
     const handleExit = () => {
       disconnectSocket();
       leaveRoom(roomId);
       leaveSession();
-      initPreview();
     };
   
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -137,21 +136,21 @@ const GameRoom = () => {
     };
   }, [roomId, navigate]);
 
+  // 게임 시작하기 버튼 클릭 
   const clkStart = () => {
     startGame();
   };
 
+  // 방 나가기 버튼 클릭 
   const clkExit = () => {
     disconnectSocket();
     leaveRoom(roomId);
     leaveSession();
-    initPreview();
     navigate('/rooms');
   };
 
   const leftCam = subscribers.slice(0, 3);
   const rightCam = subscribers.slice(3, 7);
-
 
   // GameLayout에 전달할 컴포넌트들
   const gameLayoutProps = {

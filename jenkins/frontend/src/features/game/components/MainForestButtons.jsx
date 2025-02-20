@@ -1,36 +1,32 @@
-import { useState,useEffect } from 'react';
-import {styled,createGlobalStyle} from 'styled-components';
+import { useEffect } from 'react';
+import {styled} from 'styled-components';
 import { useGame } from '../../../contexts/GameContext';
-import EmergencyVoteModal from '../../../features/game/components/vote/EmergencyVoteModal';
-import * as gameService from '../../../api/gameService';  // gameService import 추가
-import { useParams } from 'react-router-dom';  // useParam
 import buttonBgImage from '../../../assets/images/object/plat.png';
 
 
 const MainForestButtons = () => {
-  const { roomId } = useParams();
   const { 
     gameState, 
     startSaveAcorns, 
     startChargeFatigue, 
-    startEmergency,
     cancelAction, 
     isStorageActive, 
     isEnergyActive,
-    setGameState,
-    players,
     startEmergencyVote,
     isActionInProgress,
   } = useGame();
 
+  // 도토리 저장 
   const clkSave = () => {
     startSaveAcorns();
   };
 
+  // 피로도 충전 
   const clkFatigue = () => {
     startChargeFatigue();
   };
 
+  // 긴급 클릭 
   const clkEmergency = async () => {
     if (gameState.isDead || gameState.hasUsedEmergency) return;
     
@@ -38,7 +34,6 @@ const MainForestButtons = () => {
       startEmergencyVote();
       gameState.hasUsedEmergency = true;
     } catch (error) {
-      console.error('Failed to start emergency vote:', error);
     }
   };
 
@@ -54,7 +49,6 @@ const MainForestButtons = () => {
     font.load().then((loadedFont) => {
       document.fonts.add(loadedFont);
     }).catch((error) => {
-      console.error('폰트 로드 실패:', error);
     });
   }, []);
 
@@ -72,7 +66,7 @@ const MainForestButtons = () => {
 
       <EmergencyButton 
         onClick={clkEmergency}
-        disabled={gameState.hasUsedEmergency || isActionInProgress}
+        disabled={gameState.hasUsedEmergency || isActionInProgress || gameState.timer > 180}
       >
         긴급
       </EmergencyButton>

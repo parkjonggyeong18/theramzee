@@ -4,12 +4,13 @@ import { Z_INDEX } from '../../../../constants/zIndex';
 import { useGame } from '../../../../contexts/GameContext';
 import { sendVote } from '../../../../api/gameService';
 
-const EmergencyVoteModal = ({ isOpen, players, roomId }) => {
+const EmergencyVoteModal = ({ isOpen, players, roomId, timeLeft }) => {
   const { gameState } = useGame();
   const [isVoteCompleted, setIsVoteCompleted] = useState(false);
 
   if (!isOpen) return null;
 
+  // 투표 
   const clkVote = (roomId, nickName) => {
     // 이미 투표가 완료된 경우 클릭 방지
     if (isVoteCompleted) return;
@@ -26,6 +27,7 @@ const EmergencyVoteModal = ({ isOpen, players, roomId }) => {
       <ModalContainer>
         <Header>
           <Title>{gameState.voter}의 긴급 투표</Title>
+          <Timer>{timeLeft}초</Timer>
         </Header>
 
         <AlertBox>
@@ -180,6 +182,13 @@ const VoteButton = styled(BaseButton)`
   &:disabled {
     background-color: #cccccc;
   }
+`;
+
+const Timer = styled.div`
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #e74c3c;
+  font-family: 'NeoDunggeunmoPro-Regular', sans-serif;
 `;
 
 export default EmergencyVoteModal;

@@ -134,7 +134,6 @@ public class UserServiceImpl implements UserService {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        System.out.println(userDetails.getUsername());
 
         // Access 및 Refresh Token 생성
         String accessToken = jwtTokenUtil.generateAccessToken(userDetails);
@@ -300,7 +299,6 @@ public class UserServiceImpl implements UserService {
     public User getCurrentUser() {
         // 1. SecurityContextHolder에서 현재 인증된 사용자 정보 가져오기
         String username = (String) SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println(username);
         // 2. 데이터베이스에서 사용자 정보 조회
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("현재 사용자를 찾을 수 없습니다."));
@@ -330,5 +328,32 @@ public class UserServiceImpl implements UserService {
     public User getUserByUserNickname(String nickname) {
         User user = userRepository.findByNickname(nickname).orElseThrow(() -> new UserNotFoundException("User not found"));
         return user;
+    }
+
+    @Override
+    @Transactional
+    public void updateUserStatusToOnline(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        user.setUserStatus(true); // Set status to online
+        userRepository.save(user);
+    }
+
+    @Override
+    public void notifyFriendsAboutStatusChange(String username, boolean isOnline) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        List<User> friends = friendsRepository.findFriendsByUser(user, FriendStatus.ACCEPTED);
+        String statusMessage = isOnline ? "온라인" : "오프라인";
+
+        List<FriendResponse> friendResponses = friends.stream()
+                .map(friend -> new FriendResponse(friend.getNickname(), statusMessage))
+                .collect(Collectors.toList());
+
+        for (User friend : friends) {
+            messagingTemplate.convertAndSend("/topic/friends/" + friend.getUsername(), friendResponses);
+        }
     }
 }
