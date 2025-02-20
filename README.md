@@ -124,6 +124,9 @@ gateway-6DB33F?style=for-the-badge&logo=spring&logoColor=white"> <img src="https
 ### ERD
 ![image](https://github.com/user-attachments/assets/4ecf95f6-741a-4f9f-9dda-3af8736f1e51)
 <br>
+### 기능 명세서
+https://www.notion.so/1749cc6dad12808aa476fffcc0e57079?v=6b7c044b0f0440eca1af93f8e86a80b0&pvs=4
+명확한 설계와 기능 명세를 통해 명확한 기능 구현을 진행했습니다.
 
 ### 형상관리 및 이슈관리
 ![image](https://github.com/user-attachments/assets/4da577d9-fc7f-4b65-a28b-814e8435b8e3)
