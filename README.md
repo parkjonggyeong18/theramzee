@@ -43,7 +43,7 @@
 
 ### 프로젝트 아키텍쳐
 
-<img width="7492" alt="">
+<img width="7492" alt="https://github.com/user-attachments/assets/382a737b-e125-4fce-aa23-06f12e95ceba">
 <br>
 
 - FRONTEND : 
