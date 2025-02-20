@@ -1,14 +1,12 @@
-import {useCallback} from "react";
-import {useNavigate} from 'react-router-dom';
-import {subscribeToTopic} from '../api/stomp'
-import {useGame} from '../contexts/GameContext';
+import { useCallback, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+import { subscribeToTopic } from '../api/stomp';
+import { useGame } from '../contexts/GameContext';
 
 export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, endVote) => {
     const nickName = sessionStorage.getItem('nickName');
     const navigate = useNavigate();
-    const {
-        players
-    } = useGame();
+    const { players } = useGame();
 
     // 게임 초기화 응답 처리
     const handleGameStartResponse = useCallback(
@@ -33,6 +31,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                     }));
                 }
             } catch (error) {
+                console.error('Game start error:', error);
             }
         },
         [roomId, setGameState, nickName]
@@ -41,41 +40,44 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
     // 비상 상황 응답 처리
     const handleEmergencyResponse = useCallback(
         (message) => {
-            const initializedData = message.data;
-            if (message.success) {
-                setGameState(prev => ({
-                    ...prev,
-                    isVoting: true,
-                    isEmergencyVote: true,
-                    forestNum: 1,
-                    forestUsers: initializedData.forestUsers,
-                    isPaused: true,
-                    hasUsedEmergency: true,
-                    voter: initializedData.voter,
-                    serverTime: initializedData.serverTime,
-                    timer: 270 - Math.floor((initializedData.serverTime - prev.initServerTime) / 1000),
-                }));
-                cancelAction();
-                moveForest(1);
-                navigate(`/game/${roomId}/main`);
+            try {
+                const initializedData = message.data;
+                if (message.success) {
+                    setGameState(prev => ({
+                        ...prev,
+                        isVoting: true,
+                        isEmergencyVote: true,
+                        forestNum: 1,
+                        forestUsers: initializedData.forestUsers,
+                        isPaused: true,
+                        hasUsedEmergency: true,
+                        voter: initializedData.voter,
+                        serverTime: initializedData.serverTime,
+                        timer: 270 - Math.floor((initializedData.serverTime - prev.initServerTime) / 1000),
+                    }));
+                    cancelAction();
+                    moveForest(1);
+                    // 부수 효과는 추후 useEffect로 분리하는 것도 고려
+                    navigate(`/game/${roomId}/main`);
+                }
+            } catch (error) {
+                console.error('Emergency response error:', error);
             }
         },
-        [roomId]
+        [roomId, cancelAction, moveForest, navigate]
     );
 
-// 숲 이동 응답 처리
+    // 숲 이동 응답 처리
     const handleMoveResponse = useCallback(
         async (message) => {
             try {
                 if (message.success) {
                     const initializedData = message.data;
-
                     setGameState((prev) => ({
                         ...prev,
                         forestUsers: initializedData.forestUsers,
                     }));
-
-                    if (message.data['nickname'] === nickName) {
+                    if (message.data.nickname === nickName) {
                         setGameState((prev) => ({
                             ...prev,
                             forestToken: initializedData.forestToken,
@@ -84,9 +86,10 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                     }
                 }
             } catch (error) {
+                console.error('Move response error:', error);
             }
         },
-        []
+        [nickName]
     );
 
     // 도토리 저장 응답 처리
@@ -95,9 +98,8 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             try {
                 if (message.success) {
                     const initializedData = message.data;
-
-                    // 도토리가 13개 이상이면 게임 종료
                     if (initializedData.newTotalAcorns >= 13) {
+                        // 부수 효과: navigate는 업데이트 이후 useEffect에서 처리해도 좋음
                         navigate(`/game/${roomId}/main`);
                         setGameState((prev) => ({
                             ...prev,
@@ -119,7 +121,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                             ...prev,
                             totalAcorns: initializedData.newTotalAcorns
                         }));
-                        if (message.data['nickname'] === nickName) {
+                        if (message.data.nickname === nickName) {
                             setGameState((prev) => ({
                                 ...prev,
                                 heldAcorns: 0
@@ -128,6 +130,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                     }
                 }
             } catch (error) {
+                console.error('Save acorns error:', error);
             }
         },
         [setGameState, nickName, navigate, roomId]
@@ -139,23 +142,23 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             try {
                 if (message.success) {
                     const initializedData = message.data.results;
-
                     setGameState((prev) => ({
                         ...prev,
                         results: initializedData
                     }));
                 }
             } catch (error) {
+                console.error('Result response error:', error);
             }
         },
-        [setGameState, nickName]
+        [setGameState]
     );
 
     // 피로도 충전 응답 처리
     const handleChargeFatigueResponse = useCallback(
         (message) => {
             try {
-                if (message.success && message.data['nickname'] === nickName) {
+                if (message.success && message.data.nickname === nickName) {
                     const initializedData = message.data;
                     setGameState((prev) => ({
                         ...prev,
@@ -163,52 +166,54 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                     }));
                 }
             } catch (error) {
+                console.error('Charge fatigue error:', error);
             }
         },
         [setGameState, nickName]
     );
 
-    // 킬 응답 처리
+    // 킬 응답 처리 (중복 처치 방지 및 부수 효과 분리)
     const handleKillResponse = useCallback(
         (message) => {
             try {
                 if (message.success) {
-                    const initializedData = message.data;
-
+                    const data = message.data;
                     setGameState((prev) => {
-                        const newKilledPlayers = [...prev.killedPlayers, initializedData['victimNickname']];
-
-                        // 기본 업데이트 객체
+                        // 이미 처형된 플레이어인지 체크
+                        if (prev.killedPlayers.includes(data.victimNickname)) {
+                            return prev;
+                        }
+                        const newKilledPlayers = [...prev.killedPlayers, data.victimNickname];
                         const updates = {
                             ...prev,
                             killedPlayers: newKilledPlayers,
-                            killerNickname: initializedData['killerNickname']
+                            killerNickname: data.killerNickname
                         };
 
-                        // 킬러/희생자 관련 업데이트
-                        if (message.data['killerNickname'] === nickName) {
-                            updates.fatigue = initializedData['killerFatigue'];
-                        } else if (message.data['victimNickname'] === nickName) {
+                        if (data.killerNickname === nickName) {
+                            updates.fatigue = data.killerFatigue;
+                        } else if (data.victimNickname === nickName) {
                             updates.isDead = true;
                             updates.isSpectating = true;
                         }
 
                         // 나쁜 다람쥐 승리 조건 체크
                         if (updates.count - newKilledPlayers.length <= 2) {
-                            navigate(`/game/${roomId}/main`);
                             updates.isGameOver = true;
                             updates.gameOverReason = 'kill';
                             updates.winner = 'bad';
                             updates.isStarted = false;
                         }
-
                         return updates;
                     });
+                    // 상태 업데이트 후, isGameOver 플래그를 감지해 navigate 호출하는 useEffect로 부수 효과 처리 가능
+                    // 예시: if (newState.isGameOver) { navigate(`/game/${roomId}/main`); }
                 }
             } catch (error) {
+                console.error('Kill handling error:', error);
             }
         },
-        [setGameState, nickName, navigate, roomId]
+        [setGameState, nickName]
     );
 
     // 미션 완료 응답 처리
@@ -217,19 +222,15 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             try {
                 if (message.success) {
                     const initializedData = message.data;
-
-                    // initializedData에서 미션 정보 추출
                     const forestNum = initializedData.forestNum;
                     const missionNum = initializedData.missionNum;
                     const missionKey = `${forestNum}_${missionNum}`;
 
-                    // 모든 플레이어가 미션 완료 상태 업데이트
                     setGameState(prev => ({
                         ...prev,
                         [missionKey]: [true, prev[missionKey][1]],
                     }));
 
-                    // 미션을 완료한 플레이어인 경우에만 추가 상태 업데이트
                     if (initializedData.nickname === nickName) {
                         setGameState(prev => ({
                             ...prev,
@@ -239,6 +240,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                     }
                 }
             } catch (error) {
+                console.error('Complete mission error:', error);
             }
         },
         [nickName, setGameState]
@@ -252,34 +254,36 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                     navigate("/rooms");
                 }
             } catch (error) {
+                console.error('Out response error:', error);
             }
         },
-        [setGameState]
+        [navigate]
     );
 
-    // 긴급 투표 처리
+    // 긴급 투표 처리 (투표 중복 체크 및 승리 조건 개선)
     const handleVoteResponse = useCallback(
         (message) => {
             try {
                 if (message.success) {
-                    const initializedData = message.data;
+                    const data = message.data;
                     setGameState((prev) => {
-                        // 투표한 플레이어 목록 업데이트
-                        const newVotedPlayers = [...prev.votedPlayers, initializedData.nickname];
+                        // 이미 투표한 플레이어라면 중복 추가하지 않음
+                        const newVotedPlayers = prev.votedPlayers.includes(data.nickname)
+                            ? prev.votedPlayers
+                            : [...prev.votedPlayers, data.nickname];
 
                         const updates = {
                             ...prev,
-                            [initializedData.nickname]: initializedData.voteNum,
+                            [data.nickname]: data.voteNum,
                             votedPlayers: newVotedPlayers,
-                            totalVote: initializedData.totalVote, // 참고용 값 (실제 투표 완료 조건은 아래에서 계산)
+                            totalVote: data.totalVote,
                         };
 
-                        // 모든 생존자(전체 count에서 killedPlayers를 뺀 인원)가 투표를 마쳤는지 확인
+                        // 모든 생존자(전체 count에서 killedPlayers 제외)가 투표했는지 확인
                         if (newVotedPlayers.length === updates.count - updates.killedPlayers.length) {
-                            // endVote 함수가 동표일 경우 falsy(null/undefined)를 반환하도록 가정
                             const result = endVote(newVotedPlayers);
 
-                            // 동표 처리: 아무도 처형하지 않고 투표 상태만 초기화
+                            // 동표 처리: result가 falsy이면 투표 상태만 초기화
                             if (!result) {
                                 return {
                                     ...updates,
@@ -289,7 +293,7 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                                 };
                             }
 
-                            // 1. 좋은 다람쥐 승리 조건 (악당 색출 성공)
+                            // 좋은 다람쥐 승리 조건 (악당 색출 성공)
                             if (result === updates.evilSquirrelNickname) {
                                 return {
                                     ...updates,
@@ -306,8 +310,10 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                                 };
                             }
 
-                            // 2. 악당 색출 실패: result에 해당하는 플레이어를 처형
-                            const newKilledPlayers = [...prev.killedPlayers, result];
+                            // 악당 색출 실패: result에 해당하는 플레이어를 처형
+                            const newKilledPlayers = prev.killedPlayers.includes(result)
+                                ? prev.killedPlayers
+                                : [...prev.killedPlayers, result];
                             let updatedState = {
                                 ...updates,
                                 killedPlayers: newKilledPlayers,
@@ -319,13 +325,11 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                                 ...Object.fromEntries(newVotedPlayers.map((p) => [p, 0])),
                             };
 
-                            // 3. 만약 처형된 플레이어가 현재 플레이어라면 사망 상태로 전환
                             if (result === nickName) {
                                 updatedState.isDead = true;
                                 updatedState.isSpectating = true;
                             }
 
-                            // 4. 나쁜 다람쥐 승리 조건 체크 (생존자 2명 이하)
                             if (updatedState.count - newKilledPlayers.length <= 2) {
                                 updatedState = {
                                     ...updatedState,
@@ -335,7 +339,6 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                                     isStarted: false,
                                 };
                             }
-
                             return updatedState;
                         }
 
@@ -349,29 +352,28 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
         [setGameState, nickName, endVote]
     );
 
-
     // 최종 투표 처리
     const handleLastVoteResponse = useCallback(
         (message) => {
             try {
                 if (message.success) {
-                    const initializedData = message.data;
-
+                    const data = message.data;
                     setGameState((prev) => {
-                        const newVotedPlayers = [...prev.votedPlayers, initializedData.nickname];
+                        const newVotedPlayers = prev.votedPlayers.includes(data.nickname)
+                            ? prev.votedPlayers
+                            : [...prev.votedPlayers, data.nickname];
 
                         const updates = {
                             ...prev,
-                            [initializedData.nickname]: initializedData.voteNum,
+                            [data.nickname]: data.voteNum,
                             votedPlayers: newVotedPlayers,
-                            totalVote: initializedData.totalVote
+                            totalVote: data.totalVote,
                         };
 
-                        // 모든 유저 투표 완료
-                        if (initializedData.totalVote === updates.count - updates.killedPlayers.length) {
+                        if (data.totalVote === updates.count - updates.killedPlayers.length) {
                             const result = endVote(newVotedPlayers);
 
-                            // 나쁜 다람쥐 색출 유무
+                            // 나쁜 다람쥐 색출 여부에 따라 승리 처리
                             if (result === updates.evilSquirrelNickname) {
                                 updates.isGameOver = true;
                                 updates.winner = 'good';
@@ -392,12 +394,12 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
                         }
                         return updates;
                     });
-
                 }
             } catch (error) {
+                console.error('Last vote error:', error);
             }
         },
-        [setGameState]
+        [setGameState, endVote]
     );
 
     // 서버시간 동기화
@@ -405,27 +407,32 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
         (message) => {
             try {
                 if (message) {
-                    const initializedData = message['serverTime'];
-
+                    const now = message.serverTime;
                     setGameState((prev) => {
-
                         const totalGameTime = prev.hasUsedEmergency ? 300 : 240;
-                        const now = initializedData;
-                        // 기본 업데이트 객체
-                        const updates = {
+                        return {
                             ...prev,
                             serverTime: now,
                             timer: totalGameTime - Math.floor((now - prev.initServerTime) / 1000)
                         };
-                        return updates;
                     });
-
                 }
             } catch (error) {
+                console.error('Time sync error:', error);
             }
         },
         [setGameState]
     );
+
+    // 부수 효과 분리 예시: 게임 종료 시 navigate 처리 (useEffect)
+    useEffect(() => {
+        setGameState((state) => {
+            if (state.isGameOver) {
+                navigate(`/game/${roomId}/main`);
+            }
+            return state;
+        });
+    }, [navigate, roomId, setGameState]);
 
     return {
         handleGameStartResponse,
