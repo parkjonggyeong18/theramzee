@@ -12,7 +12,7 @@ import  ProfilePage  from '../../features/profile/ProfilePage';
 import ChatPage from '../../features/chat/ChatPage';
 
 //이미지 불러오기
-import PAN from "../../assets/images/object/PAN.png" ;
+import PAN2 from "../../assets/images/object/PAN2.png" ;
 
 
 import { Menu } from 'lucide-react';
@@ -123,6 +123,7 @@ const RoomPage = () => {
           <LoadingMessage>방 목록을 불러오는 중...</LoadingMessage>
         ) : (
           <RoomListContainer>
+            <BackgroundBoardImage src={PAN2} alt="container background" />
             <RefreshButtonComponent onClick={loadRooms} loading={loading} />
             <RoomList rooms={rooms} />
           </RoomListContainer>
@@ -260,10 +261,19 @@ const CreateRoomButton = styled.button`
 `;
 
 const RoomListContainer = styled.div`
-  background: url(${PAN}) top center;
   width: 90%;
-  margin-bottom:-100px;
-  background-size: contain;
+  margin-bottom: -100px;
+  position: relative;
+`;
+
+const BackgroundBoardImage = styled.img`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  object-fit: fill;
+  z-index: -1;
 `;
 
 const ModalOverlay = styled.div`

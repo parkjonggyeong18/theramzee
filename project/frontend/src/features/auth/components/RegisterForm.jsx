@@ -68,8 +68,8 @@ const RegisterForm = ({ onRegister, loading }) => {
       setErrors((prev) => ({ ...prev, email: '올바른 이메일을 입력해주세요' }));
       return;
     }
+    setIsEmailSent(true);
     try {
-      setIsEmailSent(true);
       await sendEmailVerification(formData.email);
       setEmailTimer(180);
       setErrors((prev) => ({ ...prev, email: '' }));
@@ -90,8 +90,9 @@ const RegisterForm = ({ onRegister, loading }) => {
       setErrors((prev) => ({ ...prev, emailCode: '인증번호를 입력해주세요' }));
       return;
     }
-  
+
     try {
+      await verifyEmailCode(formData.email, formData.emailCode);
       setIsEmailVerified(true);
       setEmailTimer(0);
       setErrors((prev) => ({ ...prev, emailCode: '' }));

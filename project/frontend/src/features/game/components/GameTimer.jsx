@@ -87,7 +87,7 @@ const TimerContainer = styled.div`
   height: 100px; /* 크기 살짝 줄이기 */
   padding: 15px; /* 내부 패딩 조정 */
   position: relative;
-  z-index: 1000;
+  z-index: 1001;
 `;
 
 const TimeText = styled.div`
