@@ -49,7 +49,6 @@ const GameRoom = () => {
     joinSession,
     subscribers,
     leaveSession,
-    initPreview
   } = useOpenVidu();
 
 
@@ -125,7 +124,6 @@ const GameRoom = () => {
       disconnectSocket();
       leaveRoom(roomId);
       leaveSession();
-      initPreview();
       handleLogout2();
     }
     // 공통 종료 처리 함수
@@ -133,7 +131,6 @@ const GameRoom = () => {
       disconnectSocket();
       leaveRoom(roomId);
       leaveSession();
-      initPreview();
     };
   
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -152,7 +149,6 @@ const GameRoom = () => {
     disconnectSocket();
     leaveRoom(roomId);
     leaveSession();
-    initPreview();
     navigate('/rooms');
   };
 

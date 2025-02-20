@@ -31,12 +31,10 @@ const BreathingForest = () => {
   const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
   const navigate = useNavigate();
   const { roomId } = useParams();
-  const { handleLogout, handleLogout2 } = useAuth();
+  const { handleLogout2 } = useAuth();
   const {
-    joinSession,
     subscribers,
     leaveSession,
-    initPreview
   } = useOpenVidu();
   
   const currentForestNum = gameState.forestNum;
@@ -99,7 +97,6 @@ const BreathingForest = () => {
                   disconnectSocket();
                   leaveRoom(roomId);
                   leaveSession();
-                  initPreview();
                   handleLogout2();
                 }
     if (gameState.isStarted && gameState.evilSquirrel !== null) {

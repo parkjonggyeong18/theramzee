@@ -1,110 +1,99 @@
-import React , {useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import UserVideoComponent from './components/UserVideoComponent';
 import { useOpenVidu } from '../../contexts/OpenViduContext';
-import { useAuth } from '../../contexts/AuthContext'; 
+import { useAuth } from '../../contexts/AuthContext';
 import { leaveRoom } from '../../api/room';
-import { connectSocket, disconnectSocket } from '../../api/stomp';
-const OpenViduPage = () => {
-   const { handleLogout, handleLogout2 } = useAuth();
-  const {
-    session,
-    mainStreamManager,
-    subscribers,
-    isPreview,
-    previewPublisher,
-    joinSession,
-    leaveSession,
-    setIsPreview,
-    initPreview,
-  } = useOpenVidu();
+import { disconnectSocket } from '../../api/stomp';
 
+const OpenViduPage = () => {
+  const { handleLogout2 } = useAuth();
+  const { joinSession, leaveSession } = useOpenVidu();
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const sessionId = `${roomId}-1`;
-  const username = sessionStorage.getItem('username') || 'Guest';
   const nickname = sessionStorage.getItem('nickName') || 'Guest';
   const token = sessionStorage.getItem('openViduToken');
 
-  /**
-   * "게임에 입장하기" 버튼 클릭
-   */
+  const [localStream, setLocalStream] = useState(null);
+  const videoRef = useRef(null);
+  const [isDisabled, setIsDisabled] = useState(false);
+
+  // 로컬 스트림 가져오기
+  useEffect(() => {
+    async function initLocalStream() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+        setLocalStream(stream);
+      } catch (error) {
+        console.error('Error accessing media devices:', error);
+      }
+    }
+    initLocalStream();
+  }, []);
+
+  // video 태그에 로컬 스트림 연결
+  useEffect(() => {
+    if (localStream && videoRef.current) {
+      videoRef.current.srcObject = localStream;
+    }
+  }, [localStream]);
+
+  // "게임에 입장하기" 버튼 클릭 시 session 참가
   const enterGame = async () => {
+    setIsDisabled(true); // 버튼 비활성화
+    setTimeout(() => setIsDisabled(false), 5000); // 5초 후 다시 활성화
     await joinSession(token, nickname);
-    setIsPreview(false);
     navigate(`/room/${roomId}/game`);
   };
-useEffect(() => {
-    
 
-  const handleBeforeUnload = () => { 
-    handleExit2();
+  // 페이지 종료나 뒤로가기 시 클린업
+  useEffect(() => {
+    const cleanup = () => {
+      disconnectSocket();
+      leaveRoom(roomId);
+      leaveSession();
+      handleLogout2();
+    };
 
-  };
-  
-    // 뒤로가기 처리
+    const handleBeforeUnload = () => {
+      cleanup();
+    };
+
     const handlePopState = () => {
-      handleExit();
+      cleanup();
       navigate('/rooms');
     };
-    // 종료 처리 함수
-    const handleExit2 = () => {
-      disconnectSocket();
-      leaveRoom(roomId);
-      leaveSession();
-      initPreview();
-      handleLogout2();
-    }
-    // 뒤로가기 종료 처리 함수
-    const handleExit = () => {
-      disconnectSocket();
-      leaveRoom(roomId);
-      leaveSession();
-      initPreview();
-    };
-    
+
     window.addEventListener('beforeunload', handleBeforeUnload);
     window.addEventListener('popstate', handlePopState);
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       window.removeEventListener('popstate', handlePopState);
     };
-  }, [roomId, navigate]);
+  }, [roomId, navigate, leaveSession, handleLogout2]);
 
-  // 미리보기 화면
-  if (isPreview) {
-    return (
-      <PreviewContainer>
-        <Header>
-          <Title>RAMZEE 미리보기</Title>
-        </Header>
-        <VideoWrapper>
-          {previewPublisher ? (
-            <UserVideoComponent streamManager={previewPublisher} />
-          ) : (
-            <Placeholder>카메라가 활성화되지 않았습니다</Placeholder>
-          )}
-        </VideoWrapper>
-        <ButtonGroup>
-          <EnterButton onClick={enterGame}>게임에 입장하기</EnterButton>
-        </ButtonGroup>
-      </PreviewContainer>
-    );
-  }
-
-  // 세션 화면
   return (
-    <SessionContainer>
+    <PreviewContainer>
       <Header>
-        <Title>다람쥐 월드: {roomId}</Title>
+        <Title>RAMZEE 미리보기</Title>
       </Header>
-      <VideoGrid>
-        {[...(mainStreamManager ? [mainStreamManager] : []), ...subscribers].map((stream, idx) => (
-          <UserVideoComponent key={idx} streamManager={stream} />
-        ))}
-      </VideoGrid>
-    </SessionContainer>
+      <VideoWrapper>
+        {localStream ? (
+          <video autoPlay muted playsInline ref={videoRef} style={{ width: '100%' }} />
+        ) : (
+          <Placeholder>Loading...</Placeholder>
+        )}
+      </VideoWrapper>
+      <ButtonGroup>
+      <EnterButton onClick={enterGame} disabled={isDisabled}>
+        {isDisabled ? '게임 입장중...' : '게임에 입장하기'}
+      </EnterButton>
+      </ButtonGroup>
+    </PreviewContainer>
   );
 };
 
@@ -117,27 +106,19 @@ const PreviewContainer = styled.div`
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background-color: rgba(34, 17, 7, 0.9); /* 로비와 유사한 배경색 */
+  background-color: rgba(34, 17, 7, 0.9);
 `;
 
-const Header = styled.div`
-
-`;
+const Header = styled.div``;
 
 const Title = styled.h1`
   font-size: 2.5rem;
-  color: #a4e17d; /* 밝은 녹색 */
-`;
-
-const Subtitle = styled.p`
-  font-size: 1.2rem;
-  color: #fff;
+  color: #a4e17d;
 `;
 
 const VideoWrapper = styled.div`
   width: 60%;
   max-width: 650px;
-  height: auto;
   margin: 2rem auto;
 `;
 
@@ -157,19 +138,9 @@ const ButtonGroup = styled.div`
 `;
 
 const EnterButton = styled.button`
-  background-color: #a4e17d; /* 밝은 녹색 */
+  background-color: #a4e17d;
   color: black;
   padding: 1rem 2rem;
   border-radius: 10px;
   font-size: 1.2rem;
-`;
-
-const LeaveButton = styled.button`
-  background-color: #ff6b6b; /* 밝은 빨간색 */
-`;
-
-const SessionContainer = styled.div`
-`;
-
-const VideoGrid = styled.div`
 `;
