@@ -115,6 +115,9 @@ const MainForest = () => {
   // 긴급 투표 처리 함수  
   const handleEmergencyEnd = () => {
     const result = endVote(gameState.votedPlayers);
+
+    if (result === null) return;
+
     if (result === gameState.evilSquirrelNickname) {
       setGameState(prev => ({
         ...prev,
