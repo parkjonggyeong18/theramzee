@@ -170,7 +170,7 @@ const ProgressBar = styled.div`
  bottom: 0;
  left: 0;
  height: 3px;
- background-color: rgba(255, 255, 255, 0.8);
+ background-color: rgba(76, 175, 80, 1); 
  animation: progress 10s linear forwards;
 
  @keyframes progress {
