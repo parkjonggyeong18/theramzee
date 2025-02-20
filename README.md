@@ -50,8 +50,8 @@
 - BACKEND :
 
 ### CI/CD
-- GitLab를 통해 코드베이스를 관리하며 변경 사항을 병합하기 위해 Pull Request를 생성하고 팀원들을 이를 검토하고 코드 리뷰를 진행합니다.
-PR가 merge되면 Jenkins을 통한 CI/CD가 시작됩니다. 이 파이프라인은 빌드를 자동으로 시작하고 빌드된 코드가 자동으로 배포가 진행됩니다.
+- GitLab를 통해 코드베이스를 관리하며 변경 사항을 병합하기 위해 Merge Request를 생성하고 팀원들을 이를 검토하고 코드 리뷰를 진행합니다.
+MR이이 merge되면 Jenkins을 통한 CI/CD가 시작됩니다. 이 파이프라인은 빌드를 자동으로 시작하고 빌드된 코드가 자동으로 배포가 진행됩니다.
 - 또한, AWS의 Secure Key Manager를 사용하여 DB 정보를 비롯한 암호화가 필요한 중요한 데이터들을 안전하게 관리하고 환경변수를 통해 접근합니다.
 <img width="5636" alt="Project  T3Team_bookstore_wireframe (1)" src="">
 <br>
