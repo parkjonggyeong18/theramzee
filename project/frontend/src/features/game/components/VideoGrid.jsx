@@ -66,7 +66,6 @@ const VideoGrid = (props) => {
               player.subscribeToAudio(false);
             }
           } catch (error) {
-            console.error("오디오 제어 처리 중 오류:", error);
           }
         }
       });
@@ -84,7 +83,6 @@ const VideoGrid = (props) => {
         playerNickname = playerData.clientData;
       }
     } catch (error) {
-      console.error("Error extracting nickname:", error);
     }
     const isPlayerDead = gameState.killedPlayers?.includes(playerNickname);
     return { playerNickname, isPlayerDead };

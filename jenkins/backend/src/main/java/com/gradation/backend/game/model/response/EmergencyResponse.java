@@ -10,4 +10,6 @@ import java.util.Map;
 @Data
 public class EmergencyResponse {
     Map<Integer, List<String>> forestUsers;
+    private Long serverTime;
+    String voter;
 }

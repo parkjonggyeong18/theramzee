@@ -1,6 +1,3 @@
--- 기존 데이터베이스가 있으면 삭제 ( 수정 필요 )
-DROP DATABASE IF EXISTS gradation_db;
-
 -- 데이터베이스 생성 및 선택
 CREATE DATABASE IF NOT EXISTS gradation_db;
 USE gradation_db;

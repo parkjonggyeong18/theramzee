@@ -23,7 +23,7 @@ import { disconnectSocket } from '../../../api/stomp';
 import { useAuth } from '../../../contexts/AuthContext';
 
 const TwistedForest = () => {
-  const { gameState, players, completeMission } = useGame();
+  const { gameState, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [currentMission, setCurrentMission] = useState(null);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
@@ -37,7 +37,6 @@ const TwistedForest = () => {
   const {
     subscribers,
     leaveSession,
-    initPreview
   } = useOpenVidu();
    
   // 현재 사용자가 위치한 숲 번호 가져오기
@@ -84,7 +83,6 @@ const TwistedForest = () => {
       setShowMiniGame(false);
       setCurrentMission(null);
     } catch (error) {
-      console.error('Failed to complete mission:', error);
     }
   };
 
@@ -97,7 +95,6 @@ const TwistedForest = () => {
               disconnectSocket();
               leaveRoom(roomId);
               leaveSession();
-              initPreview();
               handleLogout2();
             }
 
@@ -216,7 +213,7 @@ const MissionButtonWrapper = styled.div`
   }
   &:nth-child(2) {
     top: 33vh;
-    left: -78vh;
+    left: -68vh;
   }
   &:nth-child(3) {
     bottom: -30vh;

@@ -3,26 +3,18 @@ package com.gradation.backend.game.service;
 import com.gradation.backend.game.model.response.*;
 import io.openvidu.java.client.OpenViduHttpException;
 import io.openvidu.java.client.OpenViduJavaClientException;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
-import org.springframework.stereotype.Service;
-
-import java.lang.reflect.Field;
 import java.util.*;
 
 public interface GameService {
 
-    RoomInfoResponse getRoomInformation(int roomId);
+    RoomInitializationResponse initializeRoomStructure(int roomId, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException;
 
-    RoomInitializationResponse initializeRoomStructure(int roomId, List<String> nicknames)
-            throws OpenViduJavaClientException, OpenViduHttpException;
-
-    EmergencyResponse emergency(int roomId, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException;
+    EmergencyResponse emergency(int roomId, List<String> nicknames, String voter) throws OpenViduJavaClientException, OpenViduHttpException;
 
     MoveForestResponse moveForest(int roomId, String nickname, int newForest, List<String> nicknames) throws OpenViduJavaClientException, OpenViduHttpException;
+
+    ResultResponse result(int roomId, List<String> nicknames);
+
     /**
      * 특정 유저의 도토리를 공용 저장소에 저장하고 초기화
      *

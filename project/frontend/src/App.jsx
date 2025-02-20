@@ -21,17 +21,33 @@ const App = () => {
       sessionStorage.setItem('hasVisited', 'true'); // 방문 기록 저장
       setShowSplash(true);
       // 3초 후 스플래시 화면 종료
-      setTimeout(() => {
-        setShowSplash(false);
-      }, 3000);
+      // setTimeout(() => {
+      //   setShowSplash(false);
+      // }, 3000);
 
     }
   }, []);
 
+  useEffect(() => {
+    if (showSplash) {
+      const handleKeyDown = (e) => {
+        if (e.key === 'Escape') {
+          setShowSplash(false);
+        }
+      };
+
+      window.addEventListener('keydown', handleKeyDown);
+
+      return () => {
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [showSplash]);
+
   return (
     <>
       {showSplash ? ( // 스플래시 화면 표시
-        <SplashScreen />
+        <SplashScreen onComplete={() => setShowSplash(false)} />
       ) : ( // 스플래시 완료 후 메인 앱 렌더링
         <VolumeProvider>
           <VolumeControl />

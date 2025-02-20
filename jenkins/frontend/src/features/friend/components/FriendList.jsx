@@ -23,11 +23,9 @@ const FriendList = () => {
         receiver: sessionStorage.getItem("nickName"),
       });
 
-      console.log(`메시지를 읽음 처리했습니다: ${nickname}`);
       setUnreadCounts((prev) => ({ ...prev, [nickname]: 0 }));
       openChatOverlay(nickname);
     } catch (error) {
-      console.error("메시지 읽음 처리 실패:", error);
     }
   };
 
@@ -44,7 +42,6 @@ const FriendList = () => {
       } else if (error.response?.status === 404) {
         alert('친구가 방에 입장해있지 않습니다.');
       } else {
-        console.error('친구 따라가기 실패:', error);
         alert('친구 따라가기에 실패했습니다.');
       }
     }

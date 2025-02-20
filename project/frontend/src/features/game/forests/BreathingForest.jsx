@@ -34,7 +34,6 @@ const BreathingForest = () => {
   const {
     subscribers,
     leaveSession,
-    initPreview
   } = useOpenVidu();
   
   const currentForestNum = gameState.forestNum;
@@ -83,7 +82,6 @@ const BreathingForest = () => {
       setShowMiniGame(false);
       setCurrentMission(null);
     } catch (error) {
-      console.error('Failed to complete mission:', error);
     }
   };
 
@@ -96,7 +94,6 @@ const BreathingForest = () => {
                   disconnectSocket();
                   leaveRoom(roomId);
                   leaveSession();
-                  initPreview();
                   handleLogout2();
                 }
     if (gameState.isStarted && gameState.evilSquirrel !== null) {

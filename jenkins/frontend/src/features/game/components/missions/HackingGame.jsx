@@ -1,4 +1,3 @@
-// HackingGame.jsx
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../../contexts/GameContext';

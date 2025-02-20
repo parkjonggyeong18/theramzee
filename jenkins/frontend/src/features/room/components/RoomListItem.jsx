@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { joinRoom } from '../../../api/room';
 import { useNavigate } from 'react-router-dom';
+import PAPER from '../../../assets/images/object/paper.png'
 
 const RoomListItem = ({ room }) => {
   const [isJoining, setIsJoining] = useState(false);
@@ -62,6 +63,8 @@ const RoomListItem = ({ room }) => {
       </RoomHeader>
       <RoomInfo>
         <RoomDetails>
+          {/* {roomId, title, gameStatus, hostNickName, currentParticipantCount, nicknames, password} */}
+        <DetailItem>게임상태: {room.gameStatus}</DetailItem>
           <DetailItem>방장: {room.hostNickName}</DetailItem>
           <DetailItem>참가자: {room.currentParticipantCount > 6 ? 6 : room.currentParticipantCount}/6</DetailItem>
         </RoomDetails>
@@ -103,14 +106,15 @@ const RoomListItem = ({ room }) => {
 };
 
 const RoomCard = styled.div`
-  background-color: rgba(45, 24, 16, 0.8);
-  border-radius: 10px;
-  padding: 1.5rem;
+  background: url(${PAPER}) center center;
+  background-size: cover;
+  padding: 1rem;
+  margin: 15px;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
   transition: transform 0.2s;
-
+  margin-bottom: 100px;
   &:hover {
     transform: translateY(-5px);
   }
@@ -121,7 +125,7 @@ const RoomInfo = styled.div`
 `;
 
 const RoomTitle = styled.h3`
-  color: white;
+  color: black;
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
   overflow: hidden;
@@ -130,7 +134,7 @@ const RoomTitle = styled.h3`
 `;
 
 const RoomDetails = styled.div`
-  color: #ccc;
+  color: black;
   font-size: 0.9rem;
 `;
 
@@ -139,8 +143,8 @@ const DetailItem = styled.div`
 `;
 
 const JoinButton = styled.button`
-  background-color: #90EE90;
-  color: #2d1810;
+  background-color:rgb(77, 20, 28);
+  color: white;
   padding: 0.8rem;
   border: none;
   border-radius: 5px;

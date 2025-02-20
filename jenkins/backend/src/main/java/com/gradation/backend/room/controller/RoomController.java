@@ -59,8 +59,6 @@ public class RoomController {
 
         // 세션 생성
         Session session = openViduService.createSession(sessionId);
-        System.out.println("RoomController.createRoom");
-        System.out.println("session = " + session);
 
         // 토큰 생성
         String token = openViduService.generateToken(session.getSessionId(), nickname);
@@ -82,16 +80,13 @@ public class RoomController {
         try {
             User currentUser = userService.getCurrentUser();
             String nickname = currentUser.getNickname();
-            System.out.println("RoomController.joinRoom");
             Room updatedRoom = roomService.joinRoom(roomId, nickname, request.getPassword());
 
             //스트링 변환
             String sessionId = String.valueOf(updatedRoom.getId()) + "-1";
-            System.out.println(nickname + ":" + sessionId);
 
             //토큰 생성
             String token = openViduService.generateToken(sessionId, nickname);
-            System.out.println("token = " + token);
 
             JoinRoomResponse response = new JoinRoomResponse(updatedRoom, token);
 

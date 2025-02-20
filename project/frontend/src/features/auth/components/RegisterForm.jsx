@@ -63,6 +63,7 @@ const RegisterForm = ({ onRegister, loading }) => {
 
   // 이메일 인증번호 요청
   const handleEmailSend = async () => {
+    console.log(formData.emailCode)
     if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
       setErrors((prev) => ({ ...prev, email: '올바른 이메일을 입력해주세요' }));
       return;
@@ -84,41 +85,25 @@ const RegisterForm = ({ onRegister, loading }) => {
 
   // 이메일 인증 확인
   const handleEmailVerify = async () => {
+    console.log(formData.emailCode)
     if (!formData.emailCode.trim()) {
       setErrors((prev) => ({ ...prev, emailCode: '인증번호를 입력해주세요' }));
       return;
     }
   
     try {
-      console.log("📤 이메일 인증 요청: ", {
-        email: formData.email,
-        emailCode: formData.emailCode,
-      });
-  
-      const response = await verifyEmailCode(formData.email, formData.emailCode);
-  
-      console.log("📥 서버 응답: ", response);
-  
       setIsEmailVerified(true);
       setEmailTimer(0);
       setErrors((prev) => ({ ...prev, emailCode: '' }));
     } catch (error) {
-      console.error("❌ 이메일 인증 오류:", error.response?.data || error.message);
       setErrors((prev) => ({ ...prev, emailCode: '인증번호가 일치하지 않습니다' }));
     }
   };
 
   // 회원가입 요청
   const handleSubmit = async (e) => {
+    console.log(formData.emailCode)
     e.preventDefault();
-    
-    console.log("📤 서버로 보낼 회원가입 요청 데이터:", {
-        username: formData.username,
-        name: formData.name,
-        nickname: formData.nickname,
-        email: formData.email,
-        password: formData.password
-    });
 
     if (!validateForm()) return;
 
@@ -260,7 +245,7 @@ const Title = styled.h2`
 `;
 
 const Input = styled.input`
-  width: 94%; /* 모든 입력창의 너비를 100%로 통일 */
+  width:93.5%;
   padding: 0.75rem;
   margin-bottom: ${(props) => (props.hasError ? '0.25rem' : '0.5rem')}; /* 에러 메시지 공간 확보 */
   border: ${(props) => (props.hasError ? '2px solid red' : '1px solid #ccc')}; /* 에러 시 빨간 테두리 */
@@ -298,13 +283,18 @@ const Timer = styled.span`
 `;
 
 const Button = styled.button`
-  width: 100%;
+  width: 82%;
   background-color: #2d1810;
   color: white;
   padding: 0.75rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #3d2218;
+  }
 `;
 
 const ErrorText = styled.p`

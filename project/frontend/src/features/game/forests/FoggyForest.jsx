@@ -38,7 +38,6 @@ const FoggyForest = () => {
   const {
     subscribers,
     leaveSession,
-    initPreview
   } = useOpenVidu();
    
     // 현재 사용자가 위치한 숲 번호 가져오기
@@ -96,7 +95,6 @@ const FoggyForest = () => {
       setShowMiniGame(false);
       setCurrentMission(null);
     } catch (error) {
-      console.error('Failed to complete mission:', error);
     }
   };
 
@@ -109,7 +107,6 @@ const FoggyForest = () => {
           disconnectSocket();
           leaveRoom(roomId);
           leaveSession();
-          initPreview();
           handleLogout2();
         }
     if (gameState.isStarted && gameState.evilSquirrel !== null) {

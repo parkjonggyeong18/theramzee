@@ -95,7 +95,6 @@ public class RoomServiceImpl implements RoomService {
 
         //비번방일 경우 비밀번호 검증
         if (room.getPassword() != null && !Objects.equals(password, room.getPassword())) {
-            System.out.println(room.getPassword());
             throw new IllegalArgumentException("비밀번호 오류!");
         }
 
@@ -138,7 +137,6 @@ public class RoomServiceImpl implements RoomService {
             message.put("status", "success");
             message.put("message", "방장이 방을 나갔습니다.");
             messagingTemplate.convertAndSend("/topic/game/" + roomId + "/out", message);
-            System.out.println("방장이 방을 나갔습니다.");
             roomRepository.delete(room);
 
         } else {

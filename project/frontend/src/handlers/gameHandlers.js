@@ -1,10 +1,14 @@
 import { useCallback } from "react";
 import { useNavigate } from 'react-router-dom';
 import { subscribeToTopic } from '../api/stomp'
+import { useGame } from '../contexts/GameContext';
 
 export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, endVote) => {
   const nickName = sessionStorage.getItem('nickName');
   const navigate = useNavigate();
+    const { 
+      players
+    } = useGame();
 
   // 게임 초기화 응답 처리
   const handleGameStartResponse = useCallback(
@@ -22,15 +26,13 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             evilSquirrel: initializedData.users[userKey].evilSquirrel,
             forestToken: initializedData.users[userKey].forestToken,
             forestUsers: initializedData.forestUsers,
+            count: initializedData.forests[forestKey].count,
             evilSquirrelNickname: initializedData.forests[forestKey].evilSquirrelNickname,
             initServerTime: initializedData.serverTime,
             serverTime: initializedData.serverTime,
           }));
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [roomId, setGameState, nickName]
@@ -80,11 +82,8 @@ const handleMoveResponse = useCallback(
             forestNum: initializedData.forestNum,
           }));
         }
-      } else {
-        console.error("Game initialization failed:", message.errorCode);
       }
     } catch (error) {
-      console.error("Error parsing game start response:", error);
     }
   },
   []
@@ -126,11 +125,8 @@ const handleMoveResponse = useCallback(
               }));
             }
           }
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [setGameState, nickName, navigate, roomId]
@@ -147,11 +143,8 @@ const handleMoveResponse = useCallback(
             ...prev,
             results: initializedData
           }));
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [setGameState, nickName]
@@ -167,11 +160,8 @@ const handleMoveResponse = useCallback(
             ...prev,
             fatigue: initializedData.userFatigue
           }));
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [setGameState, nickName]
@@ -202,8 +192,8 @@ const handleMoveResponse = useCallback(
               updates.isSpectating = true;
             }
   
-            // 나쁜 다람쥐 승리 조건 체크 (4명 사망)
-            if (newKilledPlayers.length >= 4) {
+            // 나쁜 다람쥐 승리 조건 체크
+            if (updates.count - newKilledPlayers.length <= 2) {
               navigate(`/game/${roomId}/main`);
               updates.isGameOver = true;
               updates.gameOverReason = 'kill';
@@ -215,7 +205,6 @@ const handleMoveResponse = useCallback(
           });
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [setGameState, nickName, navigate, roomId]
@@ -247,11 +236,8 @@ const handleMoveResponse = useCallback(
               heldAcorns: initializedData.userAcorns
             }));
           }
-        } else {
-          console.error("미션 완료 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("미션 완료 응답 처리 중 에러:", error);
       }
     },
     [nickName, setGameState]
@@ -263,11 +249,8 @@ const handleMoveResponse = useCallback(
       try {
         if (message.status) {
           navigate("/rooms");
-        } else {
-          console.error("퇴장 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("퇴장 응답 처리 중 에러:", error);
       }
     },
     [setGameState]
@@ -291,7 +274,7 @@ const handleMoveResponse = useCallback(
             };
             
             // 모든 유저 투표 완료 
-            if (initializedData.totalVote === 6-updates.killedPlayers.length) {
+            if (initializedData.totalVote === updates.count-updates.killedPlayers.length) {
               const result = endVote(newVotedPlayers);
               
               // 동표일 경우 
@@ -316,8 +299,8 @@ const handleMoveResponse = useCallback(
                 updates[player] = 0;
               }
 
-              // 나쁜 다람쥐 승리 조건 체크 (4명 사망)
-              if (newKilledPlayers.length >= 4) {
+              // 나쁜 다람쥐 승리 조건 체크
+              if (updates.count - newKilledPlayers.length <= 2) {
                 updates.isGameOver = true;
                 updates.gameOverReason = 'kill';
                 updates.winner = 'bad';
@@ -331,11 +314,8 @@ const handleMoveResponse = useCallback(
             return updates;
           }); 
           
-        } else {
-          console.error("투표 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("투표 응답 처리 중 에러:", error);
       }
     },
     [setGameState]
@@ -359,7 +339,7 @@ const handleMoveResponse = useCallback(
             };
             
             // 모든 유저 투표 완료 
-            if (initializedData.totalVote === 6-updates.killedPlayers.length) {
+            if (initializedData.totalVote === updates.count-updates.killedPlayers.length) {
               const result = endVote(newVotedPlayers);
 
               // 나쁜 다람쥐 색출 유무
@@ -377,18 +357,12 @@ const handleMoveResponse = useCallback(
                 for (const player of newVotedPlayers) {
                   updates[player] = 0;
                 }
-              for (const player of newVotedPlayers) {
-                updates[player] = 0;
-              }
             }
             return updates;
           }); 
           
-        } else {
-          console.error("투표 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("투표 응답 처리 중 에러:", error);
       }
     },
     [setGameState]
@@ -399,9 +373,7 @@ const handleMoveResponse = useCallback(
     (message) => {
       try {
       if (message) {
-        console.log("메시지 : ", message)
         const initializedData = message['serverTime'];
-        console.log("서버 시간 응답:", initializedData);
         
         setGameState((prev) => {
           
@@ -413,13 +385,11 @@ const handleMoveResponse = useCallback(
             serverTime : now,
             timer: totalGameTime - Math.floor((now - prev.initServerTime)/1000)
           };
-          console.log("바뀐 시간: ", updates.timer);
           return updates;
         });
         
       }
     } catch (error) {
-      console.error("Error parsing game start response:", error);
     }
   },
   [setGameState]

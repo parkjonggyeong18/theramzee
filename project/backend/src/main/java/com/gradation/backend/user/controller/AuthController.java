@@ -95,7 +95,6 @@ public class AuthController {
         }
 
         String username = jwtTokenUtil.extractUsername(expiredAccessToken);
-        System.out.println("expiredAccessToken = " + expiredAccessToken);
         if (username != null && redisUtil.hasKey(username + ":refresh")) {
             // Redis에서 Refresh Token을 가져온다
             String refreshToken = (String) redisUtil.get(username + ":refresh");
@@ -104,7 +103,6 @@ public class AuthController {
             if (jwtTokenUtil.validateToken(refreshToken, userDetails)) {
                 String newAccessToken = jwtTokenUtil.generateAccessToken(userDetails);
                 TokenResponse tokenResponse = new TokenResponse(newAccessToken, userDetails.getUserNickName());
-                System.out.println("newAccessToken = " + newAccessToken);
                 return ResponseEntity.ok(BaseResponse.success("Access 토큰이 성공적으로 갱신되었습니다.", tokenResponse));
             }
         }
