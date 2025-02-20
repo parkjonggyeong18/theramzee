@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4ae0ba1a-89bb-4496-af78-19ebdd9f0380" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/김경환/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/김경환/webmobile1-skeleton/backend/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/김경환/webmobile1-skeleton/backend/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jenkins/frontend/src/contexts/OpenViduContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/jenkins/frontend/src/contexts/OpenViduContext.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jenkins/frontend/src/features/game/components/VideoGrid.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/jenkins/frontend/src/features/game/components/VideoGrid.jsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -14,11 +15,11 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/김경환/webmobile1-skeleton" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="2rZ7xprsJFvJdwG9iGcDVVse6qo" />
   <component name="ProjectLevelVcsManager">
     <ConfirmationsSetting value="2" id="Add" />
@@ -31,11 +32,28 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "master",
+    "git-widget-placeholder": "feature/game/mic",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/SSAFY/Desktop/S12P11B204/김경환/webmobile1-skeleton/backend"
+    "last_opened_file_path": "C:/Users/SSAFY/Kims/pjt/S12P11B204/project/backend",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\SSAFY\S12P11B204\project\backend\src\main\java\com\gradation\backend\common" />
+      <recent name="C:\Users\SSAFY\S12P11B204\project\backend\src\main\java\com\gradation\backend" />
+      <recent name="C:\Users\SSAFY\S12P11B204\project\backend\src\main\java\com\gradation\backend\user" />
+      <recent name="C:\Users\SSAFY\S12P11B204\project\backend\src\main\java\com\gradation\backend\room" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\SSAFY\S12P11B204\project\backend\src\main\java\com\gradation\backend\room\model" />
+    </key>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -44,7 +62,11 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1736754992252</updated>
+      <workItem from="1737683669865" duration="1472000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
 </project>
