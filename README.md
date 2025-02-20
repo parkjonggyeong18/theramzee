@@ -1,6 +1,8 @@
 ## THE RAMZEE
 
 ### 프로젝트 소개
+<img src="https://github.com/user-attachments/assets/fd99f49f-84db-4add-802f-241bebfa0b04" width="50" height="50"> 
+
 - 마피아류 웹 게임으로 다람쥐를 통해 플레이합니다.
 - 이메일 인증을 통해 회원가입을 하고 게임을 플레이 할 수 있습니다.
 - 친구 추가를 통해 친구와 같이 플레이하고 채팅을 할 수 있습니다.
