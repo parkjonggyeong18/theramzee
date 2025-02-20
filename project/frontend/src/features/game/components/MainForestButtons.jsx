@@ -168,7 +168,7 @@ const ProgressBar = styled.div`
  bottom: 0;
  left: 0;
  height: 3px;
- background-color: rgba(76, 175, 80, 1); 
+ background-color: rgba(255, 255, 255, 1); 
  animation: progress ${props => props.$evilSquirrel === false ? '7s' : '10s'} linear forwards;
 
  @keyframes progress {
