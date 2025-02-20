@@ -138,19 +138,19 @@ Jira를 통해 한주의 스프린트를 정하고 백로그를 진행해 현재
 
 ### 사이트 소개
 
-로그인<br>
+## 로그인<br>
 <img src="https://github.com/user-attachments/assets/eaf3ed90-b862-45e7-99ee-27c04abf38df" width="250" height="200"/><br>
 회원가입 후 로그인 진행합니다. 회원가입시 이메일 인증을 통해 회원가입을 진행합니다.<br>
 아이디 / 비밀번호 찾기는 이메일로 아이디 / 비밀번호를 발급합니다.
 <br><br>
 
-로비, 친구 및 채팅, 프로필<br>
+## 로비, 친구 및 채팅, 프로필<br>
 <img src="https://github.com/user-attachments/assets/438251a7-53f6-4a4a-b146-a5c794133cc0" width="250" height="200"/><br>
 만들어진 방에 참여하거나 친구 목록을 확인 가능<br>
 웹소캣을 활용해 실시간 친구 추가, 삭제, 친구 게임 따라가기 기능과 채팅 기능을 제공<br>
 프로필에서 지금 캠화면을 체크하고 닉네임, 비밀번호 수정 및 탈퇴 기능 지원원
 <br><br>
-게임 진행<br>
+## 게임 진행<br>
 <img src="https://github.com/user-attachments/assets/af1b42a0-da27-4190-8bd1-08edfc63a21d" width="250" height="200"/>
 <img src="https://github.com/user-attachments/assets/2e884b7e-4aa2-4a41-afd3-021152cd9ff0" width="250" height="200"/>
 <img src="https://github.com/user-attachments/assets/95417f95-59fa-40d6-bc5c-041f759bada4" width="250" height="200"/>
