@@ -115,7 +115,6 @@ const MainForest = () => {
   // 긴급 투표 처리 함수  
   const handleEmergencyEnd = () => {
     const result = endVote(gameState.votedPlayers);
-    console.log("result 시발 긴급투표:", result);
     if (result === gameState.evilSquirrelNickname) {
       setGameState(prev => ({
         ...prev,
@@ -157,7 +156,6 @@ const MainForest = () => {
   // 최종 투표 처리 함수  
   const handleLastVoteEnd = () => {
     const result = endVote(gameState.votedPlayers);
-    console.log("result 시발:", result);
     if (result === gameState.evilSquirrelNickname) {
       setGameState(prev => {
         const updates = {
