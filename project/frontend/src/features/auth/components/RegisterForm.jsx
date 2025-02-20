@@ -85,8 +85,8 @@ const RegisterForm = ({ onRegister, loading }) => {
 
   // 이메일 인증 확인
   const handleEmailVerify = async () => {
-    console.log(formData.emailCode)
-    if (!formData.emailCode.trim()) {
+    
+    if (!formData.emailCode) {
       setErrors((prev) => ({ ...prev, emailCode: '인증번호를 입력해주세요' }));
       return;
     }
