@@ -57,7 +57,6 @@ public class FollowController {
     public ResponseEntity<BaseResponse<RoomFollowReesponse>> followFriend(@RequestBody FriendRequest followFriendRequest) {
         try {
             User currentUser = userService.getCurrentUser();  // 현재 로그인한 사용자
-            System.out.println(currentUser);
             // 요청 본문에서 친구의 닉네임을 가져옴
             String friendNickname = followFriendRequest.getFriendNickname();
 
@@ -66,17 +65,14 @@ public class FollowController {
 
             // 친구가 속한 방 검색
             Long roomId = response.getRoomId();
-            System.out.println("roomId = " + roomId);
 
             // 친구가 속한 방의 비밀번호 가져와서 참가하기
             Room room = roomService.getRoom(roomId);
-            System.out.println("room = " + room);
 
             Room joinedRoom = roomService.friendJoinRoom(roomId, currentUser.getNickname(), room.getPassword());
 
             // 오픈비두 세션 토큰 발급
             String sessionId = roomId + "-1";
-            System.out.println("sessionId = " + sessionId);
             String token = openViduService.generateToken(sessionId, currentUser.getNickname());
             response.setToken(token);
 

@@ -12,14 +12,10 @@ export const refreshToken = async () => {
                 Authorization: `Bearer ${expiredAccessToken}`, // 만료된 토큰 전달
             },
         });
-        console.log('토큰 갱신 요청 성공:', response.data.data.accessToken);
         // 새 토큰 저장
         sessionStorage.setItem('accessToken', response.data.data.accessToken);
-        console.log('새 토큰 발급 성공:', response.data.data.accessToken);
         return response.data.data.accessToken;
     } catch (error) {
-        console.error('토큰 갱신 실패:', error);
-
         // 인증 실패 처리: 로그아웃 및 로그인 페이지로 이동
         sessionStorage.removeItem('accessToken');
         window.location.href = '/login';
@@ -37,8 +33,6 @@ export const apiRequest = async (url, method, data = null, requiresAuth = true) 
           accessToken = sessionStorage.getItem('accessToken');
         }
 
-        console.log('API 요청 시작:', { url, method, data });
-
         // 요청 수행
         const response = await axios({
             url: `${BASE_URL}${url}`,
@@ -50,21 +44,14 @@ export const apiRequest = async (url, method, data = null, requiresAuth = true) 
             },
         });
         
-
-        console.log('API 요청 성공:', response.data);
         return response.data;
     } catch (error) {
-        console.error('API 요청 실패:', error.response.data);
         
-
         // 401 Unauthorized 처리
         if (requiresAuth && error.response?.data === "Unauthorized: Authentication failed") {
-            console.warn('401 Unauthorized: 토큰 갱신 시도');
-
             try {
                 // 토큰 갱신
                 const accessToken  = await refreshToken();
-                console.log("새 토큰 발급 성공2:", accessToken);
                 // 요청 재시도
                 const retryResponse = await axios({
                     url: `${BASE_URL}${url}`,
@@ -78,7 +65,6 @@ export const apiRequest = async (url, method, data = null, requiresAuth = true) 
 
                 return retryResponse.data;
             } catch (refreshError) {
-                console.error('토큰 갱신 후 요청 실패:', refreshError);
                 throw refreshError;
             }
         }

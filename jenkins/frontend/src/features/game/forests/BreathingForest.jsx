@@ -9,16 +9,18 @@ import MyVideo from '../components/MyVideo';
 import GameTimer from '../components/GameTimer';
 import StatePanel from '../components/StatePanel';
 import MiniMap from '../components/MiniMap';
-import MissionButton from '../components/MissionButton';
 import MazeGame from '../components/missions/MazeGame';
 import VineSlashGame from '../components/missions/VineSlashGame';
 import PlantGame from '../components/missions/PlantTimingGame'
 import flyhell from '../../../assets/images/object/flyhell.png'
 import weed from '../../../assets/images/object/weed.png'
 import ram from '../../../assets/images/object/ram.png'
-
+import { leaveRoom } from '../../../api/room';
+import { disconnectSocket } from '../../../api/stomp';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useNavigate, useParams } from 'react-router-dom';
 const BreathingForest = () => {
-  const { gameState, players, completeMission } = useGame();
+  const { gameState, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [currentMission, setCurrentMission] = useState(null);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
@@ -26,7 +28,13 @@ const BreathingForest = () => {
   
   const showDescriptionOverlay = () => setIsDescriptionVisible(true);
   const hideDescriptionOverlay = () => setIsDescriptionVisible(false);
-  const { joinSession, subscribers } = useOpenVidu();
+  const navigate = useNavigate();
+  const { roomId } = useParams();
+  const { handleLogout2 } = useAuth();
+  const {
+    subscribers,
+    leaveSession,
+  } = useOpenVidu();
   
   const currentForestNum = gameState.forestNum;
   const currentForestUser = gameState.forestUsers?.[currentForestNum];
@@ -47,7 +55,6 @@ const BreathingForest = () => {
       const subscriberNickname = subData.clientData;
       return currentForestUser?.includes(subscriberNickname);
     } catch (error) {
-      console.error("🚨 OpenVidu 데이터 파싱 오류:", error);
       return false;
     }
   });
@@ -75,21 +82,33 @@ const BreathingForest = () => {
       setShowMiniGame(false);
       setCurrentMission(null);
     } catch (error) {
-      console.error('Failed to complete mission:', error);
     }
   };
 
   useEffect(() => {
+      const handleBeforeUnload = () => { 
+              handleExit2();
+        
+            };
+                const handleExit2 = () => {
+                  disconnectSocket();
+                  leaveRoom(roomId);
+                  leaveSession();
+                  handleLogout2();
+                }
     if (gameState.isStarted && gameState.evilSquirrel !== null) {
       const cursorImage = gameState.evilSquirrel ? characterImages.badSquirrel : characterImages.goodSquirrel;
       document.body.style.cursor = `url("${cursorImage}") 16 16, auto`;
     } else {
       document.body.style.cursor = 'auto';
     }
+    window.addEventListener('beforeunload', handleBeforeUnload);
     return () => {
       document.body.style.cursor = 'auto';
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [gameState.isStarted, gameState.evilSquirrel]);
+  }, [gameState.isStarted, gameState.evilSquirrel,roomId, navigate]);
+  
   const gameLayoutProps = {
     leftVideoGrid: <VideoGrid players={leftFilterCam} totalSlots={3} gridPosition="left" />,
     rightVideoGrid: <VideoGrid players={rightFilterCam} totalSlots={2} gridPosition="right" />,

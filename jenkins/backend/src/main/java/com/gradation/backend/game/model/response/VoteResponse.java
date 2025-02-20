@@ -11,4 +11,5 @@ public class VoteResponse {
     private String nickname;
     private int voteNum;
     private int totalVote;
+    private Long serverTime;
 }

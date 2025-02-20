@@ -1,4 +1,3 @@
-// components/game/common/TransitionOverlay.jsx
 import React from 'react';
 import styled from 'styled-components';
 

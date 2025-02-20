@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import RoomListItem from './RoomListItem';
 
+
 const RoomList = ({ rooms }) => {
   if (!rooms || rooms.length === 0) {
     return <EmptyMessage>생성된 방이 없습니다</EmptyMessage>;
@@ -19,8 +20,8 @@ const RoomList = ({ rooms }) => {
 const GridContainer = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 1.5rem;
-  padding: 1rem;
+  gap: 1rem;
+  padding: 1.8rem;
 `;
 
 const EmptyMessage = styled.div`

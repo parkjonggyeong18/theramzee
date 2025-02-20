@@ -10,10 +10,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +36,20 @@ public class RoomServiceImpl implements RoomService {
         User host = userRepository.findByNickname(nickname)
                 .orElseThrow(() -> new RuntimeException("생성자 닉네임이 필요합니다."));
 
+        // 이미 존재하던 방에서 퇴장
+        Room existRoom = host.getRoom();
+        if (existRoom != null) {
+            if (existRoom.getHost() == host){
+                List<User> users = existRoom.getUsers();
+                for (User participant : users) {
+                    participant.setRoom(null);
+                }
+                roomRepository.delete(existRoom);
+            } else {
+                existRoom.removeUser(host); // 기존 방에서 User 제거
+            }
+        }
+
         // 2) 방 엔티티 생성 & DB 저장
         Room room = Room.createRoom(title, password, host);
         roomRepository.save(room);
@@ -63,6 +74,19 @@ public class RoomServiceImpl implements RoomService {
         User user = userRepository.findByNickname(nickname)
                 .orElseThrow(() -> new RuntimeException("참여자를 찾을 수 없습니다."));
 
+        // 이미 존재하던 방에서 퇴장
+        Room existRoom = user.getRoom();
+        if (existRoom != null) {
+            if (existRoom.getHost() == user){
+                List<User> users = existRoom.getUsers();
+                for (User participant : users) {
+                    participant.setRoom(null);
+                }
+                roomRepository.delete(existRoom);
+            } else {
+                existRoom.removeUser(user); // 기존 방에서 User 제거
+            }
+        }
 
         // 방 조회 (fetch join)
         Room room = roomRepository.findByIdWithUsers(roomId)
@@ -70,7 +94,7 @@ public class RoomServiceImpl implements RoomService {
 
 
         //비번방일 경우 비밀번호 검증
-        if (room.getPassword() != null && !password.equals(room.getPassword())) {
+        if (room.getPassword() != null && !Objects.equals(password, room.getPassword())) {
             throw new IllegalArgumentException("비밀번호 오류!");
         }
 
@@ -113,11 +137,11 @@ public class RoomServiceImpl implements RoomService {
             message.put("status", "success");
             message.put("message", "방장이 방을 나갔습니다.");
             messagingTemplate.convertAndSend("/topic/game/" + roomId + "/out", message);
-            System.out.println("방장이 방을 나갔습니다.");
             roomRepository.delete(room);
 
+        } else {
+            room.removeUser(user);
         }
-        room.removeUser(user);
     }
 
     /**

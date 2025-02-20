@@ -9,14 +9,12 @@ export const OpenViduProvider = ({ children }) => {
   const [mainStreamManager, setMainStreamManager] = useState(undefined);
   const [publisher, setPublisher] = useState(undefined);
   const [subscribers, setSubscribers] = useState([]); // 빈 배열로 초기화
-  const [isPreview, setIsPreview] = useState(true);
   const [previewPublisher, setPreviewPublisher] = useState(null);
   
   const OV = new OpenVidu();
 
   useEffect(() => {
     window.addEventListener('beforeunload', leaveSession);
-    initPreview();
 
     return () => {
       window.removeEventListener('beforeunload', leaveSession);
@@ -24,36 +22,10 @@ export const OpenViduProvider = ({ children }) => {
   }, []);
 
   /**
-   * 미리보기(Preview) 초기화
-   */
-  const initPreview = async () => {
-    try {
-      const processedStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: true,
-      });
-
-      const previewPub = await OV.initPublisherAsync(undefined, {
-        videoSource: processedStream.getVideoTracks()[0],
-        audioSource: processedStream.getAudioTracks()[0],
-        publishAudio: true,
-        publishVideo: true,
-        mirror: true,
-      });
-
-      setPreviewPublisher(previewPub);
-
-    } catch (error) {
-      console.error('Preview init error:', error);
-    }
-  };
-
-  /**
    * 게임 세션 접속
    */
   const joinSession = async (token, userName) => {
     if (session) {
-      console.warn("⚠️ Already connected to a session. Leaving current session first...");
       await leaveSession(); // 기존 세션 정리 후 다시 연결
     }
   
@@ -71,7 +43,6 @@ export const OpenViduProvider = ({ children }) => {
         );
         if (!alreadyExists) {
           const subscriber = newSession.subscribe(event.stream, undefined);
-          console.log('New stream created:', subscriber);
           return [...prevSubscribers, subscriber];
         }
         return prevSubscribers;
@@ -88,10 +59,6 @@ export const OpenViduProvider = ({ children }) => {
       );
     });
 
-    newSession.on('exception', (exception) => {
-      console.warn(exception);
-    });
-  
     try {
       await newSession.connect(token, { clientData: userName });
   
@@ -111,7 +78,6 @@ export const OpenViduProvider = ({ children }) => {
       setMainStreamManager(newPublisher);
       setSession(newSession);
     } catch (error) {
-      console.log('Error connecting to session:', error.code, error.message);
     }
   };
 
@@ -122,12 +88,8 @@ export const OpenViduProvider = ({ children }) => {
     try {
       if (session) {
         await session.disconnect();
-        console.log(" Session disconnected successfully.");
-      } else {
-        console.warn(" session.disconnect is not a function. Skipping...");
       }
     } catch (error) {
-      console.error("❌ Error disconnecting session:", error);
     }
   
     // 상태 초기화
@@ -135,11 +97,8 @@ export const OpenViduProvider = ({ children }) => {
     setSubscribers([]);
     setMainStreamManager(undefined);
     setPublisher(undefined);
-    setIsPreview(true);
     setPreviewPublisher(null);
     await new Promise(resolve => setTimeout(resolve, 1000));
-  
-    console.log("✅ Session state cleared.");
   };
 
   return (
@@ -149,12 +108,9 @@ export const OpenViduProvider = ({ children }) => {
         mainStreamManager,
         publisher,
         subscribers,
-        isPreview,
         previewPublisher,
         joinSession,
         leaveSession,
-        setIsPreview,
-        initPreview
       }}
     >
       {children}
