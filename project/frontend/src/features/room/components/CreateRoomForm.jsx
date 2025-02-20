@@ -17,7 +17,6 @@ const CreateRoomForm = ({ onRoomCreated }) => {
       sessionStorage.setItem('roomPassword', password || null);
       await onRoomCreated(roomTitle, isPasswordEnabled ? password : '');
     } catch (error) {
-      console.error('방 생성 중 오류 발생:', error);
     } finally {
       setIsCreating(false);
     }

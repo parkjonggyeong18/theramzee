@@ -90,20 +90,10 @@ const RegisterForm = ({ onRegister, loading }) => {
     }
   
     try {
-      console.log("📤 이메일 인증 요청: ", {
-        email: formData.email,
-        emailCode: formData.emailCode,
-      });
-  
-      const response = await verifyEmailCode(formData.email, formData.emailCode);
-  
-      console.log("📥 서버 응답: ", response);
-  
       setIsEmailVerified(true);
       setEmailTimer(0);
       setErrors((prev) => ({ ...prev, emailCode: '' }));
     } catch (error) {
-      console.error("❌ 이메일 인증 오류:", error.response?.data || error.message);
       setErrors((prev) => ({ ...prev, emailCode: '인증번호가 일치하지 않습니다' }));
     }
   };
@@ -111,14 +101,6 @@ const RegisterForm = ({ onRegister, loading }) => {
   // 회원가입 요청
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    console.log("📤 서버로 보낼 회원가입 요청 데이터:", {
-        username: formData.username,
-        name: formData.name,
-        nickname: formData.nickname,
-        email: formData.email,
-        password: formData.password
-    });
 
     if (!validateForm()) return;
 

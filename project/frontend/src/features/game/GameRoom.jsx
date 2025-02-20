@@ -48,7 +48,6 @@ const GameRoom = () => {
   const {
     subscribers,
     leaveSession,
-    initPreview
   } = useOpenVidu();
 
   const { roomId } = useParams();  // roomId 가져오기
@@ -100,7 +99,6 @@ const GameRoom = () => {
           subscribeToTopic(`/topic/game/${roomId}/last-vote`, handlers.handleLastVoteResponse);
         }, 100);
       } catch (error) {
-        console.error("⚠️ Failed to connect or subscribe:", error);
       }
     };
 
@@ -120,7 +118,6 @@ const GameRoom = () => {
       disconnectSocket();
       leaveRoom(roomId);
       leaveSession();
-      initPreview();
       handleLogout2();
     }
 
@@ -129,7 +126,6 @@ const GameRoom = () => {
       disconnectSocket();
       leaveRoom(roomId);
       leaveSession();
-      initPreview();
     };
   
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -150,7 +146,6 @@ const GameRoom = () => {
     disconnectSocket();
     leaveRoom(roomId);
     leaveSession();
-    initPreview();
     navigate('/rooms');
   };
 

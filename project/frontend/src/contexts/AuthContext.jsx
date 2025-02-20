@@ -17,7 +17,6 @@ export const AuthProvider = ({ children }) => {
     try {
       logout(); // 서버에 로그아웃 요청
     } catch (error) {
-      console.error('로그아웃 실패', error);
     }
     // 토큰 삭제 및 로그인 페이지로 리다이렉트
     sessionStorage.removeItem('accessToken');
@@ -32,7 +31,6 @@ export const AuthProvider = ({ children }) => {
     try {
       logout(); // 서버에 로그아웃 요청
     } catch (error) {
-      console.error('로그아웃 실패', error);
     }
     // 토큰 삭제 및 로그인 페이지로 리다이렉트
   };
