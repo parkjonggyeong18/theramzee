@@ -10,6 +10,11 @@ import { FriendContext } from '../../contexts/FriendContext';
 import  FriendPage  from '../../features/friend/FriendPage';
 import  ProfilePage  from '../../features/profile/ProfilePage';
 import ChatPage from '../../features/chat/ChatPage';
+
+//이미지 불러오기
+import PAN from "../../assets/images/object/PAN.png" ;
+
+
 import { Menu } from 'lucide-react';
 
 const RoomPage = () => {
@@ -204,7 +209,7 @@ const PageContainer = styled.div`
 `;
 
 const BackgroundImage = styled.div`
-  position: fixed;
+  position: fixed; 
   top: 0;
   left: 0;
   width: 100%;
@@ -215,7 +220,7 @@ const BackgroundImage = styled.div`
 `;
 
 const ContentWrapper = styled.div`
-  width: 90%;
+  width: 100%;
   max-width: 1200px;
   margin: 2rem auto;
   z-index: 1;
@@ -255,10 +260,10 @@ const CreateRoomButton = styled.button`
 `;
 
 const RoomListContainer = styled.div`
-  background-color: rgba(139, 69, 19, 0.9);
-  padding: 2rem;
-  border-radius: 15px;
-  min-height: 400px;
+  background: url(${PAN}) top center;
+  width: 90%;
+  margin-bottom:-100px;
+  background-size: contain;
 `;
 
 const ModalOverlay = styled.div`
