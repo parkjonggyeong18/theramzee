@@ -150,14 +150,14 @@ Jira를 통해 한주의 스프린트를 정하고 백로그를 진행해 현재
 프로필에서 지금 캠화면을 체크하고 닉네임, 비밀번호 수정 및 탈퇴 기능 지원원
 <br><br>
 > ### 게임 진행<br>
-<img src="https://github.com/user-attachments/assets/af1b42a0-da27-4190-8bd1-08edfc63a21d" width="250" height="200"/>
-<img src="https://github.com/user-attachments/assets/2e884b7e-4aa2-4a41-afd3-021152cd9ff0" width="250" height="200"/>
-<img src="https://github.com/user-attachments/assets/95417f95-59fa-40d6-bc5c-041f759bada4" width="250" height="200"/>
-<img src="https://github.com/user-attachments/assets/36beadbc-21ef-4f40-8884-b198ed0902d1" width="250" height="200"/>
-<img src="https://github.com/user-attachments/assets/63704158-c2be-488b-918a-0928b691f9c1" width="250" height="200"/>
-<img src="https://github.com/user-attachments/assets/26ec5db4-3af7-45b6-a130-0513c140bbe0" width="250" height="200"/>
-<img src="https://github.com/user-attachments/assets/2baec8ab-67aa-450a-bd1a-94f88953cc88" width="250" height="200"/>
-<img src="https://github.com/user-attachments/assets/b7f68536-0a5e-418f-8ddc-4c6fe5212f67" width="250" height="200"/><br>
+<img src="https://github.com/user-attachments/assets/af1b42a0-da27-4190-8bd1-08edfc63a21d" width="300" height="200"/>
+<img src="https://github.com/user-attachments/assets/2e884b7e-4aa2-4a41-afd3-021152cd9ff0" width="300" height="200"/>
+<img src="https://github.com/user-attachments/assets/95417f95-59fa-40d6-bc5c-041f759bada4" width="300" height="200"/>
+<img src="https://github.com/user-attachments/assets/36beadbc-21ef-4f40-8884-b198ed0902d1" width="300" height="200"/>
+<img src="https://github.com/user-attachments/assets/63704158-c2be-488b-918a-0928b691f9c1" width="300" height="200"/>
+<img src="https://github.com/user-attachments/assets/26ec5db4-3af7-45b6-a130-0513c140bbe0" width="300" height="200"/>
+<img src="https://github.com/user-attachments/assets/2baec8ab-67aa-450a-bd1a-94f88953cc88" width="300" height="200"/>
+<img src="https://github.com/user-attachments/assets/b7f68536-0a5e-418f-8ddc-4c6fe5212f67" width="300" height="200"/><br>
 착한 다람쥐와, 나쁜다람쥐가 선정됩니다. 착한 다람쥐는 에너지를 채워 미션을 수행하고 창고에 도토리를 저장해 게임에서 승리합니다.<br> 나쁜 다람쥐는 에너지를 채워 착한 다람쥐를 모두 죽이고 승리합니다. 투표는 총 2회로 중간 투표, 최종 투표가 주어집니다.<br> 중간 투표에서는 게임을 망치는 인원이나 나쁜 다람쥐를 찾아 죽입니다.<br> 만약 나쁜 다람쥐가 죽으면 착한 다람쥐의 승리입니다.<br> 최종 투표에서는 나쁜 다람쥐가 죽으면 착한 다람쥐가 승리이지만 나쁜 다람쥐가 살아남았다면 나쁜 다람쥐의 최종 승리입니다.
 <br><br>
 
