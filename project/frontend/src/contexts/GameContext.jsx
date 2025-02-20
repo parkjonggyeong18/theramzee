@@ -20,7 +20,7 @@ export const GameProvider = ({ children }) => {
     //게임 시간
     initServerTime: null, // 서버시간 (게임 시작 시간)
     serverTime: null, // 서버 시간 (현재 시간)
-    timer: 240, // 게임 시간 (4분)
+    timer: 210, // 게임 시간 (4분)
    
     evilSquirrel: null, // true | false
     forestToken: null,  // 숲 토큰
@@ -281,7 +281,7 @@ export const GameProvider = ({ children }) => {
       chargeFatigue();
       setIsEnergyActive(false);
       setIsActionInProgress(false);
-    }, gameState.evilSquirrel === false ? 5000 : 10000);
+    }, gameState.evilSquirrel === false ? 7000 : 10000);
   }, [gameState.fatigue, isEnergyActive, gameState.isDead, gameState.evilSquirrel, chargeFatigue]);
 
   const value = {
