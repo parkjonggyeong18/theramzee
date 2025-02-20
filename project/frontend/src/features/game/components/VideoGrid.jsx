@@ -6,6 +6,7 @@ import { useKillSystem } from '../../../hooks/useKillSystem';
 import { useGame } from '../../../contexts/GameContext';
 import KillAnimation from './KillAnimation';
 import DeadOverlay from './DeadOverlay';
+import evilKillCursor from '../../../assets/images/animations/evil-kill-hover.gif';
 
 const VideoGrid = (props) => {
   const { session, subscribers } = useOpenVidu();
@@ -46,32 +47,29 @@ const VideoGrid = (props) => {
     });
   }, [slots]);
 
-    // 오디오 제어 로직 추가
-    useEffect(() => {
-      subscribers.forEach((player) => {
-        if (player?.stream?.connection?.data) {
-          try {
-            const rawData = player.stream.connection.data.split("%/%")[0];
-            const parsedData = JSON.parse(rawData);
-            const subscriberNickname = parsedData.clientData;
-            // 1) 숲에 포함되어 있는지 체크
-            const isInForest = gameState.forestUsers?.[gameState.forestNum]?.includes(subscriberNickname);
+  useEffect(() => {
+    subscribers.forEach((player) => {
+      if (player?.stream?.connection?.data) {
+        try {
+          const rawData = player.stream.connection.data.split("%/%")[0];
+          const parsedData = JSON.parse(rawData);
+          const subscriberNickname = parsedData.clientData;
+          // 1) 숲에 포함되어 있는지 체크
+          const isInForest = gameState.forestUsers?.[gameState.forestNum]?.includes(subscriberNickname);
 
-            // 2) 죽은 사람인지 체크
-            const isKilled = gameState.killedPlayers?.includes(subscriberNickname);
-  
-            if (isInForest && !isKilled) {
-              player.subscribeToAudio(true);
-            } else {
-              player.subscribeToAudio(false);
-            }
-          } catch (error) {
+          // 2) 죽은 사람인지 체크
+          const isKilled = gameState.killedPlayers?.includes(subscriberNickname);
+
+          if (isInForest && !isKilled) {
+            player.subscribeToAudio(true);
+          } else {
+            player.subscribeToAudio(false);
           }
+        } catch (error) {
         }
-      });
-    }, [subscribers, gameState.forestNum, gameState.forestUsers, gameState.killedPlayers]);
-
-
+      }
+    });
+  }, [subscribers, gameState.forestNum, gameState.forestUsers, gameState.killedPlayers]);
 
   const getPlayerInfo = (sub) => {
     let playerNickname = '';
@@ -87,7 +85,6 @@ const VideoGrid = (props) => {
     const isPlayerDead = gameState.killedPlayers?.includes(playerNickname);
     return { playerNickname, isPlayerDead };
   };
-  
 
   if (!session) {
     return <GridContainer>Loading...</GridContainer>;
@@ -103,7 +100,8 @@ const VideoGrid = (props) => {
           <VideoContainer
             key={connectionId}
             onMouseDown={(e) => isKillable && handleDragStart(e, playerNickname)}
-            style={{ cursor: isKillable ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+            isKillable={isKillable}
+            isDragging={isDragging}
           >
             {connectionId ? (
               <>
@@ -162,6 +160,27 @@ const VideoContainer = styled.div`
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  cursor: ${props => props.isKillable ? (props.isDragging ? 'grabbing' : 'pointer') : 'default'};
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url(${evilKillCursor}) center/cover no-repeat;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  ${props => props.isKillable && !props.isDragging && `
+    &:hover::before {
+      opacity: 1;
+    }
+  `}
 `;
 
 const StyledVideo = styled.video`
