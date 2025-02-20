@@ -112,8 +112,8 @@ const MainForest = () => {
         updates[player] = 0;
       }
 
-      // 나쁜 다람쥐 승리 조건 체크 (4명 사망)
-      if (newKilledPlayers.length >= 4) {
+      // 나쁜 다람쥐 승리 조건 체크
+      if (updates.count - newKilledPlayers.length <= 2) {
         updates.isGameOver = true;
         updates.gameOverReason = 'kill';
         updates.winner = 'bad';

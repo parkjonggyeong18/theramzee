@@ -82,6 +82,7 @@ public class GameServiceImpl implements GameService {
                 forestData.setTotalAcorns(0);
                 forestData.setTotalVote(0);
                 forestData.setTotalLastVote(0);
+                forestData.setCount(nicknames.size());
                 forestData.setEvilSquirrelNickname(evilSquirrelNickname);
             } else {
                 forestData.setMission1(new MissionData(false, 1));

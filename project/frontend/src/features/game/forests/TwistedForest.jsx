@@ -215,7 +215,7 @@ const MissionButtonWrapper = styled.div`
   }
   &:nth-child(2) {
     top: 33vh;
-    left: -78vh;
+    left: -68vh;
   }
   &:nth-child(3) {
     bottom: -30vh;

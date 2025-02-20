@@ -27,6 +27,7 @@ const GameOverScreen = () => {
 
     // 숲 별 유저 정보
     forestUsers: null,
+    count: 0,
 
     // 게임 진행 상태
     isStarted: false, // 게임 시작 여부
@@ -114,7 +115,7 @@ const GameOverScreen = () => {
   
     // 킬로 인한 종료 
     if (gameState.gameOverReason === 'kill') {
-      return "4명의 다람쥐를 처치했습니다!\n나쁜 다람쥐 승리!";
+      return "착한 다람쥐무리를 처치했습니다!\n나쁜 다람쥐 승리!";
     }
   
     return "게임 종료!";
