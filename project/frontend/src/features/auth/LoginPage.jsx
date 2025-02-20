@@ -28,7 +28,6 @@ const LoginPage = () => {
       setUsername(username);
       navigate('/rooms');
     } catch (error) {
-      console.error('로그인 실패', error);
       setError(error.response?.data?.message || '로그인에 실패했습니다');
     } finally {
       setLoading(false);

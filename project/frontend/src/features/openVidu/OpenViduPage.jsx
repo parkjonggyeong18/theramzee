@@ -5,11 +5,10 @@ import UserVideoComponent from './components/UserVideoComponent';
 import { useOpenVidu } from '../../contexts/OpenViduContext';
 import { useAuth } from '../../contexts/AuthContext'; 
 import { leaveRoom } from '../../api/room';
-import { connectSocket, disconnectSocket } from '../../api/stomp';
+import { disconnectSocket } from '../../api/stomp';
 const OpenViduPage = () => {
-   const { handleLogout, handleLogout2 } = useAuth();
+   const { handleLogout2 } = useAuth();
   const {
-    session,
     mainStreamManager,
     subscribers,
     isPreview,
@@ -22,8 +21,6 @@ const OpenViduPage = () => {
 
   const { roomId } = useParams();
   const navigate = useNavigate();
-  const sessionId = `${roomId}-1`;
-  const username = sessionStorage.getItem('username') || 'Guest';
   const nickname = sessionStorage.getItem('nickName') || 'Guest';
   const token = sessionStorage.getItem('openViduToken');
 
@@ -73,7 +70,7 @@ useEffect(() => {
   }, [roomId, navigate]);
 
   // 미리보기 화면
-  if (isPreview) {
+  if (true) {
     return (
       <PreviewContainer>
         <Header>
@@ -129,11 +126,6 @@ const Title = styled.h1`
   color: #a4e17d; /* 밝은 녹색 */
 `;
 
-const Subtitle = styled.p`
-  font-size: 1.2rem;
-  color: #fff;
-`;
-
 const VideoWrapper = styled.div`
   width: 60%;
   max-width: 650px;
@@ -162,10 +154,6 @@ const EnterButton = styled.button`
   padding: 1rem 2rem;
   border-radius: 10px;
   font-size: 1.2rem;
-`;
-
-const LeaveButton = styled.button`
-  background-color: #ff6b6b; /* 밝은 빨간색 */
 `;
 
 const SessionContainer = styled.div`

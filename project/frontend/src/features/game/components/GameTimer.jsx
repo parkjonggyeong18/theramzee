@@ -61,7 +61,6 @@ const GameTimer = () => {
     font.load().then((loadedFont) => {
       document.fonts.add(loadedFont);
     }).catch((error) => {
-      console.error('폰트 로드 실패:', error);
     });
   }, []);
 

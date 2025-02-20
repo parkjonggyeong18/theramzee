@@ -112,7 +112,6 @@ export const GameProvider = ({ children }) => {
         return players; // 에러 발생 시 기존 nicknames 반환
       }
     } else {
-      console.error('WebSocket is not connected or required fields are empty');
       return players;
     }
   }, [isConnected, roomId, players, nickname]);
@@ -130,11 +129,8 @@ export const GameProvider = ({ children }) => {
         // ✅ 게임 시작 요청
         gameService.startGame(roomId, nicknameList);
       } catch (error) {
-        console.error('Failed to start game:', error);
       }
-    } else {
-      console.error('Socket connection not initialized');
-    }
+    } 
   }, [isConnected, roomId, getPlayers]);
 
   // 피로도 충전 처리
@@ -143,10 +139,7 @@ export const GameProvider = ({ children }) => {
       try {
         await gameService.chargeFatigue(roomId, nickname);
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
 
@@ -156,10 +149,7 @@ export const GameProvider = ({ children }) => {
       try {
         await gameService.saveUserAcorns(roomId, nickname);
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
 
@@ -174,10 +164,7 @@ export const GameProvider = ({ children }) => {
         const nicknameList = updatedNicknames.map(player => player.nickName);
         await gameService.result(roomId, nicknameList);
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId]);
 
@@ -193,10 +180,7 @@ export const GameProvider = ({ children }) => {
         await gameService.moveForest(roomId, nickname, forestNum, nicknameList);
         setGameState.currentForestNum = forestNum;
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
   
@@ -206,10 +190,7 @@ export const GameProvider = ({ children }) => {
       try {
         await gameService.killUser(roomId, vitimNickname, nickname);
       } catch (error) {
-        console.error('Failed to get user fatigue:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty');
     }
   }, [isConnected, roomId, nickname]);
 
@@ -220,7 +201,6 @@ export const GameProvider = ({ children }) => {
         const nicknameList = players.map(player => player.nickName);
         await gameService.startEmergencyVote(roomId, nicknameList, nickname);
       } catch (error) {
-        console.error('Failed to start emergency vote:', error);
       }
     }
 }, [isConnected, roomId, players, nickname]);
@@ -264,13 +244,7 @@ export const GameProvider = ({ children }) => {
           return newState;
         });
       } catch (error) {
-        console.error('Failed to complete mission:', error);
       }
-    } else {
-      console.error('WebSocket is not connected or required fields are empty:', {
-        isConnected,
-        roomId
-      });
     }
   }, [isConnected, roomId, nickname, gameState]);
 

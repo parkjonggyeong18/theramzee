@@ -26,11 +26,8 @@ export const useGameHandlers = (roomId, setGameState, moveForest, cancelAction, 
             initServerTime: initializedData.serverTime,
             serverTime: initializedData.serverTime,
           }));
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [roomId, setGameState, nickName]
@@ -80,11 +77,8 @@ const handleMoveResponse = useCallback(
             forestNum: initializedData.forestNum,
           }));
         }
-      } else {
-        console.error("Game initialization failed:", message.errorCode);
       }
     } catch (error) {
-      console.error("Error parsing game start response:", error);
     }
   },
   []
@@ -126,11 +120,8 @@ const handleMoveResponse = useCallback(
               }));
             }
           }
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [setGameState, nickName, navigate, roomId]
@@ -147,11 +138,8 @@ const handleMoveResponse = useCallback(
             ...prev,
             results: initializedData
           }));
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [setGameState, nickName]
@@ -167,11 +155,8 @@ const handleMoveResponse = useCallback(
             ...prev,
             fatigue: initializedData.userFatigue
           }));
-        } else {
-          console.error("Game initialization failed:", message.errorCode);
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [setGameState, nickName]
@@ -215,7 +200,6 @@ const handleMoveResponse = useCallback(
           });
         }
       } catch (error) {
-        console.error("Error parsing game start response:", error);
       }
     },
     [setGameState, nickName, navigate, roomId]
@@ -247,11 +231,8 @@ const handleMoveResponse = useCallback(
               heldAcorns: initializedData.userAcorns
             }));
           }
-        } else {
-          console.error("미션 완료 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("미션 완료 응답 처리 중 에러:", error);
       }
     },
     [nickName, setGameState]
@@ -263,11 +244,8 @@ const handleMoveResponse = useCallback(
       try {
         if (message.status) {
           navigate("/rooms");
-        } else {
-          console.error("퇴장 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("퇴장 응답 처리 중 에러:", error);
       }
     },
     [setGameState]
@@ -331,11 +309,8 @@ const handleMoveResponse = useCallback(
             return updates;
           }); 
           
-        } else {
-          console.error("투표 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("투표 응답 처리 중 에러:", error);
       }
     },
     [setGameState]
@@ -384,11 +359,8 @@ const handleMoveResponse = useCallback(
             return updates;
           }); 
           
-        } else {
-          console.error("투표 실패:", message.errorCode);
         }
       } catch (error) {
-        console.error("투표 응답 처리 중 에러:", error);
       }
     },
     [setGameState]
@@ -399,9 +371,7 @@ const handleMoveResponse = useCallback(
     (message) => {
       try {
       if (message) {
-        console.log("메시지 : ", message)
         const initializedData = message['serverTime'];
-        console.log("서버 시간 응답:", initializedData);
         
         setGameState((prev) => {
           
@@ -413,13 +383,11 @@ const handleMoveResponse = useCallback(
             serverTime : now,
             timer: totalGameTime - Math.floor((now - prev.initServerTime)/1000)
           };
-          console.log("바뀐 시간: ", updates.timer);
           return updates;
         });
         
       }
     } catch (error) {
-      console.error("Error parsing game start response:", error);
     }
   },
   [setGameState]

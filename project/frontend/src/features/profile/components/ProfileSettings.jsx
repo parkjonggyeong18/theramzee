@@ -1,9 +1,8 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { updateUser, deleteUser } from '../../../api/user';
 import { useUser } from '../../../contexts/UserContext';
 import { useAuth } from '../../../contexts/AuthContext';
-import { FriendContext } from '../../../contexts/FriendContext';
 import { sendMessage } from '../../../api/stomp';
 import { apiRequest } from '../../../api/apiService';
 
@@ -48,7 +47,6 @@ const ProfileSettings = () => {
       }
     } catch (error) {
       alert('닉네임 변경에 실패했습니다.');
-      console.error("닉네임 변경 실패:", error);
     }
   };
 
@@ -103,7 +101,6 @@ const ProfileSettings = () => {
       }
     } catch (error) {
       alert('비밀번호 변경에 실패했습니다.');
-      console.error("비밀번호 변경 실패:", error);
     }
   };
 
@@ -115,7 +112,6 @@ const ProfileSettings = () => {
         handleLogout();
       } catch (error) {
         alert('회원 탈퇴에 실패했습니다.');
-        console.error("회원 탈퇴 실패:", error);
       }
     }
   };

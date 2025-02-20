@@ -48,7 +48,6 @@ export const OpenViduProvider = ({ children }) => {
       // previewPub.stream.disposeMediaStream();
 
     } catch (error) {
-      console.error('Preview init error:', error);
     }
   };
 
@@ -57,7 +56,6 @@ export const OpenViduProvider = ({ children }) => {
    */
   const joinSession = async (token, userName) => {
     if (session) {
-      console.warn("⚠️ Already connected to a session. Leaving current session first...");
       await leaveSession(); // 기존 세션 정리 후 다시 연결
     }
   
@@ -75,7 +73,6 @@ export const OpenViduProvider = ({ children }) => {
         );
         if (!alreadyExists) {
           const subscriber = newSession.subscribe(event.stream, undefined);
-          console.log('New stream created:', subscriber);
           return [...prevSubscribers, subscriber];
         }
         return prevSubscribers;
@@ -92,10 +89,6 @@ export const OpenViduProvider = ({ children }) => {
       );
     });
 
-    newSession.on('exception', (exception) => {
-      console.warn(exception);
-    });
-  
     try {
       await newSession.connect(token, { clientData: userName });
   
@@ -115,7 +108,6 @@ export const OpenViduProvider = ({ children }) => {
       setMainStreamManager(newPublisher);
       setSession(newSession);
     } catch (error) {
-      console.log('Error connecting to session:', error.code, error.message);
     }
   };
 
@@ -126,12 +118,8 @@ export const OpenViduProvider = ({ children }) => {
     try {
       if (session) {
         await session.disconnect();
-        console.log(" Session disconnected successfully.");
-      } else {
-        console.warn(" session.disconnect is not a function. Skipping...");
       }
     } catch (error) {
-      console.error("❌ Error disconnecting session:", error);
     }
   
     // 상태 초기화
@@ -142,8 +130,6 @@ export const OpenViduProvider = ({ children }) => {
     setIsPreview(true);
     setPreviewPublisher(null);
     await new Promise(resolve => setTimeout(resolve, 1000));
-  
-    console.log("✅ Session state cleared.");
   };
 
   return (

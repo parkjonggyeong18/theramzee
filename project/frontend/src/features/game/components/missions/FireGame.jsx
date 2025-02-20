@@ -1,4 +1,3 @@
-// FireGame.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { useGame } from '../../../../contexts/GameContext';
@@ -64,7 +63,6 @@ const FireGame = ({ onComplete, onClose }) => {
 
         checkSound();
       } catch (err) {
-        console.error('마이크 권한 요청 실패:', err);
       }
     };
 

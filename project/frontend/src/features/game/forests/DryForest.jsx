@@ -94,7 +94,6 @@ const rightFilterCam = filteredSubscribers.slice(3, 7);
       setShowMiniGame(false);
       setCurrentMission(null);
     } catch (error) {
-      console.error('Failed to complete mission:', error);
     }
   };
   useEffect(() => {

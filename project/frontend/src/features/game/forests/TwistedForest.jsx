@@ -23,7 +23,7 @@ import { disconnectSocket } from '../../../api/stomp';
 import { useAuth } from '../../../contexts/AuthContext';
 
 const TwistedForest = () => {
-  const { gameState, players, completeMission } = useGame();
+  const { gameState, completeMission } = useGame();
   const [showMiniGame, setShowMiniGame] = useState(false);
   const [currentMission, setCurrentMission] = useState(null);
   const [isDescriptionVisible, setIsDescriptionVisible] = useState(false);
@@ -84,7 +84,6 @@ const TwistedForest = () => {
       setShowMiniGame(false);
       setCurrentMission(null);
     } catch (error) {
-      console.error('Failed to complete mission:', error);
     }
   };
 
