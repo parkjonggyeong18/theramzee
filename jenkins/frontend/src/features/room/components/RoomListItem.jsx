@@ -64,7 +64,6 @@ const RoomListItem = ({ room }) => {
       <RoomInfo>
         <RoomDetails>
           {/* {roomId, title, gameStatus, hostNickName, currentParticipantCount, nicknames, password} */}
-        <DetailItem>게임상태: {room.gameStatus}</DetailItem>
           <DetailItem>방장: {room.hostNickName}</DetailItem>
           <DetailItem>참가자: {room.currentParticipantCount > 6 ? 6 : room.currentParticipantCount}/6</DetailItem>
         </RoomDetails>
