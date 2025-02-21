@@ -42,9 +42,9 @@ const RegisterForm = ({ onRegister, loading }) => {
     if (!formData.username || formData.username.length < 4)
       newErrors.username = '아이디는 4자 이상이어야 합니다';
 
-    if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(formData.password)) {
-      newErrors.password = '비밀번호는 8자 이상, 숫자, 대소문자, 특수문자를 포함해야 합니다';
-    }
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(formData.password)) {
+    newErrors.password = '비밀번호는 8자 이상, 숫자, 대소문자, 특수문자를 포함해야 합니다';
+}
     
     if (formData.password !== formData.confirmPassword)
       newErrors.confirmPassword = '비밀번호가 일치하지 않습니다';
