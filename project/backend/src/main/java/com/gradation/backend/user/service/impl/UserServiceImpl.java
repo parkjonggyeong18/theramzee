@@ -281,8 +281,8 @@ public class UserServiceImpl implements UserService {
      * @param password 확인하려는 password
      * @return password 패턴 일치 여부
      */
-    private boolean isValidPassword(String password) {
-        String passwordPattern = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$";
+     private boolean isValidPassword(String password) {
+        String passwordPattern = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[^A-Za-z\\d])[A-Za-z\\d[^A-Za-z\\d]]{8,20}$";
         return password.matches(passwordPattern);
     }
 
