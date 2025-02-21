@@ -34,13 +34,12 @@ const SplashScreen = ({ onComplete }) => {
   // 비디오 로드 실패 시 호출됨
   const handleVideoError = (e) => {
     console.error('Video load error:', e);
-    // 필요시 onComplete을 호출하여 스플래시를 건너뛰도록 할 수 있음
     if (onComplete) {
       onComplete();
     }
   };
 
-  // 비디오 재생 종료 시 호출됨 (비디오가 정상적으로 로드된 경우에만 onComplete 호출)
+  // 비디오 재생 종료 시 호출됨 (비디오가 정상 로드된 경우에만 onComplete 호출)
   const handleVideoEnd = () => {
     if (videoLoaded && onComplete) {
       onComplete();
@@ -59,7 +58,7 @@ const SplashScreen = ({ onComplete }) => {
         onError={handleVideoError}
         onEnded={handleVideoEnd}
       >
-        <source src="/start/video.mp4" type="video/mp4" />
+        <source src="https://ramzee.online/start/video.mp4" type="video/mp4" />
         브라우저가 비디오 태그를 지원하지 않습니다.
       </SplashVideo>
     </SplashContainer>
