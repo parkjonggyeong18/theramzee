@@ -1,205 +1,296 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import { resetPassword, findUsername } from '../../../api/email'; // API 호출 함수 가져오기
-import forestBg from "../../../assets/images/backgrounds/forest-bg.gif";
+import { sendEmailVerification, verifyEmailCode } from '../../../api/email';
 
-const ForgotPassword = () => {
+const RegisterForm = ({ onRegister, loading }) => {
   const navigate = useNavigate();
-  const [mode, setMode] = useState('id'); // 'id' 또는 'password' 모드
   const [formData, setFormData] = useState({
-    username: '',       // 사용자 ID
-    name: '',     // 사용자 이름
-    email: ''     // 사용자 이메일
+    username: '',
+    name: '',
+    nickname: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    emailCode: '',
   });
-  const [message, setMessage] = useState(''); // 결과 메시지 상태
 
-  // Form 제출 핸들러
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const [errors, setErrors] = useState({});
+  const [isEmailSent, setIsEmailSent] = useState(false);
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [emailTimer, setEmailTimer] = useState(0);
+
+  // 이메일 인증 타이머 실행 (180초 유효)
+  useEffect(() => {
+    if (emailTimer > 0) {
+      const interval = setInterval(() => {
+        setEmailTimer((prev) => (prev > 1 ? prev - 1 : 0));
+      }, 1000);
+      return () => clearInterval(interval);
+    }
+  }, [emailTimer]);
+
+  // 입력값 변경 처리
+  const handleInputChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // 폼 유효성 검사
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.username || formData.username.length < 4)
+      newErrors.username = '아이디는 4자 이상이어야 합니다';
+
+    if (!/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(formData.password)) {
+      newErrors.password = '비밀번호는 8자 이상, 숫자, 대소문자, 특수문자를 포함해야 합니다';
+    }
+    
+    if (formData.password !== formData.confirmPassword)
+      newErrors.confirmPassword = '비밀번호가 일치하지 않습니다';
+
+    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email))
+      newErrors.email = '올바른 이메일을 입력해주세요';
+
+    if (!isEmailVerified) newErrors.emailCode = '이메일 인증이 필요합니다';
+
+    if (!formData.name) newErrors.name = '이름을 입력해주세요';
+    if (!formData.nickname) newErrors.nickname = '닉네임을 입력해주세요';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // 이메일 인증번호 요청
+  const handleEmailSend = async () => {
+    console.log(formData.emailCode)
+    if (!formData.email || !/\S+@\S+\.\S+/.test(formData.email)) {
+      setErrors((prev) => ({ ...prev, email: '올바른 이메일을 입력해주세요' }));
+      return;
+    }
+    setIsEmailSent(true);
     try {
-      if (mode === 'id') {
-        // 아이디 찾기 API 호출
-        await findUsername(formData.name, formData.email); // 이름과 이메일 전달
-        setMessage('입력하신 이메일로 아이디를 발송했습니다.');
-      } else if (mode === 'password') {
-        // 비밀번호 초기화 API 호출
-        await resetPassword(formData.username, formData.email); // ID와 이메일 전달
-        setMessage('입력하신 이메일로 임시 비밀번호를 발송했습니다.');
-      }
+      await sendEmailVerification(formData.email);
+      setEmailTimer(180);
+      setErrors((prev) => ({ ...prev, email: '' }));
     } catch (error) {
-      setMessage(error.response?.data?.message || '오류가 발생했습니다. 다시 시도해주세요.');
+      setIsEmailSent(false);
+      if (error.response?.status === 400) {
+        setErrors((prev) => ({ ...prev, email: '이미 가입된 이메일입니다' }));
+      } else {
+        setErrors((prev) => ({ ...prev, email: '인증번호 전송 실패: ' + error.message }));
+      }
     }
   };
 
+  // 이메일 인증 확인
+  const handleEmailVerify = async () => {
+    
+    if (!formData.emailCode) {
+      setErrors((prev) => ({ ...prev, emailCode: '인증번호를 입력해주세요' }));
+      return;
+    }
+
+    try {
+      await verifyEmailCode(formData.email, formData.emailCode);
+      setIsEmailVerified(true);
+      setEmailTimer(0);
+      setErrors((prev) => ({ ...prev, emailCode: '' }));
+    } catch (error) {
+      setErrors((prev) => ({ ...prev, emailCode: '인증번호가 일치하지 않습니다' }));
+    }
+  };
+
+  // 회원가입 요청
+  const handleSubmit = async (e) => {
+    console.log(formData.emailCode)
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    // 백엔드 요구사항에 맞게 불필요한 필드 제거
+    onRegister({
+        username: formData.username,
+        name: formData.name,
+        nickname: formData.nickname,
+        email: formData.email,
+        password: formData.password,
+    });
+};
+
   return (
-    <Container>
-      <BackgroundImage />
-      <Title>THE RAMZEE</Title>
+    <FormContainer onSubmit={handleSubmit}>
+  <Title>회원가입</Title>
 
-      <FormContainer>
-        <TabButtons>
-          <TabButton 
-            position="left" 
-            active={mode === 'id'} 
-            onClick={() => setMode('id')}
-          >
-            ID 찾기
-          </TabButton>
-          <TabButton 
-            position="right" 
-            active={mode === 'password'} 
-            onClick={() => setMode('password')}
-          >
-            비밀번호 찾기
-          </TabButton>
-        </TabButtons>
+  {/* 아이디 입력 */}
+  <InputWrapper>
+    <Input
+      name="username"
+      placeholder="아이디"
+      value={formData.username}
+      onChange={handleInputChange}
+      hasError={!!errors.username} // 오류 여부 전달
+    />
+    {errors.username && <ErrorText>{errors.username}</ErrorText>}
+  </InputWrapper>
 
-        <form onSubmit={handleSubmit}>
-          {mode === 'id' ? (
-            <>
-              <Input
-                type="text"
-                placeholder="이름"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-              <Input
-                type="email"
-                placeholder="이메일"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </>
-          ) : (
-            <>
-              <Input
-                type="text"
-                placeholder="아이디"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              />
-              <Input
-                type="email"
-                placeholder="이메일"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </>
-          )}
-          <ButtonGroup>
-            <SubmitButton type="submit">찾기</SubmitButton>
-            <LoginButton type="button" onClick={() => navigate('/')}>뒤로가기</LoginButton>
-          </ButtonGroup>
-        </form>
+  {/* 비밀번호 입력 */}
+  <InputWrapper>
+    <Input
+      name="password"
+      type="password"
+      placeholder="비밀번호"
+      value={formData.password}
+      onChange={handleInputChange}
+      hasError={!!errors.password} // 오류 여부 전달
+    />
+    {errors.password && <ErrorText>{errors.password}</ErrorText>}
+  </InputWrapper>
 
-        {message && <Message>{message}</Message>} {/* 결과 메시지 표시 */}
-      </FormContainer>
-    </Container>
+  {/* 비밀번호 확인 */}
+  <InputWrapper>
+    <Input
+      name="confirmPassword"
+      type="password"
+      placeholder="비밀번호 확인"
+      value={formData.confirmPassword}
+      onChange={handleInputChange}
+      hasError={!!errors.confirmPassword} // 오류 여부 전달
+    />
+    {errors.confirmPassword && <ErrorText>{errors.confirmPassword}</ErrorText>}
+  </InputWrapper>
+
+  {/* 이름 입력 */}
+  <InputWrapper>
+    <Input
+      name="name"
+      placeholder="이름"
+      value={formData.name}
+      onChange={handleInputChange}
+      hasError={!!errors.name} // 오류 여부 전달
+    />
+    {errors.name && <ErrorText>{errors.name}</ErrorText>}
+  </InputWrapper>
+
+  {/* 닉네임 입력 */}
+  <InputWrapper>
+    <Input
+      name="nickname"
+      placeholder="닉네임"
+      value={formData.nickname}
+      onChange={handleInputChange}
+      hasError={!!errors.nickname} // 오류 여부 전달
+    />
+    {errors.nickname && <ErrorText>{errors.nickname}</ErrorText>}
+  </InputWrapper>
+
+  {/* 이메일 입력 */}
+  <EmailContainer>
+    <Input
+      name="email"
+      type="email"
+      placeholder="이메일"
+      value={formData.email}
+      disabled={isEmailVerified}
+      onChange={handleInputChange}
+      hasError={!!errors.email} // 오류 여부 전달
+    />
+    <EmailButton type="button" onClick={handleEmailSend} disabled={isEmailVerified || isEmailSent}>
+      {isEmailSent ? '재전송' : '인증번호 전송'}
+    </EmailButton>
+  </EmailContainer>
+  {errors.email && <ErrorText>{errors.email}</ErrorText>}
+
+  {/* 이메일 인증번호 입력 */}
+  {isEmailSent && (
+    <>
+      <EmailContainer>
+        <Input
+          name="emailCode"
+          placeholder="인증번호 입력"
+          value={formData.emailCode}
+          disabled={isEmailVerified}
+          onChange={handleInputChange}
+          hasError={!!errors.emailCode} // 오류 여부 전달
+        />
+        <EmailButton type="button" onClick={handleEmailVerify} disabled={isEmailVerified}>
+          확인
+        </EmailButton>
+        {emailTimer > 0 && <Timer>{emailTimer}s</Timer>}
+      </EmailContainer>
+      {errors.emailCode && <ErrorText>{errors.emailCode}</ErrorText>}
+    </>
+  )}
+
+  {/* 버튼 그룹 */}
+  <ButtonGroup>
+    <Button type="submit" disabled={loading}>{loading ? '가입 중...' : '가입하기'}</Button>
+    <LoginButton type="button" onClick={() => navigate('/')}>뒤로가기</LoginButton>
+  </ButtonGroup>
+</FormContainer>
   );
 };
 
-// 스타일 정의
-const Container = styled.div`
-  height: 100vh;
-  width: 100vw;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-`;
-
-const BackgroundImage = styled.div`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: url(${forestBg});
-  background-size: cover;
-  z-index: -1;
-`;
-
-const Title = styled.h1`
-  font-size: 4rem;
-  font-weight: bold;
-  color: white;
-  margin-bottom: 2rem;
-  text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
-`;
-
-const FormContainer = styled.div`
-  background-color: rgba(139,69,19,0.9);
+// **스타일 구성**
+const FormContainer = styled.form`
+  background: rgba(139, 69, 19, 0.9);
   padding: 2rem;
   border-radius: 15px;
   width: 400px;
 `;
 
-const TabButtons = styled.div`
- display:flex;
- margin-bottom: 1.5rem;
- background: rgba(139, 69, 19, 0.9);
- border-radius: 10px;
-`;
-
-const TabButton=styled.button`
-  flex:1;
-  padding:.5rem;
-  background:${props=>props.active?'#2d1810':'transparent'};
-  color:${props=>props.active?'white':'#2d1810'};
-  border:none;
-  cursor:pointer;
-
-  border-radius: ${props => 
-    props.position === 'left'
-      ? '10px 0 0 10px' 
-      : '0 10px 10px 0'
-  };
-`;
-
-const Input=styled.input`
-  width:93.5%;
-  padding:.75rem;
+const Title = styled.h2`
+  color: white;
+  text-align: center;
   margin-bottom: 1rem;
-  border: none;
+`;
+
+const Input = styled.input`
+  width:93.5%;
+  padding: 0.75rem;
+  margin-bottom: ${(props) => (props.hasError ? '0.25rem' : '0.5rem')}; /* 에러 메시지 공간 확보 */
+  border: ${(props) => (props.hasError ? '2px solid red' : '1px solid #ccc')}; /* 에러 시 빨간 테두리 */
   border-radius: 5px;
   font-size: 1rem;
-  transition: transform 0.2s;
 
   &:focus {
     outline: none;
-    transform: scale(1.02);
+    border-color: ${(props) => (props.hasError ? 'red' : '#90ee90')}; /* 포커스 시 색상 변경 */
   }
 `;
 
-const ButtonGroup=styled.div`
-  display:flex;
-  justify-content:space-between;
-  // gap:.5rem;
-  // margin-bottom: 1rem;
+const EmailContainer = styled.div`
+  display: flex;
+  gap: 8px;
+  align-items: center; /* 수직 중앙 정렬 */
 `;
 
-const SubmitButton=styled.button`
-  background: #90EE90;
+const EmailButton = styled.button`
+  background-color: #90EE90;
   color: black;
-  padding:.5rem 1.5rem;
-  border-radius: 5px;
+  padding: 0.3rem 1rem ;
   border: none;
-  cursor:pointer;
-  transition: background-color 0.2s;
-
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: -0.6rem;
   &:hover {
     background-color: #98FB98;
   }
 `;
 
-const LoginButton=styled.button`
+const Timer = styled.span`
+  color: #ff6b6b;
+  font-size: 0.9rem;
+`;
+
+const Button = styled.button`
+  width: 82%;
   background-color: #2d1810;
   color: white;
-  padding:.5rem 1.5rem;
-  border-radius: 5px;
+  padding: 0.75rem;
   border: none;
-  cursor:pointer;
+  border-radius: 5px;
+  cursor: pointer;
   transition: background-color 0.2s;
 
   &:hover {
@@ -207,10 +298,42 @@ const LoginButton=styled.button`
   }
 `;
 
-const Message=styled.p`
-  color:white;
-  margin-top:.75rem;
-  text-align:center;
+const ErrorText = styled.p`
+  color: red;
+  font-size: 0.8rem;
+  margin-top: -0.25rem;
+`;
+const ButtonGroup=styled.div`
+display
+:flex;
+justify-content:flex-end;
+  margin-top: 0.5rem;
+gap:.5rem;`;
+
+const LoginButton = styled.button`
+  background-color: #2d1810;
+  color: white;
+  padding: 0.5rem;
+  width: 100px; /* 버튼 너비 고정 */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  text-align: center; /* 텍스트 가운데 정렬 */
+  
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #3d2218;
+  }
+
+  &:active {
+    background-color: #1e0f08;
+  }
 `;
 
-export default ForgotPassword;
+
+const InputWrapper = styled.div`
+  margin-bottom: ${(props) => (props.hasError ? '1rem' : '0.5rem')};
+`;
+export default RegisterForm;
