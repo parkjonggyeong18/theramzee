@@ -190,7 +190,7 @@ public class EmailServiceImpl implements EmailService {
         String uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String lowercase = "abcdefghijklmnopqrstuvwxyz";
         String digits = "0123456789";
-        String specialChars = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
+        String specialChars = "@$!%*?&";
 
         Random random = new Random();
 
