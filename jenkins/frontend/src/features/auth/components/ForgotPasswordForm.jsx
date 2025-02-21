@@ -24,7 +24,10 @@ const ForgotPassword = () => {
         setMessage('입력하신 이메일로 아이디를 발송했습니다.');
       } else if (mode === 'password') {
         // 비밀번호 초기화 API 호출
-        await resetPassword(formData.id, formData.email); // ID와 이메일 전달
+        console.log(formData.id, formData.email);
+        const response = await resetPassword(formData.id, formData.email); // ID와 이메일 전달
+        console.log(response.data);
+        
         setMessage('입력하신 이메일로 임시 비밀번호를 발송했습니다.');
       }
     } catch (error) {
