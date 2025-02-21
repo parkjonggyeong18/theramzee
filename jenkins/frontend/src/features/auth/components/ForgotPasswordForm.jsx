@@ -8,7 +8,7 @@ const ForgotPassword = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState('id'); // 'id' 또는 'password' 모드
   const [formData, setFormData] = useState({
-    id: '',       // 사용자 ID
+    username: '',       // 사용자 ID
     name: '',     // 사용자 이름
     email: ''     // 사용자 이메일
   });
@@ -24,7 +24,7 @@ const ForgotPassword = () => {
         setMessage('입력하신 이메일로 아이디를 발송했습니다.');
       } else if (mode === 'password') {
         // 비밀번호 초기화 API 호출
-        await resetPassword(formData.id, formData.email); // ID와 이메일 전달
+        await resetPassword(formData.username, formData.email); // ID와 이메일 전달
         setMessage('입력하신 이메일로 임시 비밀번호를 발송했습니다.');
       }
     } catch (error) {
@@ -76,8 +76,8 @@ const ForgotPassword = () => {
               <Input
                 type="text"
                 placeholder="아이디"
-                value={formData.id}
-                onChange={(e) => setFormData({ ...formData, id: e.target.value })}
+                value={formData.username}
+                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               />
               <Input
                 type="email"
