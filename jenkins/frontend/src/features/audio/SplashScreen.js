@@ -1,55 +1,10 @@
-// import React, { useEffect } from 'react';
-// import styled from 'styled-components';
-
-// const SplashScreen = ({ onComplete }) => {
-//   useEffect(() => {
-//     // 입장 음악 재생
-//     const audio = new Audio('/audio/entrance.mp3');
-//     audio.play().catch((error) => console.error('음악 재생 오류:', error));
-
-//     // GIF 종료 후 콜백 호출
-//     const timer = setTimeout(() => {
-//       audio.pause(); // 음악 정지
-//     }, 3000);
-
-//     return () => {
-//       clearTimeout(timer); // 타이머 정리
-//       audio.pause(); // 컴포넌트 언마운트 시 음악 정지
-//     };
-//   }, [onComplete]);
-
-//   return (
-//     <SplashContainer>
-//       <SplashImage src={'/start/img.gif'} alt="스플래시 화면" />
-//     </SplashContainer>
-//   );
-// };
-
-// const SplashContainer = styled.div`
-//   position: fixed;
-//   top: 0;
-//   left: 0;
-//   width: 100vw;
-//   height: 100vh;
-//   background-color: black; /* 배경색 */
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-// `;
-
-// const SplashImage = styled.img`
-//   width: auto;
-// `;
-
-// export default SplashScreen;
-
-
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 const SplashScreen = ({ onComplete }) => {
   const videoRef = useRef(null);
   const audioRef = useRef(null);
+  const [videoLoaded, setVideoLoaded] = useState(false);
 
   useEffect(() => {
     // intro-music.mp3 오디오 객체 생성 및 볼륨 50% 설정
@@ -71,13 +26,38 @@ const SplashScreen = ({ onComplete }) => {
     };
   }, []);
 
+  // 비디오가 정상적으로 로드되었을 때 호출됨
+  const handleVideoLoaded = () => {
+    setVideoLoaded(true);
+  };
+
+  // 비디오 로드 실패 시 호출됨
+  const handleVideoError = (e) => {
+    console.error('Video load error:', e);
+    // 필요시 onComplete을 호출하여 스플래시를 건너뛰도록 할 수 있음
+    if (onComplete) {
+      onComplete();
+    }
+  };
+
+  // 비디오 재생 종료 시 호출됨 (비디오가 정상적으로 로드된 경우에만 onComplete 호출)
+  const handleVideoEnd = () => {
+    if (videoLoaded && onComplete) {
+      onComplete();
+    }
+  };
+
   return (
     <SplashContainer>
       <SplashVideo
         ref={videoRef}
         autoPlay
         muted
-        onEnded={() => onComplete && onComplete()}
+        playsInline
+        preload="auto"
+        onLoadedData={handleVideoLoaded}
+        onError={handleVideoError}
+        onEnded={handleVideoEnd}
       >
         <source src="/start/video.mp4" type="video/mp4" />
         브라우저가 비디오 태그를 지원하지 않습니다.
