@@ -13,7 +13,6 @@ services:
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
-    restart: unless-stopped
     networks:
       - theramzee-network
 
@@ -25,7 +24,6 @@ services:
       - "${REDIS_PORT}:6379"
     volumes:
       - theramzee-redis-data:/data
-    restart: unless-stopped
     networks:
       - theramzee-network
 
@@ -38,7 +36,6 @@ services:
     depends_on:
       - mysql
       - redis
-    restart: unless-stopped
     networks:
       - theramzee-network
 
@@ -48,7 +45,6 @@ services:
     container_name: theramzee-frontend
     depends_on:
       - backend
-    restart: unless-stopped
     networks:
       - theramzee-network
 
@@ -66,7 +62,6 @@ services:
     depends_on:
       - frontend
       - backend
-    restart: unless-stopped
     networks:
       - theramzee-network
 
