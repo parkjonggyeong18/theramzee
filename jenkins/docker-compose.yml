@@ -4,6 +4,7 @@ services:
   mysql:
     image: mysql:8.0.37
     environment:
+      MYSQL_HOST: mysq
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
@@ -25,6 +26,8 @@ services:
 
   redis:
     image: redis:7.2-alpine
+    environment:
+      REDIS_HOST: redis
     command: redis-server --bind 0.0.0.0
     ports:
       - "${REDIS_PORT}:6379"
