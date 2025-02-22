@@ -1,7 +1,8 @@
+version: '3.7'
+
 services:
   mysql:
-    image: mysql:8.0.37  # 2025년 기준 LTS 버전
-    #container_name: theramzee-mysql
+    image: mysql:8.0.37
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -23,8 +24,7 @@ services:
       retries: 5
 
   redis:
-    image: redis:7.2-alpine  # 경량화 버전
-    #container_name: theramzee-redis
+    image: redis:7.2-alpine
     command: redis-server --bind 0.0.0.0
     ports:
       - "${REDIS_PORT}:6379"
@@ -34,7 +34,7 @@ services:
     networks:
       - theramzee-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 3
@@ -55,10 +55,8 @@ services:
     env_file:
       - .env
     depends_on:
-      mysql:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - mysql
+      - redis
     restart: unless-stopped
     networks:
       - theramzee-network
@@ -72,8 +70,7 @@ services:
         constraints:
           - node.role == worker
     depends_on:
-      backend:
-        condition: service_started
+      - backend
     restart: unless-stopped
     networks:
       - theramzee-network
@@ -81,9 +78,8 @@ services:
   nginx:
     build: ./nginx
     image: ${NGINX_IMAGE}
-    #container_name: theramzee-nginx
     deploy:
-      mode: global  # 모든 노드에 배포
+      mode: global
       update_config:
         parallelism: 1
         delay: 15s
@@ -118,4 +114,4 @@ networks:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.20.0.0/24  # 고정 IP 대역
+        - subnet: 172.20.0.0/24
