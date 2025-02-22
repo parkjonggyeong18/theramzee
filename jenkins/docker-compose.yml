@@ -40,8 +40,15 @@ services:
       retries: 3
 
   backend:
-    build: ./backend
     image: ${BACKEND_IMAGE}
+    env_file:
+      - .env
+    depends_on:
+      - mysql
+      - redis
+    restart: unless-stopped
+    networks:
+      - theramzee-network
     deploy:
       replicas: 2
       update_config:
@@ -52,34 +59,19 @@ services:
         parallelism: 1
         delay: 5s
         order: stop-first
-    env_file:
-      - .env
-    depends_on:
-      - mysql
-      - redis
-    restart: unless-stopped
-    networks:
-      - theramzee-network
 
   frontend:
-    build: ./frontend
     image: ${FRONTEND_IMAGE}
-    deploy:
-      replicas: 2
     depends_on:
       - backend
     restart: unless-stopped
     networks:
       - theramzee-network
+    deploy:
+      replicas: 2
 
   nginx:
-    build: ./nginx
     image: ${NGINX_IMAGE}
-    deploy:
-      mode: global
-      update_config:
-        parallelism: 1
-        delay: 15s
     ports:
       - "80:80"
       - "443:443"
@@ -93,6 +85,11 @@ services:
     restart: unless-stopped
     networks:
       - theramzee-network
+    deploy:
+      mode: global
+      update_config:
+        parallelism: 1
+        delay: 15s
 
 volumes:
   theramzee-mysql-data:
