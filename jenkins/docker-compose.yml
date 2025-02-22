@@ -40,7 +40,7 @@ services:
       retries: 3
 
   backend:
-    image: ${BACKEND_IMAGE}
+    image: murhyun2/theramzee_backend:latest
     env_file:
       - .env
     depends_on:
@@ -61,7 +61,7 @@ services:
         order: stop-first
 
   frontend:
-    image: ${FRONTEND_IMAGE}
+    image: murhyun2/theramzee_frontend:latest
     depends_on:
       - backend
     restart: unless-stopped
@@ -71,7 +71,7 @@ services:
       replicas: 2
 
   nginx:
-    image: ${NGINX_IMAGE}
+    image: murhyun2/theramzee_nginx:latest
     ports:
       - "80:80"
       - "443:443"
