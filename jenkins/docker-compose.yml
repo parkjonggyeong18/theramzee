@@ -1,26 +1,31 @@
 services:
   mysql:
-    image: mysql:latest
-    container_name: theramzee-mysql-1
+    image: mysql:8.0.37  # 2025년 기준 LTS 버전
+    container_name: theramzee-mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     ports:
       - "${MYSQL_PORT}:3306"
     volumes:
-      - theramzee-mysql-data:/var/lib/mysql
-      - ./mysql/init:/docker-entrypoint-initdb.d
+      - mysql_data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci
-    restart: unless-stopped
+      - --default-authentication-plugin=mysql_native_password
     networks:
       - theramzee-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-u${MYSQL_USERNAME}", "-p${MYSQL_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
+    image: redis:7.2-alpine  # 경량화 버전
+    container_name: theramzee-redis
     command: redis-server --bind 0.0.0.0
-    image: redis:latest
-    container_name: theramzee-redis-1
     ports:
       - "${REDIS_PORT}:6379"
     volumes:
@@ -28,16 +33,23 @@ services:
     restart: unless-stopped
     networks:
       - theramzee-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
   backend:
     build: ./backend
     image: ${BACKEND_IMAGE}
-    container_name: theramzee-backend-1
+    container_name: theramzee-backend
     env_file:
       - .env
     depends_on:
-      - mysql
-      - redis
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - theramzee-network
@@ -45,9 +57,10 @@ services:
   frontend:
     build: ./frontend
     image: ${FRONTEND_IMAGE}
-    container_name: theramzee-frontend-1
+    container_name: theramzee-frontend
     depends_on:
-      - backend
+      backend:
+        condition: service_started
     restart: unless-stopped
     networks:
       - theramzee-network
@@ -55,7 +68,7 @@ services:
   nginx:
     build: ./nginx
     image: ${NGINX_IMAGE}
-    container_name: theramzee-nginx-1
+    container_name: theramzee-nginx
     ports:
       - "80:80"
       - "443:443"
@@ -63,6 +76,7 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - /etc/letsencrypt:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
+      - static_files:${STATIC_FILES_PATH}
     depends_on:
       - frontend
       - backend
@@ -73,7 +87,11 @@ services:
 volumes:
   theramzee-mysql-data:
   theramzee-redis-data:
+  static_files:
 
 networks:
   theramzee-network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24  # 고정 IP 대역
