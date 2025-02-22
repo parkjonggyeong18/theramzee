@@ -96,7 +96,6 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
       - /etc/letsencrypt:/etc/letsencrypt
       - ./certbot/www:/var/www/certbot
-      - static_files:${STATIC_FILES_PATH}
     depends_on:
       - frontend
       - backend
@@ -107,7 +106,6 @@ services:
 volumes:
   theramzee-mysql-data:
   theramzee-redis-data:
-  static_files:
 
 networks:
   theramzee-network:
