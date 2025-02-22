@@ -109,4 +109,4 @@ volumes:
 
 networks:
   theramzee-network:
-    driver: bridge
+    driver: overlay
