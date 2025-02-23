@@ -51,6 +51,8 @@ services:
   nginx:
     build: ./nginx
     image: ${NGINX_IMAGE}
+    environment:
+      - DEPLOY_COLOR=${DEPLOY_COLOR}   # Jenkins 파이프라인에서 new_color 값을 전달
     ports:
       - "80:80"
       - "443:443"
