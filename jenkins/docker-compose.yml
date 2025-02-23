@@ -32,8 +32,6 @@ services:
   backend:
     build: ./backend
     image: ${BACKEND_IMAGE}
-    environment:
-      -
     env_file:
       - .env
     depends_on:
