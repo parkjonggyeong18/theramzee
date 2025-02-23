@@ -1,42 +1,9 @@
 services:
-  mysql:
-    image: mysql:latest
-    container_name: theramzee-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-    #ports:
-    #  - "${MYSQL_PORT}:3306"
-    volumes:
-      - theramzee-mysql-data:/var/lib/mysql
-      - ./mysql/init:/docker-entrypoint-initdb.d
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    restart: unless-stopped
-    networks:
-      - theramzee-network
-
-  redis:
-    image: redis:latest
-    container_name: theramzee-redis
-    command: redis-server --bind 0.0.0.0
-    #ports:
-    #  - "${REDIS_PORT}:6379"
-    volumes:
-      - theramzee-redis-data:/data
-    restart: unless-stopped
-    networks:
-      - theramzee-network
-
   backend:
     build: ./backend
     image: ${BACKEND_IMAGE}
     env_file:
       - .env
-    depends_on:
-      - mysql
-      - redis
     restart: unless-stopped
     networks:
       - theramzee-network
@@ -67,10 +34,6 @@ services:
     networks:
       - theramzee-network
 
-volumes:
-  theramzee-mysql-data:
-  theramzee-redis-data:
-
 networks:
   theramzee-network:
-    driver: bridge
+    external: true
