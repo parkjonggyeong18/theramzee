@@ -51,7 +51,6 @@ services:
   nginx:
     build: ./nginx
     image: ${NGINX_IMAGE}
-    container_name: theramzee-nginx
     ports:
       - "80:80"
       - "443:443"
