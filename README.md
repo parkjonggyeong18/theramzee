@@ -271,7 +271,10 @@ Jira를 통해 한주의 스프린트를 정하고 백로그를 진행해 현재
 
 - Mattermost 연동  
   - Jenkins build 정보 알림 메시지 봇 구현
-  
+
+- Blue-Green 무중단 배포
+  - Blue와 Green 두 개의 배포 환경을 구축
+  - Blue와 Green 환경 중 비활성화된 환경에 새로운 빌드를 배포 후 전환
 <br/>
 
 ## :bust_in_silhouette: 김선진
