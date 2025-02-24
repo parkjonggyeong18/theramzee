@@ -17,6 +17,23 @@ services:
     networks:
       - theramzee-network
 
+  nginx:
+    build: ./nginx
+    image: ${NGINX_IMAGE}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - /etc/letsencrypt:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    networks:
+      - theramzee-network
+
 networks:
   theramzee-network:
     external: true
