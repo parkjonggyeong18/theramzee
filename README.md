@@ -235,46 +235,54 @@ Jira를 통해 한주의 스프린트를 정하고 백로그를 진행해 현재
 - 전체 아키텍쳐 설계
 
 - 서비스 SSL 보안 적용  
-  - Letsencrypt 및 Certbot을 이용하여 SSL 보안 적용
+  - Let's Encrypt와 Certbot을 활용해 SSL 인증서를 발급 및 자동 갱신 설정
+  - HTTPS 적용을 통한 공격 방지 및 데이터 보호
 
 - 서버 구성 요소 설정  
   - Nginx, Docker, MySQL, ufw 등
 
-- openvidu 환경 세팅
+- openvidu 서버 구성 및 클라이언트 연동 설정
 
 - 환경변수 관리  
-  - .env 파일 작성
+  - .env 파일 설계 및 관리 체계 구축
 
 > ### FrontEnd / BackEnd EC2 배포
 
 - Dockerfile 작성 및 Config 파일 설정
 
-- docker-compose 파일 설정
+- docker-compose 파일을 통한 컨테이너 오케스트레이션 구성
 
 > ### Nginx 웹서버 적용
 
 - Reverse Proxy 설정  
-  - 접근 제한 및 서비스 리다이렉트 적용
+  - Nginx를 이용하여 접근 제어 및 서비스 리다이렉션 구성
 
 - 악성 봇 접근 차단  
-  - 브루트포스, 스크래핑 등 대응
+  - 브루트포스 공격, 스크래핑 등 악성 트래픽 차단을 위한 보안 정책 적용
 
 > ### Jenkins CI/CD Pipeline 구축
 
-- Gitlab Webhook 연동  
-  - push 및 merge 시 Jenkins에 상태 전송 및 build 트리거
+- GitLab Webhook 연동  
+  - GitLab의 push 및 merge 이벤트 발생 시 Jenkins에 상태 전송 및 빌드 트리거 자동화
 
 - Docker Hub 이미지 배포
+  - 빌드 완료 후 Docker Hub에 이미지를 자동으로 푸시하는 CI/CD 파이프라인 구성
 
 - EC2 서버 배포  
-  - 빌드한 이미지를 pull 받아 container 실행
+  - 최신 빌드 이미지를 EC2에서 자동으로 pull 받아 Docker 컨테이너 실행
 
 - Mattermost 연동  
-  - Jenkins build 정보 알림 메시지 봇 구현
+  - Jenkins 빌드 결과 및 상태를 Mattermost 채널에 알림 메시지 봇을 통해 전송
 
 - Blue-Green 무중단 배포
-  - Blue와 Green 두 개의 배포 환경을 구축
-  - Blue와 Green 환경 중 비활성화된 환경에 새로운 빌드를 배포 후 전환
+  - Blue와 Green 배포 환경 구축, 로드밸런싱 트래픽 분산 처리
+  - 비활성 환경에 새로운 빌드를 배포 후, 트래픽 전환을 통해 무중단 배포 실현
+
+> ### GA4 연동
+
+  - Google Analytics 4(GA4)와의 연동을 통해 사용자 행동 및 방문 통계를 분석
+    - 게임 맵별 머무름 시간 및 이벤트 발생 패턴 분석
+    - 지역별 분포, 평균 접속 시간, 재방문율 등 방문자 통계 심층 분석
 <br/>
 
 ## :bust_in_silhouette: 김선진
